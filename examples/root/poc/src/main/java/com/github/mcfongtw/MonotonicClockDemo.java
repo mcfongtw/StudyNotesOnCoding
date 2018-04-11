@@ -16,17 +16,18 @@ public class MonotonicClockDemo {
 
     private static class SudoExecutor
     {
-        public static void run(String[] cmds) throws IOException, InterruptedException
+        public static void run(String userCmd, String sudoPasswd) throws IOException, InterruptedException
         {
-            //      /* __debug_code__
-            for(String cmd : cmds)
+            String[] cmdStrings = {shellName, shellParam, "echo \"" + sudoPasswd + "\" | " + sudoCmd + " -S " + userCmd};
+
+            for(String cmdStr : cmdStrings)
             {
-                System.out.print(cmd);
+                System.out.print(cmdStr);
                 System.out.print(' ');
             }
             System.out.println();
             //      */
-            Process process = Runtime.getRuntime().exec(cmds);
+            Process process = Runtime.getRuntime().exec(cmdStrings);
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
             LineNumberReader input = new LineNumberReader(ir);
             String line;
@@ -37,11 +38,6 @@ public class MonotonicClockDemo {
         }
 
 
-        public static String[] buildCommands(String cmd, String sudoPasswd)
-        {
-            String[] cmds = {shellName, shellParam, "echo \"" + sudoPasswd + "\" | " + sudoCmd + " -S " + cmd};
-            return cmds;
-        }
 
         protected static String sudoCmd = "sudo";
         protected static String shellName = "/bin/bash";
@@ -53,14 +49,14 @@ public class MonotonicClockDemo {
 
         long startMillsTime = System.currentTimeMillis();
         //Set system clock 10 min forward
-        SudoExecutor.run(SudoExecutor.buildCommands(DATE_COMMAND, PASSWORD));
+        SudoExecutor.run(DATE_COMMAND, PASSWORD);
         long stopMillisTime = System.currentTimeMillis();
 
         System.out.println("Monotonicity Test -> System.currentTimeMillis(): " + (stopMillisTime - startMillsTime) / MS_PER_SECOND + " s");
 
         long startNanoTime = System.nanoTime();
         //Set system clock 10 min forward
-        SudoExecutor.run(SudoExecutor.buildCommands(DATE_COMMAND, PASSWORD));
+        SudoExecutor.run(DATE_COMMAND, PASSWORD);
         long stopNanoTime = System.nanoTime();
 
         System.out.println("Monotonicity Test -> System.nanoTime(): " + (stopNanoTime - startNanoTime) / NS_PER_SECOND + " s");
