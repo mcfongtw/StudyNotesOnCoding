@@ -26,6 +26,11 @@
             Java source/target to use for compilation.
           -->
         <javac.target>1.8</javac.target>
+
+        <!--
+            Google Guava version to use with this project.
+        -->
+        <guava.version>23.0</guava.version>
     </properties>
 
 </project>
