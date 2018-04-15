@@ -38,6 +38,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <name>Java Perf Poc</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
