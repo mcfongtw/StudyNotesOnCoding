@@ -1,11 +1,6 @@
 package com.github.mcfongtw;
 
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Collections;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /*
@@ -22,25 +17,24 @@ public class DeoptimizationDemo {
 
 
     private static void madeNotEntrantExperiment() {
-        List<? extends Set<Integer>> listOfSets =
+        List<? extends Map<Integer, String>> listOfMaps =
                 Arrays.asList(
-                        new HashSet<Integer>(),
-                        new TreeSet<Integer>(),
-                        new ConcurrentSkipListSet<Integer>(),
-                        Collections.synchronizedSortedSet(new TreeSet<Integer>() {
-                        }));
-        for (Set<Integer> set : listOfSets) {
-            doBenchmark(set);
+                        new HashMap<Integer, String>(),
+                        new Hashtable<Integer, String>(),
+                        new TreeMap<Integer, String>()
+                        );
+        for (Map<Integer, String> map : listOfMaps) {
+            doBenchmark(map);
         }
     }
 
-    private static void doBenchmark(Set<Integer> set) {
+    private static void doBenchmark(Map<Integer, String> map) {
         final int NUM_OF_ELEMENTS = 10_000_000;
         long start = System.nanoTime();
         for (int i = 0; i < NUM_OF_ELEMENTS; i++) {
-            set.add(i);
+            map.put(i, String.valueOf(i));
         }
         long end = System.nanoTime();
-        System.out.println(set.getClass() + " took " +  (end - start) / 1000000 + " ms");
+        System.out.println(map.getClass() + " took " +  (end - start) / 1000000 + " ms");
     }
 }
