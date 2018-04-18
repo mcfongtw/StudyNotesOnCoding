@@ -12,8 +12,6 @@ public class MonotonicClockDemo {
 
     public static final String DATE_COMMAND = "date -s \"1 min\"";
 
-    public static final String PASSWORD = "Love_0502";
-
     private static class SudoExecutor
     {
         public static void run(String userCmd, String sudoPasswd) throws IOException, InterruptedException
@@ -47,16 +45,23 @@ public class MonotonicClockDemo {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
+        if(args.length < 1) {
+            System.out.println("Usage > java -jar MonotonicClockDemo.jar {sudo password}");
+            System.exit(-1);
+        }
+
+        String password = args[0];
+
         long startMillsTime = System.currentTimeMillis();
         //Set system clock 10 min forward
-        SudoExecutor.run(DATE_COMMAND, PASSWORD);
+        SudoExecutor.run(DATE_COMMAND, password);
         long stopMillisTime = System.currentTimeMillis();
 
         System.out.println("Monotonicity Test -> System.currentTimeMillis(): " + (stopMillisTime - startMillsTime) / MS_PER_SECOND + " s");
 
         long startNanoTime = System.nanoTime();
         //Set system clock 10 min forward
-        SudoExecutor.run(DATE_COMMAND, PASSWORD);
+        SudoExecutor.run(DATE_COMMAND, password);
         long stopNanoTime = System.nanoTime();
 
         System.out.println("Monotonicity Test -> System.nanoTime(): " + (stopNanoTime - startNanoTime) / NS_PER_SECOND + " s");
