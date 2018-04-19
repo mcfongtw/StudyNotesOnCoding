@@ -15,9 +15,6 @@ public class CommonHashBenchmark {
     @State(Scope.Benchmark)
     public static class ExecutionPlan {
 
-        @Param({ "100", "500", "1000" })
-        public int iterations;
-
         public Hasher murmur3;
 
         public Hasher sha256;
@@ -39,23 +36,17 @@ public class CommonHashBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
+    @Measurement(iterations=100)
     public void measureMurmur3_128(ExecutionPlan plan) {
-
-        for (int i = 0; i < plan.iterations; i++) {
-            plan.murmur3.putString(plan.password, Charset.defaultCharset());
-        }
-
+        plan.murmur3.putString(plan.password, Charset.defaultCharset());
         plan.murmur3.hash();
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
+    @Measurement(iterations=100)
     public void measureSha256(ExecutionPlan plan) {
-
-        for (int i = 0; i < plan.iterations; i++) {
-            plan.sha256.putString(plan.password, Charset.defaultCharset());
-        }
-
+        plan.sha256.putString(plan.password, Charset.defaultCharset());
         plan.sha256.hash();
     }
 
