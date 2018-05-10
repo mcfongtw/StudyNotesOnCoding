@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+DOCKER_HOST_NAME = "dockerhost"
+DOCKER_HOST_VAGRANTFILE = "../Vagrantfile"
+NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+	config.vm.define "openjdk-container" do |openjdk|
+  		openjdk.vm.provider "docker" do |docker|
+			docker.build_dir = "."
+			docker.force_host_vm = true
+    			docker.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			docker.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			docker.has_ssh = true
+			docker.name = "openjdk-container"
+			docker.remains_running = false
+			docker.create_args = ['--privileged=true']
+  		end
+	end
+end

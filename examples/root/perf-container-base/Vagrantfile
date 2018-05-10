@@ -1,0 +1,67 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
+DOCKER_HOST_NAME = "dockerhost"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+   config.vm.provision "docker"
+   
+   config.vm.provider "virtualbox" do |box|
+	box.name = "#{DOCKER_HOST_NAME}"
+        box.memory = "1024"
+   	box.cpus = 2
+   end
+
+
+   config.vm.define "#{DOCKER_HOST_NAME}" do |ubuntu1604|
+	   ubuntu1604.vm.hostname = "ubuntu1604base"
+   	   ubuntu1604.vm.box = "ubuntu/xenial64"
+	   ubuntu1604.vm.box_version = "20180511.0.0"
+	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "2"
+	   ubuntu1604.vm.network "forwarded_port",
+		   guest: 8080, host: 8080
+ 
+   	   ubuntu1604.vm.provision "shell", inline: <<-'SHELL'
+		set -x -e
+
+		# The following line terminates all ssh connections. Therefore
+		#   # Vagrant will be forced to reconnect.
+		#     # That's a workaround to have the docker command in the PATH
+		#ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
+
+		# Add ubuntu debug symbol repo
+		cat <<EOT >> /etc/apt/sources.list.d/dbgsym.list
+deb http://ddebs.ubuntu.com/ xenial      main restricted universe multiverse
+deb http://ddebs.ubuntu.com/ xenial-updates  main restricted universe multiverse
+deb http://ddebs.ubuntu.com/ xenial-proposed main restricted universe multiverse
+EOT
+
+		# Add ubuntu GPG key import
+		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C8CAB6595FDFF622	
+
+		apt-get update
+
+		# Linux kernel header and debug symbol
+		apt-get install -y linux-image-`uname -r`-dbgsym linux-headers-`uname -r` linux-image-extra-`uname -r`
+
+		# Other system debug symbol
+		apt-get install -y libc6-dbgsym
+
+		# perf related
+		apt-get install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
+
+		apt-get clean
+
+		# Set permission to collect perf stat
+		# -1 - Not paranoid at all
+		echo 'kernel.perf_event_paranoid = -1' > /etc/sysctl.d/perf.conf
+
+		# set access of perf without root : -1
+		echo -1 > /proc/sys/kernel/perf_event_paranoid
+	SHELL
+    end
+
+end

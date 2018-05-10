@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  build_ubuntu_perf_tools_1604:
+    build:
+      context: ./
+    image: mcfongtw/ubuntu_perf_tools:16.04
+  demo:
+    image: mcfongtw/ubuntu_perf_tools:16.04
+    privileged: true
+    volumes:
+      # To retrieve symbols correctly from host side
+      # https://stackoverflow.com/questions/38927895/how-do-you-get-debugging-symbols-working-in-linux-perf-tool-inside-docker-contai
+      - /var/lib/docker:/var/lib/docker
+      # Map the /output in container to /tmp on Host
+      - /tmp:/output
