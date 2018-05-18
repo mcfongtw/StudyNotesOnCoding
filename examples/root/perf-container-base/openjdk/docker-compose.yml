@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  build_ubuntu1604_openjdk_8:
+    build: ./
+    image: mcfongtw/ubuntu1604-openjdk:8
+  demo:
+    image: mcfongtw/ubuntu1604-openjdk:8
+    privileged: true
+    volumes:
+      # To retrieve symbols correctly from host side
+      # https://stackoverflow.com/questions/38927895/how-do-you-get-debugging-symbols-working-in-linux-perf-tool-inside-docker-contai
+      - /var/lib/docker:/var/lib/docker
+      # Map the /output in container to /tmp on Host
+      - /tmp:/output

@@ -1,0 +1,3 @@
+deb http://ddebs.ubuntu.com/ xenial      main restricted universe multiverse
+deb http://ddebs.ubuntu.com/ xenial-updates  main restricted universe multiverse
+deb http://ddebs.ubuntu.com/ xenial-proposed main restricted universe multiverse
