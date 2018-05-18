@@ -18,6 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			docker.name = "openjdk-container"
 			docker.remains_running = false
 			docker.create_args = ['--privileged=true']
+			docker.volumes=["/var/lib/docker:/var/lib/docker", "/tmp:/output"]
   		end
 	end
 end
