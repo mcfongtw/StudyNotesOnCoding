@@ -40,9 +40,14 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN export JAVA_HOME
 
 ####################################################### 
+# Compile perf-map-agent from source code
 RUN cd /workspace && \
 	git clone https://github.com/jvm-profiling-tools/perf-map-agent.git
 
+# Install build required dependencies
+RUN apt-get update && \
+        apt-get install -y g++ && \
+	apt-get clean; 
 
 RUN cd /workspace/perf-map-agent/ && \
 	cmake . && \
