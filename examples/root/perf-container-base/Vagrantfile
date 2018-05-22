@@ -3,18 +3,17 @@
 
 VAGRANTFILE_API_VERSION = "2"
 NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
-DOCKER_HOST_NAME = "dockerhost"
+DOCKER_HOST_NAME = "ContainerHost"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-   config.vm.provision "docker"
    
    config.vm.provider "virtualbox" do |box|
 	box.name = "#{DOCKER_HOST_NAME}"
         box.memory = "1024"
    	box.cpus = 2
    end
-
+   config.vm.provision "docker"
 
    config.vm.define "#{DOCKER_HOST_NAME}" do |ubuntu1604|
 	   ubuntu1604.vm.hostname = "ubuntu1604base"
@@ -26,11 +25,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  
    	   ubuntu1604.vm.provision "shell", inline: <<-'SHELL'
 		set -x -e
-
-		# The following line terminates all ssh connections. Therefore
-		#   # Vagrant will be forced to reconnect.
-		#     # That's a workaround to have the docker command in the PATH
-		#ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
 
 		# Add ubuntu debug symbol repo
 		cat <<EOT >> /etc/apt/sources.list.d/dbgsym.list
@@ -61,6 +55,11 @@ EOT
 
 		# set access of perf without root : -1
 		echo -1 > /proc/sys/kernel/perf_event_paranoid
+
+    		# The following line terminates all ssh connections. Therefore
+		# Vagrant will be forced to reconnect.
+    		# That's a workaround to have the docker command in the PATH
+	        ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill
 	SHELL
     end
 
