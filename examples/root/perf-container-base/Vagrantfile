@@ -20,8 +20,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    	   ubuntu1604.vm.box = "ubuntu/xenial64"
 	   ubuntu1604.vm.box_version = "20180511.0.0"
 	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "2"
-	   ubuntu1604.vm.network "forwarded_port",
-		   guest: 8080, host: 8080
+	   #ubuntu1604.vm.network "forwarded_port",
+	   #	   guest: 22, host: 2022
  
    	   ubuntu1604.vm.provision "shell", inline: <<-'SHELL'
 		set -x -e
@@ -44,14 +44,7 @@ EOT
 		# Other system debug symbol
 		apt-get install -y libc6-dbgsym
 
-		# perf related
-		apt-get install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
-
 		apt-get clean
-
-		# Set permission to collect perf stat
-		# -1 - Not paranoid at all
-		echo 'kernel.perf_event_paranoid = -1' > /etc/sysctl.d/perf.conf
 
 		# set access of perf without root : -1
 		echo -1 > /proc/sys/kernel/perf_event_paranoid
