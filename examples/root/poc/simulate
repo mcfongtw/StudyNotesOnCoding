@@ -1,0 +1,25 @@
+# vim: filetype=sh
+#!/bin/bash
+#
+# Testing local docker build with docker-compose
+#
+
+usage() {
+    echo $"Usage: $0 {build/bash}"
+    exit 1
+}
+
+case "$1" in
+    build)
+		mvn package
+		docker-compose build
+        ;;
+    bash)
+		# Since there was no service, we brings up the container with bash
+		docker-compose run demo bash
+        ;;
+    *)  
+        usage
+        ;;
+esac
+

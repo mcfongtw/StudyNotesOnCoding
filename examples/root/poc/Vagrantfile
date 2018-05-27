@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+DOCKER_HOST_NAME = "ContainerHost"
+DOCKER_HOST_VAGRANTFILE = "../perf-container-base/Vagrantfile"
+NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+	config.vm.define "CpuLockDownDemoVM" do |demo|
+  		demo.vm.provider "docker" do |docker|
+			docker.build_dir = "."
+			docker.force_host_vm = true
+    			docker.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			docker.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			docker.has_ssh = false
+			docker.remains_running = true
+			docker.build_args = ['--build-arg', 'JAR_PATH=target/CpuLockDownDemo.jar']
+			docker.create_args = ['--privileged=true']
+			docker.volumes=["/var/lib/docker:/var/lib/docker", "/tmp:/output"]
+  		end
+		demo.ssh.port = 22
+		demo.ssh.private_key_path = 'phusion.key'
+		demo.ssh.username = "root"
+		demo.vm.synced_folder ".", "/vagrant"
+		demo.vm.provision "shell", inline: "echo SSH Init Complete!"
+	end
+end
