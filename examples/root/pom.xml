@@ -31,6 +31,7 @@
             Google Guava version to use with this project.
         -->
         <guava.version>23.0</guava.version>
+        <commons.io.version>2.6</commons.io.version>
     </properties>
 
     <dependencies>
