@@ -26,6 +26,15 @@ RUN apt-get update && \
 # -1 - Not paranoid at all
 RUN echo 'kernel.perf_event_paranoid = -1' > /etc/sysctl.d/perf.conf
 ####################################################### 
+# Git clone from example
+RUN git clone --depth=1 https://github.com/mcfongtw/StudyNotesOnJavaPerformance /workspace/StudyNotesOnJavaPerformance
+
+WORKDIR /workspace/StudyNotesOnJavaPerformance/examples/root
+
+RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh &&  mvn clean && mvn package"
+
+WORKDIR /workspace
+####################################################### 
 # Setup entry point
 COPY docker-entrypoint.sh /workspace/docker-entrypoint.sh
 
