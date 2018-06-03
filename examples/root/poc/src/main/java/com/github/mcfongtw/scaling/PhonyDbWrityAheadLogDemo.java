@@ -5,26 +5,26 @@ import java.io.OutputStream;
 
 public class PhonyDbWrityAheadLogDemo {
 
-    private static void doWrite1(int size) throws Exception {
-        FileOutputStream fos = new FileOutputStream("/tmp/db-write-ahead-log");
+    private static void doWriteTraditionally(int size) throws Exception {
+        FileOutputStream fos = new FileOutputStream("/tmp/db-write-ahead-0.log");
         byte[] data = new byte[size];
         fos.write(data);
         fos.close();
     }
 
-    private static void doWrite0(int size) throws Exception {
-        try (OutputStream os = new FileOutputStream("/tmp/db-write-ahead-auto-closable-log")) {
+    private static void doWriteAutoClosably(int size) throws Exception {
+        try (OutputStream os = new FileOutputStream("/tmp/db-write-ahead-1.log")) {
             byte[] data = new byte[size];
             os.write(data);
         }
     }
 
     private static void flushData() throws Exception {
-        doWrite1((int)(Math.random() * 4 * 1048576 + 1));
+        doWriteTraditionally((int)(Math.random() * 4 * 1048576 + 1));
     }
 
     private static void workerWriter(int size) throws Exception {
-        doWrite0(size);
+        doWriteAutoClosably(size);
     }
 
     private static void mainWriter() throws Exception {
