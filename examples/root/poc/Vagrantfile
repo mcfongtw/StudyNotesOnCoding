@@ -8,7 +8,7 @@ NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-	config.vm.define "CpuLockDownDemoVM" do |demo|
+	config.vm.define "SimplePocDemoVM" do |demo|
   		demo.vm.provider "docker" do |docker|
 			docker.build_dir = "."
 			docker.force_host_vm = true
