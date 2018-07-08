@@ -48,7 +48,7 @@ public class FutureTaskAsyncTest {
         SleepTask task = new SleepTask(testDurationInMilliSecond);
         Future<Void> future = this.executorService.submit(task, null);
 
-        cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
+        FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
         Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
@@ -72,7 +72,7 @@ public class FutureTaskAsyncTest {
         SleepTask task = new SleepTask(testDurationInMilliSecond);
         Future<Void> future = this.executorService.submit(task, null);
 
-        cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
+        FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
         Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
@@ -95,7 +95,7 @@ public class FutureTaskAsyncTest {
         SimplePrimeCheckerTask task = new SimplePrimeCheckerTask(BIG_PRIME);
         Future<Boolean> future = this.executorService.submit(task, Boolean.FALSE);
 
-        cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
+        FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
         Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
@@ -119,7 +119,7 @@ public class FutureTaskAsyncTest {
         SimplePrimeCheckerTask task = new SmartPrimeCheckerTask(BIG_PRIME);
         Future<Boolean> future = this.executorService.submit(task, Boolean.FALSE);
 
-        cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
+        FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
         Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
@@ -134,22 +134,6 @@ public class FutureTaskAsyncTest {
         } catch(CancellationException expected) {
             LOGGER.error("Task cancelled due to {}", expected.getClass().getName());
         }
-    }
-
-    private static void cancelFutureAsync(final Future<?> future, final long delayDurationInMillis, boolean mayInterruptIfRunning) {
-        Runnable cancellation = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(delayDurationInMillis);
-                    future.cancel(mayInterruptIfRunning);
-                } catch (InterruptedException ie) {
-                    LOGGER.error("Task interrupted due to {}", ie.getClass().getName());
-                }
-            }
-        };
-
-        new Thread(cancellation).start();
     }
 
     @AfterEach
