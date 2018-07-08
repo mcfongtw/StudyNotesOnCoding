@@ -3,9 +3,7 @@ package com.github.mcfongtw.concurrency.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Callable;
-
-public class SimplePrimeCheckerTask extends BechmarkTask<Boolean> implements Callable<Boolean> {
+public class SimplePrimeCheckerTask extends BechmarkTask<Boolean> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -15,10 +13,6 @@ public class SimplePrimeCheckerTask extends BechmarkTask<Boolean> implements Cal
         this.num = num;
     }
 
-    @Override
-    public Boolean call() throws Exception {
-        return this.measure();
-    }
 
     @Override
     protected Boolean doTask() throws Exception {

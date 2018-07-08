@@ -31,7 +31,7 @@ public class FutureTaskAsyncTest {
     public void testSleepFuture() throws Exception {
         final long testDurationInMilliSecond = 3_000;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Void> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task, null);
         Awaitility.await().between(testDurationInMilliSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
@@ -46,7 +46,7 @@ public class FutureTaskAsyncTest {
         final long testDurationInMilliSecond = 3_000;
         final long cancellationDelayInMillisSecond = 100;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Void> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task, null);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
@@ -70,7 +70,7 @@ public class FutureTaskAsyncTest {
         final long testDurationInMilliSecond = 3_000;
         final long cancellationDelayInMillisSecond = 100;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Void> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task, null);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
@@ -93,7 +93,7 @@ public class FutureTaskAsyncTest {
     public void testInterruptPrimeCheckerFuture() throws Exception {
         final long cancellationDelayInMillisSecond = 10;
         SimplePrimeCheckerTask task = new SimplePrimeCheckerTask(BIG_PRIME);
-        Future<Boolean> future = this.executorService.submit(task);
+        Future<Boolean> future = this.executorService.submit(task, Boolean.FALSE);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
@@ -117,7 +117,7 @@ public class FutureTaskAsyncTest {
     public void testInterruptSmartPrimeCheckerFuture() throws Exception {
         final long cancellationDelayInMillisSecond = 10;
         SimplePrimeCheckerTask task = new SmartPrimeCheckerTask(BIG_PRIME);
-        Future<Boolean> future = this.executorService.submit(task);
+        Future<Boolean> future = this.executorService.submit(task, Boolean.FALSE);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
