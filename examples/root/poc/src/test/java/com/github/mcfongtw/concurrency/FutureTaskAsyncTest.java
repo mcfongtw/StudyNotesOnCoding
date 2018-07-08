@@ -1,5 +1,8 @@
 package com.github.mcfongtw.concurrency;
 
+import com.github.mcfongtw.concurrency.task.SimplePrimeCheckerTask;
+import com.github.mcfongtw.concurrency.task.SleepTask;
+import com.github.mcfongtw.concurrency.task.SmartPrimeCheckerTask;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -10,11 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
-import static com.github.mcfongtw.concurrency.FutureTaskAsyncTest.LOGGER;
 
 public class FutureTaskAsyncTest {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(FutureTaskAsyncTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(FutureTaskAsyncTest.class);
 
     private static final long BIG_PRIME = 1000000000000003L;
 
@@ -29,7 +31,7 @@ public class FutureTaskAsyncTest {
     public void testSleepFuture() throws Exception {
         final long testDurationInMilliSecond = 3_000;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Double> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task);
         Awaitility.await().between(testDurationInMilliSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
@@ -44,7 +46,7 @@ public class FutureTaskAsyncTest {
         final long testDurationInMilliSecond = 3_000;
         final long cancellationDelayInMillisSecond = 100;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Double> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
@@ -68,7 +70,7 @@ public class FutureTaskAsyncTest {
         final long testDurationInMilliSecond = 3_000;
         final long cancellationDelayInMillisSecond = 100;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
-        Future<Double> future = this.executorService.submit(task);
+        Future<Void> future = this.executorService.submit(task);
 
         cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
@@ -156,103 +158,4 @@ public class FutureTaskAsyncTest {
     }
 
 
-}
-
-class SleepTask implements Callable<Double> {
-    protected final long sleepTimeInMillis;
-
-    public SleepTask(long sleepTime) {
-        this.sleepTimeInMillis = sleepTime;
-    }
-
-    @Override
-    public Double call() throws Exception {
-        double begin = System.nanoTime();
-
-        Thread.sleep(this.sleepTimeInMillis);
-
-        double end = System.nanoTime();
-        double elapsedTime = (end - begin) / 1E6;
-
-        LOGGER.info("elapsed Time : {} ms", elapsedTime);
-
-        return elapsedTime;
-    }
-}
-
-class SimplePrimeCheckerTask implements Callable<Boolean> {
-
-    protected final long num;
-
-    public SimplePrimeCheckerTask(long num) {
-        this.num = num;
-    }
-
-    @Override
-    public Boolean call() throws Exception {
-        double begin = System.nanoTime();
-
-        Boolean result = this.isPrime();
-
-        double end = System.nanoTime();
-        double elapsedTime = (end - begin) / 1E6;
-
-        LOGGER.info("elapsed Time : {} ms", elapsedTime);
-
-        return result;
-    }
-
-    protected boolean isPrime() {
-        if (num < 2) {
-            return false;
-        }
-        if (num == 2) {
-            return true;
-        }
-        // even number
-        if (num % 2 == 0) { return false;
-        }
-
-        // odd number
-        for (int i = 3; i * i <= num; i += 2) {
-            if (num % i == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-}
-
-
-class SmartPrimeCheckerTask extends SimplePrimeCheckerTask {
-
-    public SmartPrimeCheckerTask(long num) {
-        super(num);
-    }
-
-    @Override
-    protected boolean isPrime() {
-        if (num < 2) {
-            return false;
-        }
-        if (num == 2) {
-            return true;
-        }
-        // even number
-        if (num % 2 == 0) { return false;
-        }
-
-        // odd number
-        for (int i = 3; i * i <= num; i += 2) {
-            if(Thread.currentThread().isInterrupted()) {
-                LOGGER.warn("Prime Checking process is interrupted!");
-                return false;
-            }
-            if (num % i == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
