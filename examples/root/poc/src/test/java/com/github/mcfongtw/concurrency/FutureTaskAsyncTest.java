@@ -18,6 +18,8 @@ public class FutureTaskAsyncTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FutureTaskAsyncTest.class);
 
+    private static final long AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS = 200;
+
     private static final long BIG_PRIME = 1000000000000003L;
 
     private ExecutorService executorService;
@@ -32,7 +34,7 @@ public class FutureTaskAsyncTest {
         final long testDurationInMilliSecond = 3_000;
         SleepTask task = new SleepTask(testDurationInMilliSecond);
         Future<Void> future = this.executorService.submit(task, null);
-        Awaitility.await().between(testDurationInMilliSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+        Awaitility.await().between(testDurationInMilliSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return future.isDone();
@@ -50,7 +52,7 @@ public class FutureTaskAsyncTest {
 
         FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
-        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, testDurationInMilliSecond + AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return future.isCancelled();
@@ -74,7 +76,7 @@ public class FutureTaskAsyncTest {
 
         FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
-        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return future.isCancelled();
@@ -97,7 +99,7 @@ public class FutureTaskAsyncTest {
 
         FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
-        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return future.isCancelled();
@@ -121,7 +123,7 @@ public class FutureTaskAsyncTest {
 
         FutureUtils.cancelFutureAsync(future, cancellationDelayInMillisSecond, true);
 
-        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + 100, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+        Awaitility.await().between(cancellationDelayInMillisSecond, TimeUnit.MILLISECONDS, cancellationDelayInMillisSecond + AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return future.isCancelled();

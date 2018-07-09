@@ -1,0 +1,23 @@
+language: java
+
+
+jdk:
+  - oraclejdk8
+  - oraclejdk9
+  - openjdk8
+
+#Container-based
+dist: trusty
+sudo: false
+
+script:
+  - cd examples/root
+  # oraclejdk 8
+  - jdk_switcher use oraclejdk8
+  - mvn test
+  # oraclejdk 9
+  - jdk_switcher use oraclejdk9
+  - mvn test
+  # openjdk 8
+  - jdk_switcher use openjdk8
+  - mvn test
