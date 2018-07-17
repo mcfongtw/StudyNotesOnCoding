@@ -20,7 +20,12 @@ Therefore, using Docker + Vagrant, we could build a project being
 # Vagrantfile
 
 ## ContainerHost
-[Vagrantfile](https://github.com/mcfongtw/StudyNotesOnJavaPerformance/blob/master/examples/root/perf-container-base/Vagrantfile) defines a custom Linux based vagrant box. 
+[Vagrantfile](https://github.com/mcfongtw/StudyNotesOnJavaPerformance/blob/master/examples/root/perf-container-base-builder/Vagrantfile) defines a custom Linux based vagrant box, which is pre-bulit and user can download from [Vagrant Cloud](https://app.vagrantup.com/mcfongtw/boxes/ubuntu-xenial-dbgsym). Here is the bash command to spin up this VM box:
+```bash
+$> vagrant box add mcfongtw/ubuntu-xenial-dbgsym --insecure
+$> ....
+$> vagrant up
+```
 
 The purpose of the container host is to provide a Linux based installed with [debug symbols](http://www.brendangregg.com/perf.html#Symbols)
 
