@@ -26,4 +26,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		demo.vm.synced_folder ".", "/vagrant"
 		demo.vm.provision "shell", inline: "echo SSH Init Complete!"
 	end
+
+	config.vm.define "SimplePocMonitorContainer" do |monitor|
+  		monitor.vm.provider "prometheus" do |prometheus|
+			prometheus.image = "prom/prometheus:v2.3.2"
+			prometheus.force_host_vm = true
+			prometheus.link("SimplePocDemoVM:SimplePocDemoVM")
+    			prometheus.vagrant_machine = "#{DOCKER_HOST_NAME}"
+			prometheus.has_ssh = false
+			prometheus.remains_running = true
+			prometheus.create_args = ['--privileged=true']
+			prometheus.username = "mcfongtw"
+			prometheus.password = "Love_0502"
+  		end
+	end
 end
