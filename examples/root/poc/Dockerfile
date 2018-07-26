@@ -1,18 +1,14 @@
 # A template Dockerfile for all demonstrating java program using perf tools
 #
 #
-FROM mcfongtw/ubuntu_perf_openjdk:8
+FROM mcfongtw/ubuntu_perf_openjdk:latest
 
 MAINTAINER Michael Fong <mcfong.open@gmail.com>
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
-ARG JAR_PATH
-
 WORKDIR /workspace
-
-COPY $JAR_PATH /workspace
 
 ####################################################### 
 #FIXME: The perf installation did not propagated properly from upstream. Remove this once resolved.
@@ -31,7 +27,9 @@ RUN git clone --depth=1 https://github.com/mcfongtw/StudyNotesOnJavaPerformance 
 
 WORKDIR /workspace/StudyNotesOnJavaPerformance/examples/root
 
-RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh &&  mvn clean && mvn package"
+ENV SDKMAN_DIR /workspace/.sdkman
+
+RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh &&  mvn clean package -DskipTests"
 
 WORKDIR /workspace
 ####################################################### 

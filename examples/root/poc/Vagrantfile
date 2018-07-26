@@ -12,11 +12,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   		demo.vm.provider "docker" do |docker|
 			docker.build_dir = "."
 			docker.force_host_vm = true
+			docker.pull = true
     			docker.vagrant_machine = "#{DOCKER_HOST_NAME}"
     			docker.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			docker.has_ssh = false
 			docker.remains_running = true
-			docker.build_args = ['--build-arg', 'JAR_PATH=target/CpuLockDownDemo.jar']
 			docker.create_args = ['--privileged=true']
 			docker.volumes=["/var/lib/docker:/var/lib/docker", "/tmp:/output"]
   		end
