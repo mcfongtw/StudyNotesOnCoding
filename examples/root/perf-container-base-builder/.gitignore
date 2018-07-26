@@ -1,0 +1,5 @@
+# vagrant build
+.vagrant/
+*.log
+*.box
+.secret
