@@ -6,20 +6,20 @@ NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 DOCKER_HOST_NAME = "ContainerHost"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
    
    config.vm.provider "virtualbox" do |box|
 	box.name = "#{DOCKER_HOST_NAME}"
         box.memory = "1024"
    	box.cpus = 2
+	# https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
+	box.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
    end
-   config.vm.provision "docker"
 
    config.vm.define "#{DOCKER_HOST_NAME}" do |ubuntu1604|
 	   ubuntu1604.vm.hostname = "ubuntu1604base"
    	   ubuntu1604.vm.box = "mcfongtw/ubuntu-xenial-dbgsym"
-	   ubuntu1604.vm.box_version = "20180511.0.0"
-	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "2"
+	   ubuntu1604.vm.box_version = "20180511.0.0.1"
+	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "0"
     end
 
 end

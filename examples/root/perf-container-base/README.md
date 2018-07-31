@@ -47,8 +47,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   		box.vm.provider "docker" do |docker|
 			docker.build_dir = "."
 			docker.force_host_vm = true
-    		docker.vagrant_machine = "#{DOCKER_HOST_NAME}"
-    		docker.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+	    		docker.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			docker.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			docker.remains_running = true
   		end
 	end

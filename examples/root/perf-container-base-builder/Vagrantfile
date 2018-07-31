@@ -2,26 +2,20 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 DOCKER_HOST_NAME = "ContainerHostDev"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-   
    config.vm.provider "virtualbox" do |box|
 	box.name = "#{DOCKER_HOST_NAME}"
         box.memory = "1024"
    	box.cpus = 2
    end
-   config.vm.provision "docker"
 
    config.vm.define "#{DOCKER_HOST_NAME}" do |ubuntu1604|
 	   ubuntu1604.vm.hostname = "ubuntu1604base"
    	   ubuntu1604.vm.box = "ubuntu/xenial64"
 	   ubuntu1604.vm.box_version = "20180511.0.0"
-	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "2"
-	   #ubuntu1604.vm.network "forwarded_port",
-	   #	   guest: 22, host: 2022
  
    	   ubuntu1604.vm.provision "shell", inline: <<-'SHELL'
 		set -x -e
