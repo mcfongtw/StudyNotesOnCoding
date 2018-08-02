@@ -6,86 +6,71 @@ DOCKER_HOST_NAME = "ContainerHost"
 DOCKER_HOST_VAGRANTFILE = "../perf-container-base/Vagrantfile"
 NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 
-SSH_PUB_KEY = File.readlines("#{Dir.home}/.ssh/id_rsa_vagrant.pub").first.strip
-SSH_PRV_KEY = File.readlines("#{Dir.home}/.ssh/id_rsa_vagrant")
-
-$sshInitScript = <<-SCRIPT
-	echo "SSH Key Provisioning"
-	mkdir -p /home/vagrant/.ssh/
-
-	touch /home/vagrant/.ssh/authorized_keys
-	echo #{SSH_PUB_KEY} >> /home/vagrant/.ssh/authorized_keys
-	echo #{SSH_PUB_KEY} > /home/vagrant/.ssh/id_rsa.pub
-	chmod 644 /home/vagrant/.ssh/id_rsa.pub
-	
-	echo #{SSH_PRV_KEY} > /home/vagrant/.ssh/id_rsa
-	chmod 600 /home/vagrant/.ssh/id_rsa
-
-	ssh-keyscan -H #{NETWORK_PRIVATE_IP_PREFIX} + "1" >> /home/vagrant/.ssh/known_hosts
-
-	chown -R vagrant:vagrant /home/vagrant/
-SCRIPT
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-#	config.vm.define "SimplePocDemoVM" do |demo|
-#		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "1"
-#  		demo.vm.provider "docker" do |poc|
-#			poc.build_dir = "."
-#			poc.force_host_vm = true
-#			poc.pull = true
-#    			poc.vagrant_machine = "#{DOCKER_HOST_NAME}"
-#    			poc.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
-#			poc.has_ssh = false
-#			poc.remains_running = true
-#			poc.create_args = ['--privileged=true']
-#			poc.volumes=["/var/lib/docker:/var/lib/docker", "/tmp:/output"]
-#  		end
-#		demo.ssh.port = 22
-#		demo.ssh.private_key_path = 'phusion.key'
-#		demo.ssh.username = "root"
-#		demo.vm.synced_folder ".", "/vagrant"
-#		demo.vm.provision "shell", inline: "echo SSH Init Complete!"
-#	end
+	config.vm.define "SimplePocDemoVM" do |demo|
+		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "1"
+  		demo.vm.provider "docker" do |poc|
+			poc.build_dir = "."
+			poc.name = "poc"
+			poc.force_host_vm = true
+			poc.pull = true
+    			poc.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			poc.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			poc.has_ssh = false
+			poc.remains_running = true
+			poc.create_args = ['--privileged=true']
+  		end
+		demo.ssh.port = 22
+		demo.ssh.private_key_path = 'phusion.key'
+		demo.ssh.username = "root"
+		demo.vm.synced_folder ".", "/vagrant"
+		demo.vm.provision "shell", inline: "echo SSH Init Complete!"
+	end
 	
 	config.vm.define "MonitorDbContainer" do |db|
 		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "2"
-  		db.vm.provider "docker" do |prometheus|
-			prometheus.image = "influxdb:1.6"
-			prometheus.pull = true
-			prometheus.force_host_vm = true
-		#	prometheus.link("SimplePocDemoVM:SimplePocDemoVM")
-    			prometheus.vagrant_machine = "#{DOCKER_HOST_NAME}"
-    			prometheus.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
-			prometheus.has_ssh = true
-			prometheus.remains_running = true
-			prometheus.create_args = ['--privileged=true']
+  		db.vm.provider "docker" do |influxdb|
+			influxdb.image = "mcfongtw/ubuntu_perf_monitor_db:0.1"
+			influxdb.name = "influxdb"
+			influxdb.pull = true
+			influxdb.force_host_vm = true
+			influxdb.link("poc:poc")
+    			influxdb.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			influxdb.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			influxdb.has_ssh = false
+			influxdb.remains_running = true
+			influxdb.create_args = ['--privileged=true']
+			# This port is not forwarded to VM Host, can only be accessed inside VirtualBox instance.
+			influxdb.ports = ["8086:8086"]
+			influxdb.volumes=["/proc:/mnt/proc"]
   		end
 		db.ssh.port = 22
-		db.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa_vagrant']
-		#db.ssh.private_key_path = '~/.ssh/id_rsa_vagrant'
-		db.ssh.username = "vagrant"
+		db.ssh.private_key_path = 'phusion.key'
+		db.ssh.username = "root"
 		db.ssh.insert_key = false
-	#	db.ssh.forward_agent = true
 		db.vm.synced_folder ".", "/vagrant"
-		db.vm.provision "shell", inline: $sshInitScript 
 	end
 	
-	
-#	config.vm.define "MonitorAgentContainer" do |agent|
-#		agent.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
-#  		agent.vm.provider "docker" do |nodeexporter|
-#			nodeexporter.image = "prom/node-exporter:v0.16.0"
-#			nodeexporter.force_host_vm = true
-#			nodeexporter.link("SimplePocDemoVM:SimplePocDemoVM")
-#    			nodeexporter.vagrant_machine = "#{DOCKER_HOST_NAME}"
-#    			nodeexporter.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
-#			nodeexporter.has_ssh = false
-#			nodeexporter.remains_running = true
-#			nodeexporter.create_args = ['--privileged=true']
-#  		end
-#		agent.ssh.port = 22
-#		agent.vm.synced_folder ".", "/vagrant"
-#		agent.vm.provision "shell", inline: "echo SSH Init Complete!"
-#	end
+	config.vm.define "MonitorWebContainer" do |web|
+		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
+  		web.vm.provider "docker" do |grafana|
+			grafana.image = "mcfongtw/ubuntu_perf_monitor_web:latest"
+			grafana.force_host_vm = true
+			grafana.pull = true
+			grafana.name = "grafana"
+			grafana.link("influxdb:influxdb")
+    			grafana.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			grafana.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			grafana.has_ssh = false
+			grafana.ports = ["3000:3000"]
+			grafana.remains_running = true
+			grafana.volumes=["tmp_grafana:/var/lib/grafana"]
+  		end
+		web.ssh.port = 22
+		web.ssh.private_key_path = 'phusion.key'
+		web.ssh.username = "root"
+		web.ssh.insert_key = false
+		web.vm.synced_folder ".", "/vagrant"
+	end
 end
