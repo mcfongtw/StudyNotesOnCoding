@@ -40,14 +40,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.12.1.GA</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.mcfongtw</groupId>
+            <artifactId>java.perf.common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <!-- Testing -->
         <dependency>
@@ -170,35 +170,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.scaling.PhonyDbWrityAheadLogDemo</mainClass>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <!--
-                                        Shading signed JARs will fail without this.
-                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-                                    -->
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>CrazyDbWriteAheadLogDemo</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>CrazyDbWriteAheadLogDemo</finalName>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.scaling.CrazyDbWriteAheadLogDemo</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>

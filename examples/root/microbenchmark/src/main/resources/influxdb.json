@@ -1,0 +1,12 @@
+{
+  "type": "influxdb",
+  "sender" : {
+    "type": "http",
+    "host": "localhost",
+    "port": "8086",
+    "database": "demo",
+    "jersey": {
+      "connectionTimeout": "500 milliseconds"
+    }
+  }
+}

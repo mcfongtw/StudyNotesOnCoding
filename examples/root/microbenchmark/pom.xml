@@ -59,6 +59,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.mcfongtw</groupId>
+            <artifactId>java.perf.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -147,6 +152,39 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.TryWithResourceBenchmark</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!--
+                                        Shading signed JARs will fail without this.
+                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                    -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>BufferingEffectBenchmark</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>BufferingEffectBenchmark-jmh-${jmh.version}</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.mcfongtw.io.BufferingEffectBenchmark</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>logback.xml</resource>
+                                    <resource>influxdb.json</resource>
                                 </transformer>
                             </transformers>
                             <filters>

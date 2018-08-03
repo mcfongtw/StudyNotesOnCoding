@@ -8,10 +8,13 @@ NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-	config.vm.define "SimplePocDemoVM" do |demo|
-		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "1"
+	config.vm.define "SimplePocContainer" do |demo|
+		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "2"
+		# TODO: Sync maven reopsitory before building Docker container.
+		# demo.vm.synced_folder "~/.m2/", "/root/.m2/", id: "maven"
+		demo.vm.synced_folder ".", "/vagrant", id: "vagrant"
   		demo.vm.provider "docker" do |poc|
-			poc.build_dir = "."
+			poc.build_dir = "../"
 			poc.name = "poc"
 			poc.force_host_vm = true
 			poc.pull = true
@@ -24,12 +27,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		demo.ssh.port = 22
 		demo.ssh.private_key_path = 'phusion.key'
 		demo.ssh.username = "root"
-		demo.vm.synced_folder ".", "/vagrant"
-		demo.vm.provision "shell", inline: "echo SSH Init Complete!"
 	end
 	
 	config.vm.define "MonitorDbContainer" do |db|
-		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "2"
+		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
   		db.vm.provider "docker" do |influxdb|
 			influxdb.image = "mcfongtw/ubuntu_perf_monitor_db:0.1"
 			influxdb.name = "influxdb"
@@ -49,11 +50,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		db.ssh.private_key_path = 'phusion.key'
 		db.ssh.username = "root"
 		db.ssh.insert_key = false
-		db.vm.synced_folder ".", "/vagrant"
 	end
 	
 	config.vm.define "MonitorWebContainer" do |web|
-		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
+		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "4"
   		web.vm.provider "docker" do |grafana|
 			grafana.image = "mcfongtw/ubuntu_perf_monitor_web:latest"
 			grafana.force_host_vm = true
@@ -71,6 +71,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		web.ssh.private_key_path = 'phusion.key'
 		web.ssh.username = "root"
 		web.ssh.insert_key = false
-		web.vm.synced_folder ".", "/vagrant"
 	end
 end

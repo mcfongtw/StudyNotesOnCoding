@@ -8,8 +8,6 @@ MAINTAINER Michael Fong <mcfong.open@gmail.com>
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
-WORKDIR /workspace
-
 ####################################################### 
 #FIXME: The perf installation did not propagated properly from upstream. Remove this once resolved.
 #
@@ -23,9 +21,10 @@ RUN apt-get update && \
 RUN echo 'kernel.perf_event_paranoid = -1' > /etc/sysctl.d/perf.conf
 ####################################################### 
 # Git clone from example
-RUN git clone --depth=1 https://github.com/mcfongtw/StudyNotesOnJavaPerformance /workspace/StudyNotesOnJavaPerformance
+#RUN git clone --depth=1 https://github.com/mcfongtw/StudyNotesOnJavaPerformance /workspace/StudyNotesOnJavaPerformance
+COPY ./ /workspace/StudyNotesOnJavaPerformance
 
-WORKDIR /workspace/StudyNotesOnJavaPerformance/examples/root
+WORKDIR /workspace/StudyNotesOnJavaPerformance/
 
 ENV SDKMAN_DIR /workspace/.sdkman
 
@@ -39,9 +38,6 @@ COPY docker-entrypoint.sh /workspace/docker-entrypoint.sh
 RUN chmod +x /workspace/docker-entrypoint.sh
 
 ENTRYPOINT ["/workspace/docker-entrypoint.sh"]
-
-####################################################### 
-COPY docker-compose.yml /vagrant/docker-compose.yml
 
 ####################################################### 
 # Clean up APT when done.

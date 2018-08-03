@@ -26,5 +26,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Port-forward Grafana 3000
    config.vm.network "forwarded_port", guest: 3000, host: 3000, protocol: "tcp", auto_correct: true
+   # Port-forward InfluxDB 8086
+   config.vm.network "forwarded_port", guest: 8086, host: 8086, protocol: "tcp", auto_correct: true
+
 
 end

@@ -12,6 +12,7 @@
     <modules>
         <module>microbenchmark</module>
         <module>poc</module>
+        <module>common</module>
     </modules>
 
     <properties>
@@ -36,6 +37,8 @@
         <junit.version>5.2.0</junit.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
+        <iodropwizard.metrics.version>4.0.3</iodropwizard.metrics.version>
+        <iodropwizard-influxdb-reporter.version>1.2.2</iodropwizard-influxdb-reporter.version>
     </properties>
 
     <dependencies>
@@ -63,6 +66,22 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${iodropwizard.metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.kickstarter</groupId>
+            <artifactId>dropwizard-influxdb-reporter</artifactId>
+            <version>${iodropwizard-influxdb-reporter.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
