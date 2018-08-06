@@ -29,15 +29,21 @@ public abstract class AbstractIoBenchmark {
             logger.info("Metric Reporter Status: [{}]", enableReporter);
 
             if(enableReporter) {
-                metricReporter.start(1, TimeUnit.MILLISECONDS);
+                //TODO: Read reporting interval from configuration
+                metricReporter.start(100, TimeUnit.MILLISECONDS);
 
                 logger.info("Starting reporting metric");
             }
         }
 
+        @Override
+        protected void finalize() {
+            if(enableReporter) {
+                metricReporter.stop();
+            }
+        }
+
     }
 
-    protected void finalize() {
-        this.metricReporter.stop();
-    }
+
 }
