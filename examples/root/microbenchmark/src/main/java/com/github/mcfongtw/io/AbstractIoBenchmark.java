@@ -1,11 +1,13 @@
 package com.github.mcfongtw.io;
 
 import com.codahale.metrics.ScheduledReporter;
+import com.github.mcfongtw.utils.SudoExecutors;
 import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jmh.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractIoBenchmark {
@@ -36,6 +38,7 @@ public abstract class AbstractIoBenchmark {
             }
         }
 
+
         @Override
         protected void finalize() {
             if(enableReporter) {
@@ -43,7 +46,21 @@ public abstract class AbstractIoBenchmark {
             }
         }
 
+        @Setup(Level.Trial)
+        public void setUp() throws IOException {
+
+        }
+
+        @TearDown(Level.Trial)
+        public void tearDown() throws IOException, InterruptedException {
+            logger.info("Start to dropping free pagecache, dentries and inodes...");
+            SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", "Love_0502");
+            logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+        }
+
+
     }
+
 
 
 }

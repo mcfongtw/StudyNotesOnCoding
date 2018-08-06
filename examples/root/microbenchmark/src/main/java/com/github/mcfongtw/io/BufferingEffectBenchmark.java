@@ -30,13 +30,15 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
 
         @Setup(Level.Trial)
         public void setUp() throws IOException {
+            super.setUp();
             tempDir = Files.createTempDir();
             new File(tempDir.getAbsolutePath()).mkdirs();
             logger.debug("Temp dir created at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
         }
 
         @TearDown(Level.Trial)
-        public void tearDown() throws IOException {
+        public void tearDown() throws IOException, InterruptedException {
+            super.tearDown();
             FileUtils.deleteDirectory(tempDir);
             logger.debug("Temp dir deleted at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
 
