@@ -24,14 +24,14 @@ public class LatencyMetricUnitTest {
 
     @AfterEach
     public void tearDoown() {
-        metricRegistry.remove(TEST_NAME + "TotalLatencyMillis");
-        metricRegistry.remove(TEST_NAME + "Latency");
+        metricRegistry.remove(MetricUtils.concat(TEST_NAME, "TotalLatencyMillis"));
+        metricRegistry.remove(MetricUtils.concat(TEST_NAME,  "Latency"));
     }
 
     @Test
     public void testGetLatencyMetric() {
-        Assertions.assertTrue(metricRegistry.getCounters(MetricFilter.ALL).keySet().contains(TEST_NAME + "TotalLatencyMillis"));
-        Assertions.assertTrue(metricRegistry.getTimers(MetricFilter.ALL).keySet().contains(TEST_NAME + "Latency"));
+        Assertions.assertTrue(metricRegistry.getCounters(MetricFilter.ALL).keySet().contains(MetricUtils.concat(TEST_NAME, "TotalLatencyMillis")));
+        Assertions.assertTrue(metricRegistry.getTimers(MetricFilter.ALL).keySet().contains(MetricUtils.concat(TEST_NAME,  "Latency")));
     }
 
     @Test
@@ -39,14 +39,12 @@ public class LatencyMetricUnitTest {
         //1 sec
         metric.addTime(1000, TimeUnit.MILLISECONDS);
 
-        Assertions.assertEquals(1, metric.getCount());
-        Assertions.assertEquals(1000, metric.getTotalLatencyInMillis());
+        Assertions.assertEquals(1000, metric.getCount());
 
         //1 millis
         metric.addTime(1000, TimeUnit.MICROSECONDS);
 
-        Assertions.assertEquals(2, metric.getCount());
-        Assertions.assertEquals(1001, metric.getTotalLatencyInMillis());
+        Assertions.assertEquals(1001, metric.getCount());
     }
 
 

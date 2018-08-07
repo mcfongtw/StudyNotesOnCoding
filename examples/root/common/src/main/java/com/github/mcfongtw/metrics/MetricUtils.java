@@ -16,4 +16,8 @@ public class MetricUtils {
     public static MetricRegistry getDefaultMetricRegistry() {
         return defaultMetricRegistry;
     }
+
+    public static String concat(String prefix, String metricName) {
+        return prefix + "." + metricName;
+    }
 }

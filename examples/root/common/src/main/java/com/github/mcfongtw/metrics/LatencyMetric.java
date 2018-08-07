@@ -12,8 +12,8 @@ public class LatencyMetric implements Metered, Sampling,  Metric, Counting {
     private MetricRegistry registry = MetricUtils.getDefaultMetricRegistry();
 
     public LatencyMetric(String prefix) {
-        latencyTimer = registry.timer(prefix + "Latency");
-        totalLatencyInMillis = registry.counter(prefix + "TotalLatencyMillis");
+        latencyTimer = registry.timer(MetricUtils.concat(prefix, "Latency"));
+        totalLatencyInMillis = registry.counter(MetricUtils.concat(prefix,  "TotalLatencyMillis"));
     }
 
     public void addTime(long duration, TimeUnit unit) {
@@ -21,12 +21,8 @@ public class LatencyMetric implements Metered, Sampling,  Metric, Counting {
         totalLatencyInMillis.inc(TimeUnit.MILLISECONDS.convert(duration, unit));
     }
 
-    public long getTotalLatencyInMillis() {
-        return totalLatencyInMillis.getCount();
-    }
-
     public long getCount() {
-        return latencyTimer.getCount();
+        return totalLatencyInMillis.getCount();
     }
 
     public double getFifteenMinuteRate() {

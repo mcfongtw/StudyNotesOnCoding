@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractIoBenchmark {
 
-    protected static final int NUM_ITERATION = 10;
+    protected static final int NUM_ITERATION = 100;
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
@@ -30,7 +30,7 @@ public abstract class AbstractIoBenchmark {
 
             if(enableReporter) {
                 //TODO: Read reporting interval from configuration
-                metricReporter.start(100, TimeUnit.MILLISECONDS);
+                metricReporter.start(1, TimeUnit.SECONDS);
 
                 logger.info("Starting reporting metric");
             }

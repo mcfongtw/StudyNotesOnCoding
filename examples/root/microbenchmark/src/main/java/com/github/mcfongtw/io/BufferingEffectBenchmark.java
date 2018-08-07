@@ -1,6 +1,5 @@
 package com.github.mcfongtw.io;
 
-import com.github.mcfongtw.metrics.LatencyMetric;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
@@ -23,8 +22,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
 
         File tempDir;
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(BufferingEffectBenchmark.class.getSimpleName());
-
+        InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(BufferingEffectBenchmark.class.getName());
 
         @Param({"512", "4096", "10240"})
         public int bufferSize;
@@ -123,6 +121,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
+        //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(BufferingEffectBenchmark.class.getSimpleName())
