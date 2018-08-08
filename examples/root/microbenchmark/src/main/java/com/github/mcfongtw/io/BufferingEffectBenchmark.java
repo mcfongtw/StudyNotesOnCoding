@@ -1,7 +1,5 @@
 package com.github.mcfongtw.io;
 
-import com.google.common.io.Files;
-import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -16,12 +14,6 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     @State(Scope.Benchmark)
     public static class BufferingEffectExecutionPlan extends AbstractExecutionPlan {
 
-        String finPath;
-
-        String foutPath;
-
-        File tempDir;
-
         InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(BufferingEffectBenchmark.class.getName());
 
         @Param({"512", "4096", "10240"})
@@ -29,30 +21,25 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
 
 
         @Setup(Level.Trial)
-        public void setUp() throws IOException {
+        public void setUp() throws IOException, InterruptedException {
             super.setUp();
-            tempDir = Files.createTempDir();
-            new File(tempDir.getAbsolutePath()).mkdirs();
             logger.debug("Temp dir created at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
+            logger.debug("File created at [{}] for BufferSize {}", finPath, bufferSize);
+            logger.debug("File created at [{}] for BufferSize {}", foutPath, bufferSize);
         }
 
         @TearDown(Level.Trial)
         public void tearDown() throws IOException, InterruptedException {
             super.tearDown();
-            FileUtils.deleteDirectory(tempDir);
+
             logger.debug("Temp dir deleted at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
 
         }
 
         @Setup(Level.Iteration)
         public void iterate() throws IOException {
-            finPath = tempDir.getAbsolutePath() + "/in.data";
-            foutPath = tempDir.getAbsolutePath() + "/out.data";
-            logger.debug("File created at [{}] for BufferSize {}", finPath, bufferSize);
-            logger.debug("File created at [{}] for BufferSize {}", foutPath, bufferSize);
 
-            FileUtils.touch(new File(finPath));
-            FileUtils.touch(new File(foutPath));
+
         }
 
     }
