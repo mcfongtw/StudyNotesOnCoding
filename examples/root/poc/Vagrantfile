@@ -10,19 +10,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	config.vm.define "SimplePocContainer" do |demo|
 		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "2"
-		# TODO: Sync maven reopsitory before building Docker container.
-		# demo.vm.synced_folder "~/.m2/", "/root/.m2/", id: "maven"
-		demo.vm.synced_folder ".", "/vagrant", id: "vagrant"
-  		demo.vm.provider "docker" do |poc|
-			poc.build_dir = "../"
-			poc.name = "poc"
-			poc.force_host_vm = true
-			poc.pull = true
-    			poc.vagrant_machine = "#{DOCKER_HOST_NAME}"
-    			poc.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
-			poc.has_ssh = false
-			poc.remains_running = true
-			poc.create_args = ['--privileged=true']
+	# TODO: Sync maven reopsitory before building Docker container.
+		demo.vm.synced_folder "#{Dir.home}/.m2/", "/vagrant", id: "maven"
+		demo.vm.synced_folder "../../../../StudyNotesOnJavaPerformance", "/vagrant/StudyNotesOnJavaPerformance", id: "src"
+ 		demo.vm.provider "docker" do |experiment|
+			experiment.build_dir = "../"
+			experiment.name = "experiment"
+			experiment.force_host_vm = true
+			experiment.pull = true
+   			experiment.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			experiment.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			experiment.has_ssh = false
+			experiment.remains_running = true
+			experiment.create_args = ['--privileged=true']
   		end
 		demo.ssh.port = 22
 		demo.ssh.private_key_path = 'phusion.key'
@@ -31,18 +31,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	
 	config.vm.define "MonitorDbContainer" do |db|
 		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
-  		db.vm.provider "docker" do |influxdb|
+ 		db.vm.provider "docker" do |influxdb|
 			influxdb.image = "mcfongtw/ubuntu_perf_monitor_db:0.1"
-			influxdb.name = "influxdb"
+			influxdb.name = "influxdb16"
 			influxdb.pull = true
 			influxdb.force_host_vm = true
-			influxdb.link("poc:poc")
-    			influxdb.vagrant_machine = "#{DOCKER_HOST_NAME}"
+			influxdb.link("experiment:experiment")
+   			influxdb.vagrant_machine = "#{DOCKER_HOST_NAME}"
     			influxdb.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			influxdb.has_ssh = false
 			influxdb.remains_running = true
 			influxdb.create_args = ['--privileged=true']
-			# This port is not forwarded to VM Host, can only be accessed inside VirtualBox instance.
 			influxdb.ports = ["8086:8086"]
 			influxdb.volumes=["/proc:/mnt/proc"]
   		end
@@ -54,12 +53,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	
 	config.vm.define "MonitorWebContainer" do |web|
 		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "4"
-  		web.vm.provider "docker" do |grafana|
+ 		web.vm.provider "docker" do |grafana|
 			grafana.image = "mcfongtw/ubuntu_perf_monitor_web:latest"
 			grafana.force_host_vm = true
 			grafana.pull = true
-			grafana.name = "grafana"
-			grafana.link("influxdb:influxdb")
+			grafana.name = "grafana522"
+			grafana.link("influxdb16:influxdb16")
     			grafana.vagrant_machine = "#{DOCKER_HOST_NAME}"
     			grafana.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			grafana.has_ssh = false

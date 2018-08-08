@@ -1,7 +1,7 @@
 # A template Dockerfile for all demonstrating java program using perf tools
 #
 #
-FROM mcfongtw/ubuntu_perf_openjdk:latest
+FROM mcfongtw/ubuntu_perf_openjdk:8
 
 MAINTAINER Michael Fong <mcfong.open@gmail.com>
 
@@ -20,17 +20,13 @@ RUN apt-get update && \
 # -1 - Not paranoid at all
 RUN echo 'kernel.perf_event_paranoid = -1' > /etc/sysctl.d/perf.conf
 ####################################################### 
-# Git clone from example
-#RUN git clone --depth=1 https://github.com/mcfongtw/StudyNotesOnJavaPerformance /workspace/StudyNotesOnJavaPerformance
-COPY ./ /workspace/StudyNotesOnJavaPerformance
-
-WORKDIR /workspace/StudyNotesOnJavaPerformance/
+WORKDIR /vagrant/StudyNotesOnJavaPerformance/
 
 ENV SDKMAN_DIR /workspace/.sdkman
 
-RUN bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh &&  mvn clean package -DskipTests"
+COPY docker-mvn-build.sh /vagrant/StudyNotesOnJavaPerformance/examples/root
 
-WORKDIR /workspace
+WORKDIR /vagrant/StudyNotesOnJavaPerformance/examples/
 ####################################################### 
 # Setup entry point
 COPY docker-entrypoint.sh /workspace/docker-entrypoint.sh
@@ -42,4 +38,3 @@ ENTRYPOINT ["/workspace/docker-entrypoint.sh"]
 ####################################################### 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
