@@ -16,11 +16,12 @@ public abstract class AbstractIoBenchmark {
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
-    @State(Scope.Benchmark)
     protected static abstract class AbstractExecutionPlan {
         protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
         private volatile  boolean enableReporter = false;
+
+        private String sudoPassword = "";
 
         public AbstractExecutionPlan() {
             String propVal = System.getProperty("enableReporter");
@@ -36,6 +37,12 @@ public abstract class AbstractIoBenchmark {
 
                 logger.info("Starting reporting metric");
             }
+
+            String sudoPasswordVal = System.getProperty("sudoPassword");
+            if(StringUtils.isNotEmpty(sudoPasswordVal)) {
+                sudoPassword = sudoPasswordVal;
+            }
+            logger.debug("SudoPassword: {}", sudoPassword);
         }
 
 
@@ -46,16 +53,16 @@ public abstract class AbstractIoBenchmark {
             }
         }
 
-        @Setup(Level.Trial)
         public void setUp() throws IOException {
 
         }
 
-        @TearDown(Level.Trial)
         public void tearDown() throws IOException, InterruptedException {
-            logger.info("Start to dropping free pagecache, dentries and inodes...");
-            SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", "Love_0502");
-            logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+            if(StringUtils.isNotEmpty(sudoPassword)) {
+                logger.info("Start to dropping free pagecache, dentries and inodes...");
+                SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
+                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+            }
         }
 
 

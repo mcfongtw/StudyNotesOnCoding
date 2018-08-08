@@ -123,6 +123,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
+        //TODO: Need to recreate table via command line:
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
