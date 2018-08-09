@@ -18,7 +18,7 @@ public class MemoryMappingBenchmark extends AbstractIoBenchmark {
     @State(Scope.Benchmark)
     public static class MemoryMappingExecutionPlan extends AbstractExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(BufferingEffectBenchmark.class.getSimpleName());
+        LatencyMetric ioLatencyMetric = new LatencyMetric(MemoryMappingBenchmark.class.getName());
 
         @Param({"4096", "10240", "102400"})
         public int bufferCapacity;
