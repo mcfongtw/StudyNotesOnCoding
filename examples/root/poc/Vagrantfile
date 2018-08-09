@@ -13,16 +13,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# TODO: Sync maven reopsitory before building Docker container.
 		demo.vm.synced_folder "#{Dir.home}/.m2/", "/vagrant", id: "maven"
 		demo.vm.synced_folder "../../../../StudyNotesOnJavaPerformance", "/vagrant/StudyNotesOnJavaPerformance", id: "src"
- 		demo.vm.provider "docker" do |experiment|
-			experiment.build_dir = "../"
-			experiment.name = "experiment"
-			experiment.force_host_vm = true
-			experiment.pull = true
-   			experiment.vagrant_machine = "#{DOCKER_HOST_NAME}"
-    			experiment.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
-			experiment.has_ssh = false
-			experiment.remains_running = true
-			experiment.create_args = ['--privileged=true']
+ 		demo.vm.provider "docker" do |poc|
+			poc.build_dir = "../"
+			poc.name = "poc"
+			poc.force_host_vm = true
+			poc.pull = true
+   			poc.vagrant_machine = "#{DOCKER_HOST_NAME}"
+    			poc.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
+			poc.has_ssh = false
+			poc.remains_running = true
+			poc.create_args = ['--privileged=true']
   		end
 		demo.ssh.port = 22
 		demo.ssh.private_key_path = 'phusion.key'
@@ -33,10 +33,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
  		db.vm.provider "docker" do |influxdb|
 			influxdb.image = "mcfongtw/ubuntu_perf_monitor_db:0.1"
-			influxdb.name = "influxdb16"
+			influxdb.name = "influxdb"
 			influxdb.pull = true
 			influxdb.force_host_vm = true
-			influxdb.link("experiment:experiment")
+			influxdb.link("poc:poc")
    			influxdb.vagrant_machine = "#{DOCKER_HOST_NAME}"
     			influxdb.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			influxdb.has_ssh = false
@@ -57,8 +57,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			grafana.image = "mcfongtw/ubuntu_perf_monitor_web:latest"
 			grafana.force_host_vm = true
 			grafana.pull = true
-			grafana.name = "grafana522"
-			grafana.link("influxdb16:influxdb16")
+			grafana.name = "grafana"
+			grafana.link("influxdb:influxdb")
     			grafana.vagrant_machine = "#{DOCKER_HOST_NAME}"
     			grafana.vagrant_vagrantfile = "#{DOCKER_HOST_VAGRANTFILE}"
 			grafana.has_ssh = false
