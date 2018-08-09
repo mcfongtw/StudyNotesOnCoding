@@ -5,7 +5,6 @@ import com.github.mcfongtw.utils.SudoExecutors;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openjdk.jmh.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,11 @@ public abstract class AbstractIoBenchmark {
 
     protected static final int NUM_ITERATION = 100;
 
-    protected static final int TOTAL_DATA_WRITEN = 10000;
+    private static final int UNIT_ONE_KILO = 1024;
+
+    private static final int UNIT_ONE_MEGA = UNIT_ONE_KILO * UNIT_ONE_KILO;
+
+    protected static final int TOTAL_DATA_WRITEN = 1 * UNIT_ONE_MEGA;
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
@@ -45,7 +48,7 @@ public abstract class AbstractIoBenchmark {
 
             if(enableReporter) {
                 //TODO: Read reporting interval from configuration
-                metricReporter.start(1, TimeUnit.SECONDS);
+                metricReporter.start(500, TimeUnit.MILLISECONDS);
 
                 logger.info("Starting reporting metric");
             }
@@ -79,7 +82,7 @@ public abstract class AbstractIoBenchmark {
                     FileOutputStream fin = new FileOutputStream(finPath);
             ) {
                 for(int i = 0; i < TOTAL_DATA_WRITEN; i++) {
-                    fin.write(i);
+                    fin.write((byte) i);
                 }
             }
 
