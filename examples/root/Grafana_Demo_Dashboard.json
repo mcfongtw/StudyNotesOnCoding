@@ -1470,6 +1470,194 @@
         "x": 12,
         "y": 27
       },
+      "id": 12,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "disk.op.merge",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "disk_read",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [
+                  "1m"
+                ],
+                "type": "non_negative_derivative"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "instance",
+              "operator": "=",
+              "value": "sda"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "disk_octets"
+            }
+          ]
+        },
+        {
+          "alias": "disk.op.read",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "disk_write",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [
+                  "1m"
+                ],
+                "type": "non_negative_derivative"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "instance",
+              "operator": "=",
+              "value": "sda"
+            },
+            {
+              "condition": "AND",
+              "key": "type",
+              "operator": "=",
+              "value": "disk_octets"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Disk Throughput",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB_COLLECTD}",
+      "fill": 1,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 36
+      },
       "id": 8,
       "legend": {
         "alignAsTable": true,
@@ -1638,13 +1826,140 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": "${DS_INFLUXDB_COLLECTD}",
+      "fill": 1,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 36
+      },
+      "id": 13,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "df -h /",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "df_value",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "type_instance",
+              "operator": "=",
+              "value": "free"
+            },
+            {
+              "condition": "AND",
+              "key": "instance",
+              "operator": "=",
+              "value": "root"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Disk Space",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "${DS_INFLUXDB_DEMO}",
       "fill": 1,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 36
+        "y": 45
       },
       "id": 3,
       "legend": {
@@ -1654,6 +1969,7 @@
         "max": true,
         "min": false,
         "show": true,
+        "sortDesc": false,
         "total": false,
         "values": true
       },
@@ -1713,6 +2029,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -1756,6 +2078,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -1863,7 +2191,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 36
+        "y": 45
       },
       "id": 9,
       "legend": {
@@ -1932,6 +2260,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -1976,6 +2310,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2020,6 +2360,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2064,6 +2410,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2108,6 +2460,12 @@
           ],
           "tags": [
             {
+              "key": "benchmark",
+              "operator": "=",
+              "value": "BufferingEffect"
+            },
+            {
+              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2164,7 +2522,7 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -2195,5 +2553,5 @@
   "timezone": "",
   "title": "Demo",
   "uid": "g3tSeM5iz",
-  "version": 1
+  "version": 2
 }
