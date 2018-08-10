@@ -28,8 +28,6 @@ public abstract class AbstractIoBenchmark {
     protected static abstract class AbstractExecutionPlan {
         protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-        private volatile  boolean enableReporter = false;
-
         private String sudoPassword = "";
 
         protected String finPath;
@@ -39,18 +37,9 @@ public abstract class AbstractIoBenchmark {
         protected File tempDir;
 
         public AbstractExecutionPlan() {
-            String propVal = System.getProperty("enableReporter");
-            if(StringUtils.isNotEmpty(propVal)) {
-                enableReporter = Boolean.parseBoolean(propVal);
-            }
-
-            logger.info("Metric Reporter Status: [{}]", enableReporter);
-
-            if(enableReporter) {
-                metricReporter.start(500, TimeUnit.MILLISECONDS);
-
-                logger.info("Starting reporting metric");
-            }
+            logger.info("Starting reporting metric...");
+            metricReporter.start(500, TimeUnit.MILLISECONDS);
+            logger.info("Starting reporting metric...DONE");
 
             String sudoPasswordVal = System.getProperty("sudoPassword");
             if(StringUtils.isNotEmpty(sudoPasswordVal)) {
@@ -62,9 +51,9 @@ public abstract class AbstractIoBenchmark {
 
         @Override
         protected void finalize() {
-            if(enableReporter) {
-                metricReporter.stop();
-            }
+            logger.info("Stopping reporting metric...");
+            metricReporter.stop();
+            logger.info("Stopping reporting metric...DONE");
         }
 
         public void setUp() throws IOException, InterruptedException {
@@ -94,8 +83,6 @@ public abstract class AbstractIoBenchmark {
 
         public void tearDown() throws IOException, InterruptedException {
             FileUtils.deleteDirectory(tempDir);
-
-
         }
 
 
