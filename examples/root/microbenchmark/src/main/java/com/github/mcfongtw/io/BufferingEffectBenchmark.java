@@ -45,9 +45,9 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
     public void doFileReadWritePerByteBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
         try(
                 FileInputStream fin = new FileInputStream(plan.finPath);
@@ -66,9 +66,9 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void doFileReadWriteWithLocalBufferBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
         try(
                 FileInputStream fin = new FileInputStream(plan.finPath);
@@ -88,9 +88,9 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void doBufferedFileReadWriteBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
         try(
                 BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.finPath), plan.bufferSize);

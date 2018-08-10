@@ -47,7 +47,6 @@ public abstract class AbstractIoBenchmark {
             logger.info("Metric Reporter Status: [{}]", enableReporter);
 
             if(enableReporter) {
-                //TODO: Read reporting interval from configuration
                 metricReporter.start(500, TimeUnit.MILLISECONDS);
 
                 logger.info("Starting reporting metric");
