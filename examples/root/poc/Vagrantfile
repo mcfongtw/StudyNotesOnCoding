@@ -32,7 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define "MonitorDbContainer" do |db|
 		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
  		db.vm.provider "docker" do |influxdb|
-			influxdb.image = "mcfongtw/ubuntu_perf_monitor_db:0.1"
+			influxdb.image = "mcfongtw/phusion_perf_monitor_db:0.1"
 			influxdb.name = "influxdb"
 			influxdb.pull = true
 			influxdb.force_host_vm = true
@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define "MonitorWebContainer" do |web|
 		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "4"
  		web.vm.provider "docker" do |grafana|
-			grafana.image = "mcfongtw/ubuntu_perf_monitor_web:latest"
+			grafana.image = "mcfongtw/phusion_perf_monitor_web:latest"
 			grafana.force_host_vm = true
 			grafana.pull = true
 			grafana.name = "grafana"

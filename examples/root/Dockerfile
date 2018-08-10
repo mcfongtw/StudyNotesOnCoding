@@ -1,7 +1,7 @@
-# A template Dockerfile for all demonstrating java program using perf tools
+# A template Dockerfile for all program demonstration
 #
 #
-FROM mcfongtw/ubuntu_perf_openjdk:8
+FROM mcfongtw/phusion_perf_openjdk:8
 
 MAINTAINER Michael Fong <mcfong.open@gmail.com>
 

@@ -2029,12 +2029,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2078,12 +2072,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2260,12 +2248,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2310,12 +2292,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2360,12 +2336,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2410,12 +2380,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2460,12 +2424,6 @@
           ],
           "tags": [
             {
-              "key": "benchmark",
-              "operator": "=",
-              "value": "BufferingEffect"
-            },
-            {
-              "condition": "AND",
               "key": "metric",
               "operator": "=",
               "value": "Latency"
@@ -2553,5 +2511,5 @@
   "timezone": "",
   "title": "Demo",
   "uid": "g3tSeM5iz",
-  "version": 2
+  "version": 3
 }
