@@ -25,16 +25,11 @@ public abstract class AbstractIoBenchmark {
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
-    protected static abstract class AbstractExecutionPlan {
+    protected static abstract class AbstractExecutionPlan implements ExecutableLifecycle {
         protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
         private String sudoPassword = "";
 
-        protected String finPath;
-
-        protected String foutPath;
-
-        protected File tempDir;
 
         public AbstractExecutionPlan() {
             logger.info("Starting reporting metric...");
@@ -48,15 +43,99 @@ public abstract class AbstractIoBenchmark {
             logger.debug("SudoPassword: {}", sudoPassword);
         }
 
+        @Override
+        public void preTrialSetUp() throws Exception {
+            logger.trace("[preTrialSetUp]");
+        }
 
         @Override
-        protected void finalize() {
+        public void doTrialSetUp() throws Exception {
+            this.preTrialSetUp();
+            logger.trace("[doTrialSetUp]");
+            this.postTrialSetUp();
+        }
+
+        @Override
+        public void postTrialSetUp() throws IOException, InterruptedException {
+            logger.trace("[postTrialSetUp]");
+
+            if(StringUtils.isNotEmpty(sudoPassword)) {
+                logger.info("Start to dropping free pagecache, dentries and inodes...");
+                SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
+                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+            }
+        }
+
+        @Override
+        public void preTrialTearDown() throws Exception {
+            logger.trace("[preTrialTearDown]");
+
+        }
+
+        @Override
+        public void doTrialTearDown() throws Exception {
+            this.preTrialTearDown();
+            logger.trace("[doTrialTearDown]");
+            this.postTrialTearDown();
+        }
+
+        @Override
+        public void postTrialTearDown() throws Exception {
+            logger.trace("[postTrialTearDown]");
             logger.info("Stopping reporting metric...");
             metricReporter.stop();
             logger.info("Stopping reporting metric...DONE");
         }
 
-        public void setUp() throws IOException, InterruptedException {
+        @Override
+        public void preIterationSetup() throws Exception {
+            logger.trace("[preIterationSetup]");
+        }
+
+        @Override
+        public void doIterationSetup() throws Exception {
+            this.preIterationSetup();
+            logger.trace("[doIterationSetup]");
+            this.postIterationSetup();
+        }
+
+        @Override
+        public void postIterationSetup()  throws Exception {
+            logger.trace("[postIterationSetup]");
+        }
+
+        @Override
+        public void preIterationTearDown() throws Exception{
+            logger.trace("[preIterationTearDown]");
+        }
+
+        @Override
+        public void doIterationTearDown() throws Exception{
+            this.preIterationTearDown();
+            logger.trace("[doIterationTearDown]");
+            this.postIterationTearDown();
+        }
+
+        @Override
+        public void postIterationTearDown()  throws Exception{
+            logger.trace("[postIterationTearDown]");
+        }
+
+    }
+
+
+    protected static abstract class AbstractSequentialExecutionPlan extends AbstractExecutionPlan {
+
+        protected String finPath;
+
+        protected String foutPath;
+
+        protected File tempDir;
+
+        @Override
+        public void preTrialSetUp() throws Exception {
+            super.preTrialSetUp();
+
             tempDir = Files.createTempDir();
             new File(tempDir.getAbsolutePath()).mkdirs();
 
@@ -74,20 +153,18 @@ public abstract class AbstractIoBenchmark {
                 }
             }
 
-            if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to dropping free pagecache, dentries and inodes...");
-                SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
-                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
-            }
+            logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
+            logger.debug("File created at [{}]", finPath);
+            logger.debug("File created at [{}]", foutPath);
         }
 
-        public void tearDown() throws IOException, InterruptedException {
+        @Override
+        public void postTrialTearDown() throws Exception {
+            super.postTrialTearDown();
+
             FileUtils.deleteDirectory(tempDir);
+            logger.debug("Temp dir deleted at [{}]", tempDir.getAbsolutePath());
         }
-
-
     }
-
-
 
 }

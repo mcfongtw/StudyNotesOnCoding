@@ -180,7 +180,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>BufferingEffectBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.BufferingEffectBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.SequentialFileStreamBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
@@ -213,7 +213,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>MemoryMappingBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.MemoryMappingBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.SequentialMemoryMapBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>

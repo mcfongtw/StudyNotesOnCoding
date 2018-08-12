@@ -4,7 +4,7 @@
   "groupCounters": "true",
   "metricTemplates": {
     "io": {
-      "pattern": "com.github.mcfongtw.io.(?<benchmark>.*)Benchmark.(?<metric>.*)$",
+      "pattern": "com.github.mcfongtw.io.(?<benchmark>[a-zA-Z0-9_]*).(?<metric>[a-zA-Z0-9_]*)$",
       "tagKeys": ["benchmark", "metric"]
     }
   },

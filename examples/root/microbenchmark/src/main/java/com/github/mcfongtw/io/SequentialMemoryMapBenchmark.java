@@ -13,42 +13,48 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.TimeUnit;
 
-public class MemoryMappingBenchmark extends AbstractIoBenchmark {
+public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
 
     @State(Scope.Benchmark)
-    public static class MemoryMappingExecutionPlan extends AbstractExecutionPlan {
+    public static class SequentialMemoryMapExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(MemoryMappingBenchmark.class.getName());
+        LatencyMetric ioLatencyMetric = new LatencyMetric(SequentialMemoryMapBenchmark.class.getName());
 
         @Param({"4096", "10240", "102400"})
         public int bufferCapacity;
 
+        @Override
         @Setup(Level.Trial)
-        public void setUp() throws IOException, InterruptedException {
-            super.setUp();
-            logger.debug("Temp dir created at [{}] for BufferSize {}", tempDir.getAbsolutePath());
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
         }
 
+        @Override
         @TearDown(Level.Trial)
-        public void tearDown() throws IOException, InterruptedException {
-            super.tearDown();
-            logger.debug("Temp dir deleted at [{}] for BufferSize {}", tempDir.getAbsolutePath());
-
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
         }
 
+        @Override
         @Setup(Level.Iteration)
-        public void iterate() throws IOException {
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
 
+        @Override
+        @TearDown(Level.Iteration)
+        public void doIterationTearDown() throws Exception {
+            super.doIterationSetup();
         }
 
     }
 
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileChannelHeapMemoryBasedReadWriteBenchmark(MemoryMappingExecutionPlan plan) throws IOException {
+    public void doHeapMemoryBackedChannelStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
         FileChannel fout = new RandomAccessFile(plan.foutPath, "rw").getChannel();
         FileChannel fin = new RandomAccessFile(plan.finPath, "r").getChannel();
 
@@ -69,10 +75,10 @@ public class MemoryMappingBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileChannelDirectMemoryBasedReadWriteBenchmark(MemoryMappingExecutionPlan plan) throws IOException {
+    public void doDirectMemoryBackedChannelStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
         FileChannel fout = new RandomAccessFile(plan.foutPath, "rw").getChannel();
         FileChannel fin = new RandomAccessFile(plan.finPath, "r").getChannel();
 
@@ -93,10 +99,10 @@ public class MemoryMappingBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void doStreamBasedReadWriteBenchmark(MemoryMappingExecutionPlan plan) throws IOException {
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void doFileBackedStreamByteByByte(SequentialMemoryMapExecutionPlan plan) throws IOException {
         RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
         RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
 
@@ -120,7 +126,7 @@ public class MemoryMappingBenchmark extends AbstractIoBenchmark {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
-                .include(MemoryMappingBenchmark.class.getSimpleName())
+                .include(SequentialMemoryMapBenchmark.class.getSimpleName())
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)

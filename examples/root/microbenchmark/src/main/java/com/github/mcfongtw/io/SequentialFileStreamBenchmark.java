@@ -9,37 +9,38 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 
-public class BufferingEffectBenchmark extends AbstractIoBenchmark {
+public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
 
     @State(Scope.Benchmark)
-    public static class BufferingEffectExecutionPlan extends AbstractExecutionPlan {
+    public static class SequentialFileStreamExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(BufferingEffectBenchmark.class.getName());
+        InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialFileStreamBenchmark.class.getName());
 
         @Param({"512", "4096", "10240"})
         public int bufferSize;
 
-
+        @Override
         @Setup(Level.Trial)
-        public void setUp() throws IOException, InterruptedException {
-            super.setUp();
-            logger.debug("Temp dir created at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
-            logger.debug("File created at [{}] for BufferSize {}", finPath, bufferSize);
-            logger.debug("File created at [{}] for BufferSize {}", foutPath, bufferSize);
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
         }
 
+        @Override
         @TearDown(Level.Trial)
-        public void tearDown() throws IOException, InterruptedException {
-            super.tearDown();
-
-            logger.debug("Temp dir deleted at [{}] for BufferSize {}", tempDir.getAbsolutePath(), bufferSize);
-
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
         }
 
+        @Override
         @Setup(Level.Iteration)
-        public void iterate() throws IOException {
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
 
-
+        @Override
+        @TearDown(Level.Iteration)
+        public void doIterationTearDown() throws Exception {
+            super.doIterationSetup();
         }
 
     }
@@ -48,7 +49,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
-    public void doFileReadWritePerByteBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
+    public void doFileStreamByteByByte(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
                 FileInputStream fin = new FileInputStream(plan.finPath);
                 FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -69,7 +70,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileReadWriteWithLocalBufferBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
+    public void doFileStreamWithLocalBufferOfVariedSize(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
                 FileInputStream fin = new FileInputStream(plan.finPath);
                 FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -91,7 +92,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doBufferedFileReadWriteBenchmark(BufferingEffectExecutionPlan plan) throws IOException {
+    public void doBufferedFileStreamWithVariedBufferSize(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
                 BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.finPath), plan.bufferSize);
                 BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.foutPath), plan.bufferSize);
@@ -114,7 +115,7 @@ public class BufferingEffectBenchmark extends AbstractIoBenchmark {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
-                .include(BufferingEffectBenchmark.class.getSimpleName())
+                .include(SequentialFileStreamBenchmark.class.getSimpleName())
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)
