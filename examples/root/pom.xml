@@ -10,6 +10,8 @@
     <version>0.1-SNAPSHOT</version>
 
     <modules>
+        <module>native</module>
+        <module>java-jni</module>
         <module>microbenchmark</module>
         <module>poc</module>
         <module>common</module>
