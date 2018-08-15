@@ -45,6 +45,22 @@
                                 <fileName>MallocArenaUtils.cpp</fileName>
                             </fileNames>
                         </source>
+                        <source>
+                            <directory>${basedir}/src/main/cpp/util</directory>
+                            <fileNames>
+                                <fileName>ConditionChecker.cpp</fileName>
+                                <fileName>DataTypeUtils.cpp</fileName>
+                                <fileName>ExceptionUtils.cpp</fileName>
+                                <fileName>JavaObjectUtils.cpp</fileName>
+                                <fileName>ObjectPointerUtils.cpp</fileName>
+                            </fileNames>
+                        </source>
+                        <source>
+                            <directory>${basedir}/src/test/cpp</directory>
+                            <fileNames>
+                                <fileName>JNIUtility.cpp</fileName>
+                            </fileNames>
+                        </source>
                     </sources>
                     <compilerStartOptions>
                         <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>

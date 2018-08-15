@@ -25,6 +25,20 @@ public class JniUtils {
         }
     }
 
+    public static void loadLibraryFromFile(String libFullPath) throws IOException {
+        File libFile = new File(libFullPath);
+
+        if (libFile.exists()) {
+            try {
+                System.load(libFile.getAbsolutePath());
+            } catch (UnsatisfiedLinkError ule) {
+                throw new RuntimeException(ule);
+            }
+        } else {
+            throw new IOException("[" + libFile.getAbsolutePath() + "] does not exist");
+        }
+    }
+
     public static void loadLibraryFromJar(String path) throws IOException {
 
         if (!path.startsWith("/")) {
