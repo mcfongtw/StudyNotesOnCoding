@@ -1,0 +1,1436 @@
+^Croot@ShannaraJedi:/data/dev/git/workspace_mcfongtw/StudyNotesOnJavaPerformance/examples/root# java -XX:NativeMemoryTracking=detail -jar poc/target/MallocArenaDemo.jar 1 2
+16:52:53.991 [Thread-0] INFO com.github.mcfongtw.ThreadLocalByteBuffer - Thread [Thread-0] has written [10485760] bytes to local buffer
+Arena 0:
+system bytes     =     135168
+in use bytes     =      90736
+Arena 1:
+system bytes     =     167936
+in use bytes     =     159488
+Arena 2:
+system bytes     =     135168
+in use bytes     =       2880
+Arena 3:
+system bytes     =     135168
+in use bytes     =       2688
+Arena 4:
+system bytes     =     962560
+in use bytes     =     958224
+Arena 5:
+system bytes     =     290816
+in use bytes     =     245008
+Arena 6:
+system bytes     =     393216
+in use bytes     =     390320
+Arena 7:
+system bytes     =     135168
+in use bytes     =       2688
+Arena 8:
+system bytes     =     135168
+in use bytes     =       3024
+Arena 9:
+system bytes     =     135168
+in use bytes     =      25968
+Arena 10:
+system bytes     =     135168
+in use bytes     =       2880
+Arena 11:
+system bytes     =     135168
+in use bytes     =       2352
+Arena 12:
+system bytes     =     135168
+in use bytes     =       2352
+Arena 13:
+system bytes     =     135168
+in use bytes     =       2448
+Arena 14:
+system bytes     =     135168
+in use bytes     =       2352
+Arena 15:
+system bytes     =    3489792
+in use bytes     =    3483632
+Total (incl. mmap):
+system bytes     =   74092544
+in use bytes     =   72678416
+max mmap regions =         19
+max mmap bytes   =   67301376
+root@ShannaraJedi:/data/dev/git/workspace_mcfongtw/StudyNotesOnJavaPerformance/examples/root# jcmd 19630 VM.native_memory detail
+19630:
+
+Native Memory Tracking:
+
+Total: reserved=5530252KB, committed=432592KB
+-                 Java Heap (reserved=4040704KB, committed=253952KB)
+                            (mmap: reserved=4040704KB, committed=253952KB)
+
+-                     Class (reserved=1062036KB, committed=10516KB)
+                            (classes #835)
+                            (malloc=5268KB #321)
+                            (mmap: reserved=1056768KB, committed=5248KB)
+
+-                    Thread (reserved=16517KB, committed=16517KB)
+                            (thread #17)
+                            (stack: reserved=16448KB, committed=16448KB)
+                            (malloc=51KB #86)
+                            (arena=19KB #29)
+
+-                      Code (reserved=249715KB, committed=2651KB)
+                            (malloc=115KB #518)
+                            (mmap: reserved=249600KB, committed=2536KB)
+
+-                        GC (reserved=153407KB, committed=141083KB)
+                            (malloc=5771KB #120)
+                            (mmap: reserved=147636KB, committed=135312KB)
+
+-                  Compiler (reserved=133KB, committed=133KB)
+                            (malloc=2KB #26)
+                            (arena=131KB #6)
+
+-                  Internal (reserved=5437KB, committed=5437KB)
+                            (malloc=5405KB #1846)
+                            (mmap: reserved=32KB, committed=32KB)
+
+-                    Symbol (reserved=1916KB, committed=1916KB)
+                            (malloc=1204KB #1853)
+                            (arena=712KB #1)
+
+-    Native Memory Tracking (reserved=203KB, committed=203KB)
+                            (malloc=104KB #1478)
+                            (tracking overhead=99KB)
+
+-               Arena Chunk (reserved=185KB, committed=185KB)
+                            (malloc=185KB)
+
+Virtual memory map:
+
+[0x00000006c9600000 - 0x00000007c0000000] reserved 4040704KB for Java Heap from
+    [0x00007f2f41cd3ad8]
+    [0x00007f2f41c9ac7c]
+    [0x00007f2f41b4a100]
+    [0x00007f2f41c9b439]
+
+	[0x00000006c9600000 - 0x00000006d3b80000] committed 169472KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b8ad13]
+            [0x00007f2f415175a1]
+            [0x00007f2f41b4a259]
+
+	[0x000000076dd00000 - 0x0000000772f80000] committed 84480KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b9c21d]
+            [0x00007f2f41517567]
+            [0x00007f2f41b4a259]
+
+[0x00000007c0000000 - 0x0000000800000000] reserved 1048576KB for Class from
+    [0x00007f2f41cd2edc]
+    [0x00007f2f41aa5e1f]
+    [0x00007f2f41aa681f]
+    [0x00007f2f41c9b6bd]
+
+	[0x00000007c0080000 - 0x00000007c00a0000] committed 128KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41aa2b45]
+            [0x00007f2f41aa2d4f]
+            [0x00007f2f41aa409b]
+
+	[0x00000007c0000000 - 0x00000007c0080000] committed 512KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41aa2b45]
+            [0x00007f2f41aa2d4f]
+            [0x00007f2f41aa3251]
+
+[0x00007f2f044b0000 - 0x00007f2f0c000000] reserved 126272KB for GC from
+    [0x00007f2f41cd311d]
+    [0x00007f2f41b408f8]
+    [0x00007f2f41b92b91]
+    [0x00007f2f41b4a415]
+
+	[0x00007f2f044b0000 - 0x00007f2f0c000000] committed 126272KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b40a00]
+            [0x00007f2f41b92b91]
+            [0x00007f2f41b4a415]
+
+[0x00007f2f208d1000 - 0x00007f2f209d2000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f4154ed58]
+    [0x00007f2f41c7c547]
+    [0x00007f2f41c7ca0c]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f2806e000 - 0x00007f2f2816f000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f282cb000 - 0x00007f2f283cc000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f283cc000 - 0x00007f2f284cd000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f284cd000 - 0x00007f2f285ce000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f285ce000 - 0x00007f2f286cf000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f286cf000 - 0x00007f2f287d0000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f287d0000 - 0x00007f2f288d1000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f29017000 - 0x00007f2f29118000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f29118000 - 0x00007f2f29219000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41b21e12]
+
+[0x00007f2f29219000 - 0x00007f2f2931a000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41cddd4c]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f2a46e000 - 0x00007f2f2ac6e000] reserved 8192KB for Class from
+    [0x00007f2f41cd311d]
+    [0x00007f2f41a9cd8a]
+    [0x00007f2f41aa2815]
+    [0x00007f2f41aa686b]
+
+	[0x00007f2f2a8ae000 - 0x00007f2f2a8ee000] committed 256KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41aa2b45]
+            [0x00007f2f41aa2d4f]
+            [0x00007f2f41aa409b]
+
+	[0x00007f2f2a46e000 - 0x00007f2f2a8ae000] committed 4352KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41aa2b45]
+            [0x00007f2f41aa2d4f]
+            [0x00007f2f41aa4857]
+
+[0x00007f2f2ac6e000 - 0x00007f2f2b423000] reserved 7892KB for GC from
+    [0x00007f2f41cd311d]
+    [0x00007f2f41b9274f]
+    [0x00007f2f41b92bfc]
+    [0x00007f2f41b4a415]
+
+	[0x00007f2f2ac6e000 - 0x00007f2f2b423000] committed 7892KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b9282e]
+            [0x00007f2f41b92bfc]
+            [0x00007f2f41b4a415]
+
+[0x00007f2f2b423000 - 0x00007f2f2b524000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41811bfb]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f2b524000 - 0x00007f2f2b625000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41811bfb]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f2b625000 - 0x00007f2f2b726000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41811bfb]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f2b726000 - 0x00007f2f2bc4a000] reserved 5264KB for GC from
+    [0x00007f2f41cd2cf8]
+    [0x00007f2f41b132aa]
+    [0x00007f2f41b8a9e9]
+    [0x00007f2f41b8ad34]
+
+	[0x00007f2f2b726000 - 0x00007f2f2b779000] committed 332KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b135fa]
+            [0x00007f2f41b8ab5c]
+            [0x00007f2f41b8ad34]
+
+[0x00007f2f2bc4a000 - 0x00007f2f2c400000] reserved 7896KB for GC from
+    [0x00007f2f41cd311d]
+    [0x00007f2f4162fcb3]
+    [0x00007f2f41b4a1cd]
+    [0x00007f2f41c9b439]
+
+	[0x00007f2f2bc4a000 - 0x00007f2f2bc9d000] committed 332KB from
+            [0x00007f2f41630783]
+            [0x00007f2f4162f2f8]
+            [0x00007f2f41b8aa38]
+            [0x00007f2f41b8ad34]
+
+	[0x00007f2f2c16d000 - 0x00007f2f2c197000] committed 168KB from
+            [0x00007f2f41630783]
+            [0x00007f2f4162f2f8]
+            [0x00007f2f41b9be42]
+            [0x00007f2f41517567]
+
+	[0x00007f2f2c3ff000 - 0x00007f2f2c400000] committed 4KB from
+            [0x00007f2f4162fd70]
+            [0x00007f2f41b4a1cd]
+            [0x00007f2f41c9b439]
+            [0x00007f2f41c9b682]
+
+[0x00007f2f2c400000 - 0x00007f2f2c7c0000] reserved 3840KB for Code from
+    [0x00007f2f41cd2cf8]
+    [0x00007f2f41852106]
+    [0x00007f2f416b2050]
+    [0x00007f2f4187ae7b]
+
+	[0x00007f2f2c400000 - 0x00007f2f2c40a000] committed 40KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41852125]
+            [0x00007f2f416b2050]
+            [0x00007f2f4187ae7b]
+
+[0x00007f2f2c7c0000 - 0x00007f2f3b7c0000] reserved 245760KB for Code from
+    [0x00007f2f41cd4003]
+    [0x00007f2f41851fd1]
+    [0x00007f2f416b2050]
+    [0x00007f2f4187ae7b]
+
+	[0x00007f2f2c7c0000 - 0x00007f2f2ca30000] committed 2496KB from
+            [0x00007f2f41cd47c4]
+            [0x00007f2f41852027]
+            [0x00007f2f416b2050]
+            [0x00007f2f4187ae7b]
+
+[0x00007f2f40074000 - 0x00007f2f40175000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41811bfb]
+    [0x00007f2f41b21e12]
+
+[0x00007f2f42e7c000 - 0x00007f2f42eca000] reserved 312KB for GC from
+    [0x00007f2f41cd311d]
+    [0x00007f2f41b9274f]
+    [0x00007f2f41b92bc2]
+    [0x00007f2f41b4a415]
+
+	[0x00007f2f42e7c000 - 0x00007f2f42eca000] committed 312KB from
+            [0x00007f2f41b9a206]
+            [0x00007f2f41b9282e]
+            [0x00007f2f41b92bc2]
+            [0x00007f2f41b4a415]
+
+[0x00007f2f42eca000 - 0x00007f2f42fcb000] reserved and committed 1028KB for Thread Stack from
+    [0x00007f2f41c8099a]
+    [0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+    [0x00007f2f42bb8f2e]
+    [0x00007f2f42bbd4ed]
+
+[0x00007f2f42fdf000 - 0x00007f2f42fe7000] reserved and committed 32KB for Internal from
+    [0x00007f2f41b6ea5a]
+    [0x00007f2f41b6d509]
+    [0x00007f2f41c80961]
+    [0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+Details:
+
+[0x00007f2f41b93765]
+[0x00007f2f41b9542d]
+[0x00007f2f41b94697]
+[0x00007f2f41c99ee7]
+                             (malloc=5120KB type=Class #5)
+
+[0x00007f2f41569b45]
+[0x00007f2f41b83ec4]
+[0x00007f2f41b92dd2]
+[0x00007f2f41b484b5]
+                             (malloc=5120KB type=Internal #5)
+
+[0x00007f2f41b83c0d]
+[0x00007f2f41b84177]
+[0x00007f2f41b92dd2]
+[0x00007f2f41b484b5]
+                             (malloc=4096KB type=GC #4)
+
+[0x00007f2f41b83c0d]
+[0x00007f2f41b8420f]
+[0x00007f2f41b92dd2]
+[0x00007f2f41b484b5]
+                             (malloc=1024KB type=GC #1)
+
+[0x00007f2f41b84a15]
+[0x00007f2f41b83b27]
+[0x00007f2f41b84177]
+[0x00007f2f41b92dd2]
+                             (malloc=512KB type=GC #4)
+
+[0x00007f2f41c9bb85]
+[0x00007f2f4187ae8f]
+[0x00007f2f41c80a2a]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=469KB type=Symbol #1)
+
+[0x00007f2f41850235]
+[0x00007f2f41850271]
+[0x00007f2f41c3e3bb]
+[0x00007f2f41c3e59b]
+                             (malloc=432KB type=Symbol #54)
+
+[0x00007f2f41c3c839]
+[0x00007f2f41c9b9fb]
+[0x00007f2f4187ae8f]
+[0x00007f2f41c80a2a]
+                             (malloc=360KB type=Arena Chunk #1)
+
+[0x00007f2f41c9bb55]
+[0x00007f2f4187ae8f]
+[0x00007f2f41c80a2a]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=156KB type=Symbol #1)
+
+[0x00007f2f41b84a15]
+[0x00007f2f41b83b27]
+[0x00007f2f41b8420f]
+[0x00007f2f41b92dd2]
+                             (malloc=128KB type=GC #1)
+
+[0x00007f2f41a637e0]
+[0x00007f2f41a638b0]
+[0x00007f2f41a64010]
+                             (malloc=101KB type=Native Memory Tracking #1435)
+
+[0x00007f2f4172c84c]
+[0x00007f2f41691f57]
+[0x00007f2f41693458]
+[0x00007f2f4169a2fa]
+                             (malloc=87KB type=Internal #742)
+
+[0x00007f2f416aa385]
+[0x00007f2f416aa752]
+[0x00007f2f41af378f]
+[0x00007f2f41af4422]
+                             (malloc=81KB type=Code #164)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f418902c1]
+[0x00007f2f418d0c19]
+                             (malloc=64KB type=Arena Chunk #2)
+
+[0x00007f2f41c3a8a5]
+[0x00007f2f41c3e37f]
+[0x00007f2f41c3e59b]
+[0x00007f2f4168d356]
+                             (malloc=55KB type=Symbol #1408)
+
+[0x00007f2f4184f945]
+[0x00007f2f4184f9a1]
+[0x00007f2f4179b14e]
+[0x00007f2f41c45aa5]
+                             (malloc=48KB type=Class #3)
+
+[0x00007f2f41850235]
+[0x00007f2f41850291]
+[0x00007f2f41c3ebc6]
+[0x00007f2f41c3f0fe]
+                             (malloc=48KB type=Symbol #6)
+
+[0x00007f2f4184f945]
+[0x00007f2f4184f9e1]
+[0x00007f2f41b77ece]
+[0x00007f2f41c4c321]
+                             (malloc=32KB type=Class #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4161e460]
+[0x00007f2f4161e878]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41ad4f0f]
+[0x00007f2f41ad51f8]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f417995fd]
+[0x00007f2f41c93cc0]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41a76e24]
+[0x00007f2f41a77c88]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41afc25d]
+[0x00007f2f41a79e0c]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4161e2c0]
+[0x00007f2f4161fb62]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4168f562]
+[0x00007f2f41693989]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4173c12c]
+[0x00007f2f41694235]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41569817]
+[0x00007f2f41602651]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4179404d]
+[0x00007f2f41794601]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41a76e24]
+[0x00007f2f41a76ddd]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4159a3d6]
+[0x00007f2f4159c206]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f4173bad1]
+[0x00007f2f41694235]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41c4c0e5]
+[0x00007f2f41c4e77a]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41bac881]
+[0x00007f2f4163ef5f]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f415f728a]
+[0x00007f2f415fb8f1]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f416af861]
+[0x00007f2f41be79d1]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f415208d9]
+[0x00007f2f41695a26]
+[0x00007f2f4169893b]
+                             (malloc=32KB type=Arena Chunk #1)
+
+[0x00007f2f41850235]
+[0x00007f2f41850271]
+[0x00007f2f41c3d359]
+[0x00007f2f41c3dd44]
+                             (malloc=24KB type=Symbol #3)
+
+[0x00007f2f41c42362]
+[0x00007f2f41c423f0]
+[0x00007f2f41c43028]
+[0x00007f2f4188c350]
+                             (malloc=22KB type=Internal #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151f8d3]
+[0x00007f2f41a7522b]
+[0x00007f2f416d1483]
+                             (malloc=20KB type=Arena Chunk #2)
+
+[0x00007f2f417adf9d]
+[0x00007f2f417ad628]
+[0x00007f2f4173386c]
+[0x00007f2f417330ba]
+                             (malloc=17KB type=Internal #3)
+
+[0x00007f2f4184f945]
+[0x00007f2f4184f9c1]
+[0x00007f2f4179bc51]
+[0x00007f2f4179cc15]
+                             (malloc=16KB type=Class #1)
+
+[0x00007f2f4179c931]
+[0x00007f2f41c4edfb]
+[0x00007f2f41c98008]
+[0x00007f2f41c995ab]
+                             (malloc=16KB type=Class #1)
+
+[0x00007f2f417adc2a]
+[0x00007f2f417ad56d]
+[0x00007f2f4173386c]
+[0x00007f2f417330ba]
+                             (malloc=12KB type=Internal #6)
+
+[0x00007f2f4172c84c]
+[0x00007f2f41691f57]
+[0x00007f2f41693458]
+[0x00007f2f41c46ab6]
+                             (malloc=11KB type=Internal #93)
+
+[0x00007f2f41c3a8a5]
+[0x00007f2f41c3e37f]
+[0x00007f2f41c3e59b]
+[0x00007f2f4168c863]
+                             (malloc=11KB type=Symbol #274)
+
+[0x00007f2f416b4d21]
+[0x00007f2f41c9b3fa]
+[0x00007f2f41c9b682]
+[0x00007f2f4187ae8f]
+                             (malloc=10KB type=Internal #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f4181122e]
+[0x00007f2f41b4a3d9]
+[0x00007f2f41c9b439]
+                             (malloc=10KB type=Thread #4)
+
+[0x00007f2f41c755fd]
+[0x00007f2f419143b4] JVM_StartThread+0xb4
+[0x00007f2f2c7d8407]
+                             (malloc=9KB type=Thread #3)
+
+[0x00007f2f41850d25]
+[0x00007f2f41bd756b]
+[0x00007f2f41be38e8]
+[0x00007f2f41bda1dc]
+                             (malloc=8KB type=Code #2)
+
+[0x00007f2f4179c905]
+[0x00007f2f41c4edfb]
+[0x00007f2f41c98008]
+[0x00007f2f41c995ab]
+                             (malloc=8KB type=Class #1)
+
+[0x00007f2f41b779b5]
+[0x00007f2f41c4ee21]
+[0x00007f2f41c98008]
+[0x00007f2f41c995ab]
+                             (malloc=8KB type=Class #1)
+
+[0x00007f2f416aa385]
+[0x00007f2f416abfc3]
+[0x00007f2f4160e5ca]
+[0x00007f2f4160e685]
+                             (malloc=7KB type=Code #29)
+
+[0x00007f2f41c3a8a5]
+[0x00007f2f41c3d3bd]
+[0x00007f2f41c3d57e]
+[0x00007f2f4173aa3a]
+                             (malloc=6KB type=Symbol #72)
+
+[0x00007f2f41c755fd]
+[0x00007f2f416d8d44]
+[0x00007f2f416de60b]
+[0x00007f2f416deb16]
+                             (malloc=6KB type=Thread #2)
+
+[0x00007f2f41bd9b3a]
+[0x00007f2f41aac07f]
+[0x00007f2f41885476]
+[0x00007f2f41885b62]
+                             (malloc=5KB type=Code #197)
+
+[0x00007f2f41850d25]
+[0x00007f2f41bd8e15]
+[0x00007f2f41bd9fb5]
+[0x00007f2f41aac07f]
+                             (malloc=4KB type=Code #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151faa0]
+[0x00007f2f41c7fda5]
+[0x00007f2f41811f3f]
+                             (malloc=4KB type=Arena Chunk #4)
+
+[0x00007f2f4169db9a]
+[0x00007f2f4171fe06]
+[0x00007f2f41bbef16]
+[0x00007f2f41bbf78d]
+                             (malloc=4KB type=Class #14)
+
+[0x00007f2f4184c1f5]
+[0x00007f2f41b6c064]
+[0x00007f2f41b6cf32]
+[0x00007f2f416d6015]
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f4154fccd]
+[0x00007f2f4154fee7]
+[0x00007f2f4154ffa9]
+[0x00007f2f4154eec7]
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f416d8d44]
+[0x00007f2f416de803]
+[0x00007f2f416deb16]
+                             (malloc=3KB type=Thread #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151faa0]
+[0x00007f2f41c7ecd5]
+[0x00007f2f41c7f989]
+                             (malloc=3KB type=Arena Chunk #3)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151faa0]
+[0x00007f2f416add77]
+[0x00007f2f415343db]
+                             (malloc=3KB type=Arena Chunk #3)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151faa0]
+[0x00007f2f41c7ecd5]
+[0x00007f2f41c7f249]
+                             (malloc=3KB type=Arena Chunk #3)
+
+[0x00007f2f41c755fd]
+[0x00007f2f4154e7c3]
+[0x00007f2f4154f8aa]
+[0x00007f2f41b1b84d]
+                             (malloc=3KB type=Thread #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f41b1bf05]
+[0x00007f2f41c813eb]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Thread #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f41bca020]
+[0x00007f2f41a6bcd9]
+[0x00007f2f41c81444]
+                             (malloc=3KB type=Thread #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f41c80975]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+[0x00007f2f42bb8f2e]
+                             (malloc=3KB type=Thread #1)
+
+[0x00007f2f4190d99a]
+[0x00007f2f418ca6d7]
+[0x00007f2f418cd076]
+[0x00007f2f4188c0e5]
+                             (malloc=3KB type=Internal #9)
+
+[0x00007f2f4190d99a]
+[0x00007f2f41c7c8ef]
+[0x00007f2f41b21e12]
+                             (malloc=3KB type=Internal #9)
+
+[0x00007f2f417bc065]
+[0x00007f2f4187ae13]
+[0x00007f2f41c80961]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f417bbe4f]
+[0x00007f2f4187ae13]
+[0x00007f2f41c80961]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f417bc171]
+[0x00007f2f4187ae13]
+[0x00007f2f41c80961]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f417bbf5d]
+[0x00007f2f4187ae13]
+[0x00007f2f41c80961]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f416db09c]
+[0x00007f2f4187af10]
+[0x00007f2f41c80a2a]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=3KB type=Internal #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f41cde43b]
+[0x00007f2f41c80b43]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=2KB type=Thread #1)
+
+[0x00007f2f41c755fd]
+[0x00007f2f41c803cf]
+[0x00007f2f41c814d9]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (malloc=2KB type=Thread #1)
+
+[0x00007f2f41bd8f45]
+[0x00007f2f41bd9fb5]
+[0x00007f2f41aac07f]
+[0x00007f2f41885476]
+                             (malloc=2KB type=Code #1)
+
+[0x00007f2f4184f945]
+[0x00007f2f41697066]
+[0x00007f2f4169a5ad]
+[0x00007f2f41c4dc0a]
+                             (malloc=2KB type=Class #5)
+
+[0x00007f2f41b95485]
+[0x00007f2f41b94697]
+[0x00007f2f41c99ee7]
+[0x00007f2f4187af1a]
+                             (malloc=2KB type=GC #1)
+
+[0x00007f2f4190d99a]
+[0x00007f2f418ca6d7]
+[0x00007f2f418cd076]
+[0x00007f2f4191eb09] JVM_DoPrivileged+0x429
+                             (malloc=2KB type=Internal #7)
+
+[0x00007f2f4184f945]
+[0x00007f2f4184f9a1]
+[0x00007f2f419fcad0]
+[0x00007f2f41c4744d]
+                             (malloc=2KB type=Class #1)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151faa0]
+[0x00007f2f4164113b]
+[0x00007f2f416d9add]
+                             (malloc=2KB type=Arena Chunk #2)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ffcd]
+[0x00007f2f41811f3f]
+[0x00007f2f41811247]
+                             (malloc=2KB type=Internal #4)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ffbe]
+[0x00007f2f41811f3f]
+[0x00007f2f41811247]
+                             (malloc=2KB type=Internal #4)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ffeb]
+[0x00007f2f41811f3f]
+[0x00007f2f41811247]
+                             (malloc=2KB type=Internal #4)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ffdc]
+[0x00007f2f41811f3f]
+[0x00007f2f41811247]
+                             (malloc=2KB type=Internal #4)
+
+[0x00007f2f4190d99a]
+[0x00007f2f418ca6d7]
+[0x00007f2f418cd076]
+[0x00007f2f4188bd50]
+                             (malloc=2KB type=Internal #5)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ef1b]
+[0x00007f2f41c7f249]
+[0x00007f2f416d8d60]
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ef0c]
+[0x00007f2f41c7f249]
+[0x00007f2f416d8d60]
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7eefd]
+[0x00007f2f41c7f249]
+[0x00007f2f416d8d60]
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7eeee]
+[0x00007f2f41c7f249]
+[0x00007f2f416d8d60]
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ef1b]
+[0x00007f2f41c7f989]
+[0x00007f2f419143d9] JVM_StartThread+0xd9
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7ef0c]
+[0x00007f2f41c7f989]
+[0x00007f2f419143d9] JVM_StartThread+0xd9
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7eefd]
+[0x00007f2f41c7f989]
+[0x00007f2f419143d9] JVM_StartThread+0xd9
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f41b4a99e]
+[0x00007f2f41c7eeee]
+[0x00007f2f41c7f989]
+[0x00007f2f419143d9] JVM_StartThread+0xd9
+                             (malloc=1KB type=Internal #3)
+
+[0x00007f2f415210f5]
+[0x00007f2f4151f9d0]
+[0x00007f2f41c7ed05]
+[0x00007f2f41c7f989]
+                             (malloc=1KB type=Arena Chunk #6)
+
+[0x00007f2f41920051] JVM_RawMonitorCreate+0x21
+[0x00007f2f3b7c57e9]
+[0x00007f2f3b7c3a3d] Java_java_util_zip_ZipFile_open+0xfd
+[0x00007f2f2c7d8407]
+                             (malloc=1KB type=Internal #11)
+
+[0x00007f2f4190d99a]
+[0x00007f2f418ca6d7]
+[0x00007f2f418cd076]
+[0x00007f2f418cafe4]
+                             (malloc=1KB type=Internal #4)
+
+[0x00007f2f4188b270]
+[0x00007f2f41af44db]
+[0x00007f2f416477ff]
+[0x00007f2f4158b7e4]
+                             (malloc=1KB type=Class #51)
+
+[0x00007f2f416aa385]
+[0x00007f2f416aa752]
+[0x00007f2f41aebfc0]
+[0x00007f2f41aed2be]
+                             (malloc=1KB type=Code #14)
+
+[0x00007f2f41b8415d]
+[0x00007f2f41b92dd2]
+[0x00007f2f41b484b5]
+[0x00007f2f41c99ee7]
+                             (malloc=1KB type=GC #4)
+
+[0x00007f2f4179bf85]
+[0x00007f2f41c4ee9d]
+[0x00007f2f41c98008]
+[0x00007f2f41c995ab]
+                             (malloc=1KB type=Symbol #1)
+
+[0x00007f2f4179cc22]
+[0x00007f2f41c4490e]
+[0x00007f2f41c4c51c]
+[0x00007f2f41c4e77a]
+                             (malloc=1KB type=Class #64)
+
+[0x00007f2f41cd3ad8]
+[0x00007f2f41c9ac7c]
+[0x00007f2f41b4a100]
+[0x00007f2f41c9b439]
+                             (reserved=4040704KB, committed=253952KB)
+
+[0x00007f2f41cd2edc]
+[0x00007f2f41aa5e1f]
+[0x00007f2f41aa681f]
+[0x00007f2f41c9b6bd]
+                             (reserved=1048576KB, committed=640KB)
+
+[0x00007f2f41cd4003]
+[0x00007f2f41851fd1]
+[0x00007f2f416b2050]
+[0x00007f2f4187ae7b]
+                             (reserved=245760KB, committed=2496KB)
+
+[0x00007f2f41cd311d]
+[0x00007f2f41b408f8]
+[0x00007f2f41b92b91]
+[0x00007f2f41b4a415]
+                             (reserved=126272KB, committed=126272KB)
+
+[0x00007f2f41b21e12]
+                             (reserved=9252KB, committed=9252KB)
+
+[0x00007f2f41cd311d]
+[0x00007f2f41a9cd8a]
+[0x00007f2f41aa2815]
+[0x00007f2f41aa686b]
+                             (reserved=8192KB, committed=4608KB)
+
+[0x00007f2f41cd311d]
+[0x00007f2f4162fcb3]
+[0x00007f2f41b4a1cd]
+[0x00007f2f41c9b439]
+                             (reserved=7896KB, committed=504KB)
+
+[0x00007f2f41cd311d]
+[0x00007f2f41b9274f]
+[0x00007f2f41b92bfc]
+[0x00007f2f41b4a415]
+                             (reserved=7892KB, committed=7892KB)
+
+[0x00007f2f41cd2cf8]
+[0x00007f2f41b132aa]
+[0x00007f2f41b8a9e9]
+[0x00007f2f41b8ad34]
+                             (reserved=5264KB, committed=332KB)
+
+[0x00007f2f41811bfb]
+[0x00007f2f41b21e12]
+                             (reserved=4112KB, committed=4112KB)
+
+[0x00007f2f41cd2cf8]
+[0x00007f2f41852106]
+[0x00007f2f416b2050]
+[0x00007f2f4187ae7b]
+                             (reserved=3840KB, committed=40KB)
+
+[0x00007f2f41c8099a]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+[0x00007f2f42bb8f2e]
+[0x00007f2f42bbd4ed]
+                             (reserved=1028KB, committed=1028KB)
+
+[0x00007f2f4154ed58]
+[0x00007f2f41c7c547]
+[0x00007f2f41c7ca0c]
+[0x00007f2f41b21e12]
+                             (reserved=1028KB, committed=1028KB)
+
+[0x00007f2f41cddd4c]
+[0x00007f2f41b21e12]
+                             (reserved=1028KB, committed=1028KB)
+
+[0x00007f2f41cd311d]
+[0x00007f2f41b9274f]
+[0x00007f2f41b92bc2]
+[0x00007f2f41b4a415]
+                             (reserved=312KB, committed=312KB)
+
+[0x00007f2f41b6ea5a]
+[0x00007f2f41b6d509]
+[0x00007f2f41c80961]
+[0x00007f2f418f4a82] JNI_CreateJavaVM+0x62
+                             (reserved=32KB, committed=32KB)
+root@ShannaraJedi:/data/dev/git/workspace_mcfongtw/StudyNotesOnJavaPerformance/examples/root# pmap -p 19630 -x
+19630:   java -XX:NativeMemoryTracking=detail -jar poc/target/MallocArenaDemo.jar 1 2
+Address           Kbytes     RSS   Dirty Mode  Mapping
+0000000000400000       4       4       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+0000000000400000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+0000000000600000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+0000000000600000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+0000000000601000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+0000000000601000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+00000000010bd000     132      28      28 rw---   [ anon ]
+00000000010bd000       0       0       0 rw---   [ anon ]
+00000006c9600000  169472       0       0 rw---   [ anon ]
+00000006c9600000       0       0       0 rw---   [ anon ]
+00000006d3b80000 2524672       0       0 -----   [ anon ]
+00000006d3b80000       0       0       0 -----   [ anon ]
+000000076dd00000   84480   13648   13648 rw---   [ anon ]
+000000076dd00000       0       0       0 rw---   [ anon ]
+0000000772f80000 1262080       0       0 -----   [ anon ]
+0000000772f80000       0       0       0 -----   [ anon ]
+00000007c0000000     640     552     552 rw---   [ anon ]
+00000007c0000000       0       0       0 rw---   [ anon ]
+00000007c00a0000 1047936       0       0 -----   [ anon ]
+00000007c00a0000       0       0       0 -----   [ anon ]
+00007f2ed8000000     132     108     108 rw---   [ anon ]   -> Arena 1
+00007f2ed8000000       0       0       0 rw---   [ anon ]
+00007f2ed8021000   65404       0       0 -----   [ anon ]   <-
+00007f2ed8021000       0       0       0 -----   [ anon ]
+00007f2ee0000000     132       4       4 rw---   [ anon ]   -> Arena 2
+00007f2ee0000000       0       0       0 rw---   [ anon ]
+00007f2ee0021000   65404       0       0 -----   [ anon ]   <-
+00007f2ee0021000       0       0       0 -----   [ anon ]
+00007f2ee4000000     164     144     144 rw---   [ anon ]   -> Arena 3
+00007f2ee4000000       0       0       0 rw---   [ anon ]
+00007f2ee4029000   65372       0       0 -----   [ anon ]   <-
+00007f2ee4029000       0       0       0 -----   [ anon ]
+00007f2ee8000000     940     940     940 rw---   [ anon ]   -> Arena 4
+00007f2ee8000000       0       0       0 rw---   [ anon ]
+00007f2ee80eb000   64596       0       0 -----   [ anon ]   <-
+00007f2ee80eb000       0       0       0 -----   [ anon ]
+00007f2eec000000     132       4       4 rw---   [ anon ]   -> Arena 5
+00007f2eec000000       0       0       0 rw---   [ anon ]
+00007f2eec021000   65404       0       0 -----   [ anon ]   <-
+00007f2eec021000       0       0       0 -----   [ anon ]
+00007f2ef0000000     384     376     376 rw---   [ anon ]   -> Arena 6
+00007f2ef0000000       0       0       0 rw---   [ anon ]
+00007f2ef0060000   65152       0       0 -----   [ anon ]   <-
+00007f2ef0060000       0       0       0 -----   [ anon ]
+00007f2ef4000000     440     440     440 rw---   [ anon ]   -> Arena 7
+00007f2ef4000000       0       0       0 rw---   [ anon ]
+00007f2ef406e000   65096       0       0 -----   [ anon ]   <-
+00007f2ef406e000       0       0       0 -----   [ anon ]
+00007f2ef8000000     132       4       4 rw---   [ anon ]   -> Arena 8
+00007f2ef8000000       0       0       0 rw---   [ anon ]
+00007f2ef8021000   65404       0       0 -----   [ anon ]   <-
+00007f2ef8021000       0       0       0 -----   [ anon ]
+00007f2efc000000     132      12      12 rw---   [ anon ]   -> Arena 9
+00007f2efc000000       0       0       0 rw---   [ anon ]
+00007f2efc021000   65404       0       0 -----   [ anon ]   <-
+00007f2efc021000       0       0       0 -----   [ anon ]
+00007f2f00000000     132      28      28 rw---   [ anon ]   -> Arena 10
+00007f2f00000000       0       0       0 rw---   [ anon ]
+00007f2f00021000   65404       0       0 -----   [ anon ]   <-
+00007f2f00021000       0       0       0 -----   [ anon ]
+00007f2f044b0000  126272       0       0 rw---   [ anon ]
+00007f2f044b0000       0       0       0 rw---   [ anon ]
+00007f2f0c000000     132       4       4 rw---   [ anon ]   -> Arena 11
+00007f2f0c000000       0       0       0 rw---   [ anon ]
+00007f2f0c021000   65404       0       0 -----   [ anon ]   <-
+00007f2f0c021000       0       0       0 -----   [ anon ]
+00007f2f10000000     132       4       4 rw---   [ anon ]   -> Arena 12
+00007f2f10000000       0       0       0 rw---   [ anon ]
+00007f2f10021000   65404       0       0 -----   [ anon ]   <-
+00007f2f10021000       0       0       0 -----   [ anon ]
+00007f2f14000000     132       4       4 rw---   [ anon ]   -> Arena 13
+00007f2f14000000       0       0       0 rw---   [ anon ]
+00007f2f14021000   65404       0       0 -----   [ anon ]   <-
+00007f2f14021000       0       0       0 -----   [ anon ]
+00007f2f1c000000     132       4       4 rw---   [ anon ]   -> Arena 14
+00007f2f1c000000       0       0       0 rw---   [ anon ]
+00007f2f1c021000   65404       0       0 -----   [ anon ]   <-
+00007f2f1c021000       0       0       0 -----   [ anon ]
+00007f2f208d1000      12       0       0 -----   [ anon ]
+00007f2f208d1000       0       0       0 -----   [ anon ]
+00007f2f208d4000    1016      12      12 rw---   [ anon ]
+00007f2f208d4000       0       0       0 rw---   [ anon ]
+00007f2f209d2000       4       4       0 r-x-- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f209d2000       0       0       0 r-x-- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f209d3000    2044       0       0 ----- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f209d3000       0       0       0 ----- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f20bd2000       4       4       4 r---- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f20bd2000       0       0       0 r---- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f20bd3000       4       4       4 rw--- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f20bd3000       0       0       0 rw--- /tmp/libnative6639131495121850005.so (deleted)
+00007f2f20bd4000   49156       4       4 rw---   [ anon ]
+00007f2f20bd4000       0       0       0 rw---   [ anon ]
+00007f2f23bd5000      92      64       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23bd5000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23bec000    2044       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23bec000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23deb000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23deb000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23dec000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23dec000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnet.so
+00007f2f23ded000      68      64       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23ded000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23dfe000    2048       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23dfe000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23ffe000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23ffe000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23fff000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f23fff000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libnio.so
+00007f2f24000000     132       4       4 rw---   [ anon ]   -> Arena 15
+00007f2f24000000       0       0       0 rw---   [ anon ]
+00007f2f24021000   65404       0       0 -----   [ anon ]   <-
+00007f2f24021000       0       0       0 -----   [ anon ]
+00007f2f2806e000      12       0       0 -----   [ anon ]
+00007f2f2806e000       0       0       0 -----   [ anon ]
+00007f2f28071000    1016     108     108 rw---   [ anon ]
+00007f2f28071000       0       0       0 rw---   [ anon ]
+00007f2f2816f000    1392    1392       0 r--s- /data/dev/git/workspace_mcfongtw/StudyNotesOnJavaPerformance/examples/root/poc/target/MallocArenaDemo.jar
+00007f2f2816f000       0       0       0 r--s- /data/dev/git/workspace_mcfongtw/StudyNotesOnJavaPerformance/examples/root/poc/target/MallocArenaDemo.jar
+00007f2f282cb000       4       0       0 -----   [ anon ]
+00007f2f282cb000       0       0       0 -----   [ anon ]
+00007f2f282cc000    1024       8       8 rw---   [ anon ]
+00007f2f282cc000       0       0       0 rw---   [ anon ]
+00007f2f283cc000      12       0       0 -----   [ anon ]
+00007f2f283cc000       0       0       0 -----   [ anon ]
+00007f2f283cf000    1016       8       8 rw---   [ anon ]
+00007f2f283cf000       0       0       0 rw---   [ anon ]
+00007f2f284cd000      12       0       0 -----   [ anon ]
+00007f2f284cd000       0       0       0 -----   [ anon ]
+00007f2f284d0000    1016      16      16 rw---   [ anon ]
+00007f2f284d0000       0       0       0 rw---   [ anon ]
+00007f2f285ce000      12       0       0 -----   [ anon ]
+00007f2f285ce000       0       0       0 -----   [ anon ]
+00007f2f285d1000    1016      24      24 rw---   [ anon ]
+00007f2f285d1000       0       0       0 rw---   [ anon ]
+00007f2f286cf000      12       0       0 -----   [ anon ]
+00007f2f286cf000       0       0       0 -----   [ anon ]
+00007f2f286d2000    1016      24      24 rw---   [ anon ]
+00007f2f286d2000       0       0       0 rw---   [ anon ]
+00007f2f287d0000      12       0       0 -----   [ anon ]
+00007f2f287d0000       0       0       0 -----   [ anon ]
+00007f2f287d3000    1016      92      92 rw---   [ anon ]
+00007f2f287d3000       0       0       0 rw---   [ anon ]
+00007f2f288d1000    7448     424       0 r---- /usr/lib/locale/locale-archive
+00007f2f288d1000       0       0       0 r---- /usr/lib/locale/locale-archive
+00007f2f29017000      12       0       0 -----   [ anon ]
+00007f2f29017000       0       0       0 -----   [ anon ]
+00007f2f2901a000    1016      88      88 rw---   [ anon ]
+00007f2f2901a000       0       0       0 rw---   [ anon ]
+00007f2f29118000      12       0       0 -----   [ anon ]
+00007f2f29118000       0       0       0 -----   [ anon ]
+00007f2f2911b000    1016      88      88 rw---   [ anon ]
+00007f2f2911b000       0       0       0 rw---   [ anon ]
+00007f2f29219000       4       0       0 -----   [ anon ]
+00007f2f29219000       0       0       0 -----   [ anon ]
+00007f2f2921a000   16444      68      68 rw---   [ anon ]
+00007f2f2921a000       0       0       0 rw---   [ anon ]
+00007f2f2a229000    1852    1852       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+00007f2f2a229000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+00007f2f2a3f8000    5080    4884    4884 rw---   [ anon ]
+00007f2f2a3f8000       0       0       0 rw---   [ anon ]
+00007f2f2a8ee000    3584       0       0 -----   [ anon ]
+00007f2f2a8ee000       0       0       0 -----   [ anon ]
+00007f2f2ac6e000    7892       0       0 rw---   [ anon ]
+00007f2f2ac6e000       0       0       0 rw---   [ anon ]
+00007f2f2b423000       4       0       0 -----   [ anon ]
+00007f2f2b423000       0       0       0 -----   [ anon ]
+00007f2f2b424000    1024       8       8 rw---   [ anon ]
+00007f2f2b424000       0       0       0 rw---   [ anon ]
+00007f2f2b524000       4       0       0 -----   [ anon ]
+00007f2f2b524000       0       0       0 -----   [ anon ]
+00007f2f2b525000    1024       8       8 rw---   [ anon ]
+00007f2f2b525000       0       0       0 rw---   [ anon ]
+00007f2f2b625000       4       0       0 -----   [ anon ]
+00007f2f2b625000       0       0       0 -----   [ anon ]
+00007f2f2b626000    1356     340     340 rw---   [ anon ]
+00007f2f2b626000       0       0       0 rw---   [ anon ]
+00007f2f2b779000    4932       0       0 -----   [ anon ]
+00007f2f2b779000       0       0       0 -----   [ anon ]
+00007f2f2bc4a000     332     332     332 rw---   [ anon ]
+00007f2f2bc4a000       0       0       0 rw---   [ anon ]
+00007f2f2bc9d000    4928       0       0 -----   [ anon ]
+00007f2f2bc9d000       0       0       0 -----   [ anon ]
+00007f2f2c16d000     168     168     168 rw---   [ anon ]
+00007f2f2c16d000       0       0       0 rw---   [ anon ]
+00007f2f2c197000    2464       0       0 -----   [ anon ]
+00007f2f2c197000       0       0       0 -----   [ anon ]
+00007f2f2c3ff000      44      44      44 rw---   [ anon ]
+00007f2f2c3ff000       0       0       0 rw---   [ anon ]
+00007f2f2c40a000    3800       0       0 -----   [ anon ]
+00007f2f2c40a000       0       0       0 -----   [ anon ]
+00007f2f2c7c0000    2496     768     768 rwx--   [ anon ]
+00007f2f2c7c0000       0       0       0 rwx--   [ anon ]
+00007f2f2ca30000  243264       0       0 -----   [ anon ]
+00007f2f2ca30000       0       0       0 -----   [ anon ]
+00007f2f3b7c0000      32      32       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b7c0000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b7c8000    2044       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b7c8000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b9c7000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b9c7000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b9c8000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b9c8000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libzip.so
+00007f2f3b9c9000      44      44       0 r-x-- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3b9c9000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3b9d4000    2044       0       0 ----- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3b9d4000       0       0       0 ----- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3bbd3000       4       4       4 r---- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3bbd3000       0       0       0 r---- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3bbd4000       4       4       4 rw--- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3bbd4000       0       0       0 rw--- /lib/x86_64-linux-gnu/libnss_files-2.23.so
+00007f2f3bbd5000      24       0       0 rw---   [ anon ]
+00007f2f3bbd5000       0       0       0 rw---   [ anon ]
+00007f2f3bbdb000      44      44       0 r-x-- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bbdb000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bbe6000    2044       0       0 ----- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bbe6000       0       0       0 ----- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bde5000       4       4       4 r---- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bde5000       0       0       0 r---- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bde6000       4       4       4 rw--- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bde6000       0       0       0 rw--- /lib/x86_64-linux-gnu/libnss_nis-2.23.so
+00007f2f3bde7000      88      64       0 r-x-- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bde7000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bdfd000    2044       0       0 ----- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bdfd000       0       0       0 ----- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bffc000       4       4       4 r---- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bffc000       0       0       0 r---- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bffd000       4       4       4 rw--- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bffd000       0       0       0 rw--- /lib/x86_64-linux-gnu/libnsl-2.23.so
+00007f2f3bffe000       8       0       0 rw---   [ anon ]
+00007f2f3bffe000       0       0       0 rw---   [ anon ]
+00007f2f3c000000    3408    2564    2564 rw---   [ anon ]
+00007f2f3c000000       0       0       0 rw---   [ anon ]
+00007f2f3c354000   62128       0       0 -----   [ anon ]
+00007f2f3c354000       0       0       0 -----   [ anon ]
+00007f2f4000b000     108     108       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/nashorn.jar
+00007f2f4000b000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/nashorn.jar
+00007f2f40026000     312     312     312 rw---   [ anon ]
+00007f2f40026000       0       0       0 rw---   [ anon ]
+00007f2f40074000       4       0       0 -----   [ anon ]
+00007f2f40074000       0       0       0 -----   [ anon ]
+00007f2f40075000    1024       8       8 rw---   [ anon ]
+00007f2f40075000       0       0       0 rw---   [ anon ]
+00007f2f40175000      32      32       0 r-x-- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f40175000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4017d000    2044       0       0 ----- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4017d000       0       0       0 ----- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4037c000       4       4       4 r---- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4037c000       0       0       0 r---- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4037d000       4       4       4 rw--- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4037d000       0       0       0 rw--- /lib/x86_64-linux-gnu/libnss_compat-2.23.so
+00007f2f4037e000     180     180       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f4037e000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f403ab000    2044       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f403ab000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f405aa000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f405aa000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f405ab000       8       8       8 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f405ab000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libjava.so
+00007f2f405ad000      60      60       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f405ad000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f405bc000    2044       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f405bc000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f407bb000       8       8       8 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f407bb000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f407bd000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f407bd000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/libverify.so
+00007f2f407be000      28      28       0 r-x-- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f407be000       0       0       0 r-x-- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f407c5000    2044       0       0 ----- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f407c5000       0       0       0 ----- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f409c4000       4       4       4 r---- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f409c4000       0       0       0 r---- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f409c5000       4       4       4 rw--- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f409c5000       0       0       0 rw--- /lib/x86_64-linux-gnu/librt-2.23.so
+00007f2f409c6000      88      64       0 r-x-- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f409c6000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f409dc000    2044       0       0 ----- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f409dc000       0       0       0 ----- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f40bdb000       4       4       4 rw--- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f40bdb000       0       0       0 rw--- /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f2f40bdc000    1056     452       0 r-x-- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40bdc000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ce4000    2044       0       0 ----- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ce4000       0       0       0 ----- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ee3000       4       4       4 r---- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ee3000       0       0       0 r---- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ee4000       4       4       4 rw--- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ee4000       0       0       0 rw--- /lib/x86_64-linux-gnu/libm-2.23.so
+00007f2f40ee5000    1480     748       0 r-x-- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f40ee5000       0       0       0 r-x-- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41057000    2048       0       0 ----- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41057000       0       0       0 ----- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41257000      40      40      40 r---- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41257000       0       0       0 r---- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41261000       8       8       8 rw--- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41261000       0       0       0 rw--- /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+00007f2f41263000      16       8       8 rw---   [ anon ]
+00007f2f41263000       0       0       0 rw---   [ anon ]
+00007f2f41267000   12660   10488       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f41267000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f41ec4000    2048       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f41ec4000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f420c4000     592     592     592 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f420c4000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f42158000     164     164     164 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f42158000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so
+00007f2f42181000     192     188     188 rw---   [ anon ]
+00007f2f42181000       0       0       0 rw---   [ anon ]
+00007f2f421b1000      96      96       0 r-x-- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f421b1000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f421c9000    2044       0       0 ----- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f421c9000       0       0       0 ----- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f423c8000       4       4       4 r---- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f423c8000       0       0       0 r---- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f423c9000       4       4       4 rw--- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f423c9000       0       0       0 rw--- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007f2f423ca000      16       4       4 rw---   [ anon ]
+00007f2f423ca000       0       0       0 rw---   [ anon ]
+00007f2f423ce000      12      12       0 r-x-- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f423ce000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f423d1000    2044       0       0 ----- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f423d1000       0       0       0 ----- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f425d0000       4       4       4 r---- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f425d0000       0       0       0 r---- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f425d1000       4       4       4 rw--- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f425d1000       0       0       0 rw--- /lib/x86_64-linux-gnu/libdl-2.23.so
+00007f2f425d2000     100     100       0 r-x-- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f425d2000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f425eb000    2044       0       0 ----- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f425eb000       0       0       0 ----- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f427ea000       4       4       4 r---- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f427ea000       0       0       0 r---- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f427eb000       4       4       4 rw--- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f427eb000       0       0       0 rw--- /lib/x86_64-linux-gnu/libz.so.1.2.8
+00007f2f427ec000    1792    1540       0 r-x-- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f427ec000       0       0       0 r-x-- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f429ac000    2048       0       0 ----- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f429ac000       0       0       0 ----- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f42bac000      16      16      16 r---- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f42bac000       0       0       0 r---- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f42bb0000       8       8       8 rw--- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f42bb0000       0       0       0 rw--- /lib/x86_64-linux-gnu/libc-2.23.so
+00007f2f42bb2000      16      16      16 rw---   [ anon ]
+00007f2f42bb2000       0       0       0 rw---   [ anon ]
+00007f2f42bb6000      52      52       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42bb6000       0       0       0 r-x-- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42bc3000    2048       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42bc3000       0       0       0 ----- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42dc3000       4       4       4 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42dc3000       0       0       0 r---- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42dc4000       4       4       4 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42dc4000       0       0       0 rw--- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/jli/libjli.so
+00007f2f42dc5000     152     152       0 r-x-- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42dc5000       0       0       0 r-x-- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42df5000      20      20       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jsse.jar
+00007f2f42df5000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jsse.jar
+00007f2f42dfa000       8       8       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunec.jar
+00007f2f42dfa000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunec.jar
+00007f2f42dfc000      12      12       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunpkcs11.jar
+00007f2f42dfc000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunpkcs11.jar
+00007f2f42dff000       4       4       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/zipfs.jar
+00007f2f42dff000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/zipfs.jar
+00007f2f42e00000      24      24       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunjce_provider.jar
+00007f2f42e00000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/sunjce_provider.jar
+00007f2f42e06000     108     108       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/cldrdata.jar
+00007f2f42e06000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/cldrdata.jar
+00007f2f42e21000     676     364     364 rw---   [ anon ]
+00007f2f42e21000       0       0       0 rw---   [ anon ]
+00007f2f42eca000      12       0       0 -----   [ anon ]
+00007f2f42eca000       0       0       0 -----   [ anon ]
+00007f2f42ecd000    1032     156     156 rw---   [ anon ]
+00007f2f42ecd000       0       0       0 rw---   [ anon ]
+00007f2f42fcf000       4       4       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jaccess.jar
+00007f2f42fcf000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jaccess.jar
+00007f2f42fd0000      40      40       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/localedata.jar
+00007f2f42fd0000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/localedata.jar
+00007f2f42fda000      12      12       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/icedtea-sound.jar
+00007f2f42fda000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/icedtea-sound.jar
+00007f2f42fdd000       8       8       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/dnsns.jar
+00007f2f42fdd000       0       0       0 r--s- /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/dnsns.jar
+00007f2f42fdf000      32      32       8 rw-s- /tmp/hsperfdata_root/19630
+00007f2f42fdf000       0       0       0 rw-s- /tmp/hsperfdata_root/19630
+00007f2f42fe7000       4       4       4 rw---   [ anon ]
+00007f2f42fe7000       0       0       0 rw---   [ anon ]
+00007f2f42fe8000       4       0       0 r----   [ anon ]
+00007f2f42fe8000       0       0       0 r----   [ anon ]
+00007f2f42fe9000       4       4       4 rw---   [ anon ]
+00007f2f42fe9000       0       0       0 rw---   [ anon ]
+00007f2f42fea000       4       4       4 r---- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42fea000       0       0       0 r---- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42feb000       4       4       4 rw--- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42feb000       0       0       0 rw--- /lib/x86_64-linux-gnu/ld-2.23.so
+00007f2f42fec000       4       4       4 rw---   [ anon ]
+00007f2f42fec000       0       0       0 rw---   [ anon ]
+00007ffc672dc000     132      36      36 rw---   [ stack ]
+00007ffc672dc000       0       0       0 rw---   [ stack ]
+00007ffc6736e000      12       0       0 r----   [ anon ]
+00007ffc6736e000       0       0       0 r----   [ anon ]
+00007ffc67371000       8       4       0 r-x--   [ anon ]
+00007ffc67371000       0       0       0 r-x--   [ anon ]
+ffffffffff600000       4       0       0 r-x--   [ anon ]
+ffffffffff600000       0       0       0 r-x--   [ anon ]
+---------------- ------- ------- -------
+total kB         6700792   46428   28060
