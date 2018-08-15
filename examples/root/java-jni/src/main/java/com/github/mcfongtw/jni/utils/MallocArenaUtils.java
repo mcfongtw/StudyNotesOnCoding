@@ -3,7 +3,8 @@ package com.github.mcfongtw.jni.utils;
 public class MallocArenaUtils {
 
     static {
-        JniUtils.loadLibrary("libnative.so");
+        JniUtils.loadLibrary("libnative-utility.so");
+        JniUtils.loadLibrary("libnative-jni.so");
     }
 
     private MallocArenaUtils() {

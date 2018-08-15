@@ -18,6 +18,7 @@ public class MallocArenaDemo {
 
         if(args.length < 2) {
             System.err.println("java MallocArenaDemo <Thread #> <data type> (bufferSize)");
+            return;
         }
 
         int numOfThreads = Integer.valueOf(args[0]);

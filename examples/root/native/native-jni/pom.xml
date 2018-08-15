@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>java.perf.native</artifactId>
+        <groupId>com.github.mcfongtw</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.github.mcfongtw</groupId>
+    <version>0.1-SNAPSHOT</version>
+    <artifactId>java.perf.native-jni</artifactId>
+    <packaging>so</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.mcfongtw</groupId>
+            <artifactId>java.perf.jni</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <!-- trigger java-jni to compile java code -->
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Copy and Rename shared libraries -->
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-so</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>../native-utility/target/java.perf.native-utility.so</sourceFile>
+                            <destinationFile>target/libnative-utility.so</destinationFile>
+                            <overWrite>true</overWrite>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>1.0-alpha-9</version>
+                <extensions>true</extensions>
+                <executions>
+                    <!-- trigger javah execution -->
+                    <execution>
+                        <id>javah</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <javahProvider>default</javahProvider>
+                            <javahOutputDirectory>${basedir}/src/main/cpp/</javahOutputDirectory>
+                            <workingDirectory>${project.parent.basedir}/../java-jni/target/classes</workingDirectory>
+                            <javahVerbose>true</javahVerbose>
+                            <javahOutputFileName>MallocArenaUtils.h</javahOutputFileName>
+                            <javahClassNames>
+                                <javahClassName>com.github.mcfongtw.jni.utils.MallocArenaUtils</javahClassName>
+                                <javahClassName>com.github.mcfongtw.jni.utils.NativeSystemCaller</javahClassName>
+                            </javahClassNames>
+                            <useEnvClasspath>false</useEnvClasspath>
+                        </configuration>
+                        <goals>
+                            <goal>javah</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <compilerProvider>generic-classic</compilerProvider>
+                    <compilerExecutable>g++</compilerExecutable>
+                    <linkerExecutable>g++</linkerExecutable>
+                    <sources>
+                        <source>
+                            <directory>${basedir}/src/main/cpp</directory>
+                            <fileNames>
+                                <fileName>MallocArenaUtils.cpp</fileName>
+                                <fileName>NativeSystemCaller.cpp</fileName>
+                            </fileNames>
+                        </source>
+                    </sources>
+                    <compilerStartOptions>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
+                    </compilerStartOptions>
+                    <compilerEndOptions>
+                        <compilerEndOption>-fPIC</compilerEndOption>
+                        <compilerEndOption>-std=gnu++11</compilerEndOption>
+                    </compilerEndOptions>
+                    <linkerStartOptions>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/linux/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
+                        <linkerStartOption>-L ${basedir}/src/main/cpp</linkerStartOption>
+                        <linkerStartOption>-L ${build.directory}</linkerStartOption>
+                    </linkerStartOptions>
+                    <linkerEndOptions>
+                        <linkerEndOption>-shared</linkerEndOption>
+                        <linkerEndOption>-fPIC</linkerEndOption>
+                        <!--<linkerEndOption>-lnative-jni</linkerEndOption>-->
+                        <linkerEndOption>-lnative-utility</linkerEndOption>
+                    </linkerEndOptions>
+                    <!-- DO NOT UNCOMMENT; OTHERWISE, BE AWARE OF ERROR  -->
+                    <!-- The packaging for this project did not assign a file to the build artifact -->
+                    <!--shared library is copied in java.perf.jni/pom.xml-->
+                    <!--<linkerFinalName>libnative-jni</linkerFinalName>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

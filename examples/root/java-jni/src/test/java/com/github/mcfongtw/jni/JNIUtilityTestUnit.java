@@ -13,7 +13,8 @@ public class JNIUtilityTestUnit {
 
     @BeforeAll
     public static void init() throws IOException {
-        JniUtils.loadLibraryFromFile("../poc/target/classes/libnative.so");
+        JniUtils.loadLibraryFromFile("../poc/target/classes/libnative-utility.so");
+        JniUtils.loadLibraryFromFile("../poc/target/classes/libnative-jni.so");
     }
 
     ////////////////////////////////////////////////////////////////////////////////////

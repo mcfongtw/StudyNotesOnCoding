@@ -87,30 +87,34 @@ THE POSSIBILITY OF SUCH DAMAGE.
                     <target>${javac.target}</target>
                 </configuration>
             </plugin>
-            <!-- Invoke CMake to call javah -->
+            <!-- Copy and Rename shared libraries -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
                 <executions>
                     <execution>
-                        <id>copy</id>
-                        <phase>compile</phase>
+                        <id>copy-so</id>
+                        <phase>validate</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.github.mcfongtw</groupId>
-                                    <artifactId>java.perf.native</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>so</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    <destFileName>libnative.so</destFileName>
-                                </artifactItem>
-                            </artifactItems>
+                            <fileSets>
+                                <fileSet>
+                                    <sourceFile>
+                                        ../native/native-utility/target/java.perf.native-utility.so
+                                    </sourceFile>
+                                    <destinationFile>target/classes/libnative-utility.so</destinationFile>
+                                </fileSet>
+                                <fileSet>
+                                    <sourceFile>
+                                        ../native/native-jni/target/java.perf.native-jni.so
+                                    </sourceFile>
+                                    <destinationFile>target/classes/libnative-jni.so</destinationFile>
+                                </fileSet>
+                            </fileSets>
+                            <overWrite>true</overWrite>
                         </configuration>
                     </execution>
                 </executions>
@@ -221,7 +225,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                                     <mainClass>com.github.mcfongtw.MallocArenaDemo</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                                    <resource>${project.build.directory}/classes/libnative.so</resource>
+                                    <resource>${project.build.directory}/classes/libnative-utility.so</resource>
+                                    <resource>${project.build.directory}/classes/libnative-jni.so</resource>
                                 </transformer>
                             </transformers>
                             <filters>
