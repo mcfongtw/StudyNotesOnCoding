@@ -1,6 +1,6 @@
 package com.github.mcfongtw;
 
-import com.github.mcfongtw.jni.utils.MallocArenaUtils;
+import com.github.mcfongtw.jni.utils.MallocUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +20,11 @@ public class MallocArenaDemo {
             System.err.println("java MallocArenaDemo <Thread #> <data type> (bufferSize)");
             return;
         }
+
+        if(MallocUtils.mallopt(MallocUtils.MallOpt.M_ARENA_MAX.getOpt(), 2) < 1) {
+            logger.error("mallopt failed!");
+        } else
+            logger.info("mallopt success!");
 
         int numOfThreads = Integer.valueOf(args[0]);
         int id = Integer.valueOf(args[1]);
@@ -65,7 +70,7 @@ class ThreadWithByteArray extends Thread {
     @Override
     public void run() {
         super.run();
-        MallocArenaUtils.mallocStats();
+        MallocUtils.mallocStats();
         try {
             Thread.sleep(MallocArenaDemo.SLEEP_TIME_IN_MILLIS);
         } catch (InterruptedException e) {
@@ -103,7 +108,7 @@ class ThreadLocalByteBuffer extends Thread {
         buffer.put((byte) capacity);
 
         logger.info("Thread [{}] has written [{}] bytes to local buffer", this.getName(), capacity);
-        MallocArenaUtils.mallocStats();
+        MallocUtils.mallocStats();
 
         try {
             Thread.sleep(MallocArenaDemo.SLEEP_TIME_IN_MILLIS);
@@ -112,5 +117,3 @@ class ThreadLocalByteBuffer extends Thread {
         }
     }
 }
-
-

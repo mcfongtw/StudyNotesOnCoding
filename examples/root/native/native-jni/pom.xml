@@ -55,16 +55,34 @@
                 <executions>
                     <!-- trigger javah execution -->
                     <execution>
-                        <id>javah</id>
+                        <id>javah-MallocUtils</id>
                         <phase>generate-sources</phase>
                         <configuration>
                             <javahProvider>default</javahProvider>
                             <javahOutputDirectory>${basedir}/src/main/cpp/</javahOutputDirectory>
                             <workingDirectory>${project.parent.basedir}/../java-jni/target/classes</workingDirectory>
                             <javahVerbose>true</javahVerbose>
-                            <javahOutputFileName>MallocArenaUtils.h</javahOutputFileName>
+                            <javahOutputFileName>MallocUtils.h</javahOutputFileName>
                             <javahClassNames>
-                                <javahClassName>com.github.mcfongtw.jni.utils.MallocArenaUtils</javahClassName>
+                                <javahClassName>com.github.mcfongtw.jni.utils.MallocUtils</javahClassName>
+                            </javahClassNames>
+                            <useEnvClasspath>false</useEnvClasspath>
+                        </configuration>
+                        <goals>
+                            <goal>javah</goal>
+                        </goals>
+                    </execution>
+                    <!-- trigger javah execution -->
+                    <execution>
+                        <id>javah-NativeSystemCaller</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <javahProvider>default</javahProvider>
+                            <javahOutputDirectory>${basedir}/src/main/cpp/</javahOutputDirectory>
+                            <workingDirectory>${project.parent.basedir}/../java-jni/target/classes</workingDirectory>
+                            <javahVerbose>true</javahVerbose>
+                            <javahOutputFileName>NativeSystemCaller.h</javahOutputFileName>
+                            <javahClassNames>
                                 <javahClassName>com.github.mcfongtw.jni.utils.NativeSystemCaller</javahClassName>
                             </javahClassNames>
                             <useEnvClasspath>false</useEnvClasspath>
@@ -82,7 +100,7 @@
                         <source>
                             <directory>${basedir}/src/main/cpp</directory>
                             <fileNames>
-                                <fileName>MallocArenaUtils.cpp</fileName>
+                                <fileName>MallocUtils.cpp</fileName>
                                 <fileName>NativeSystemCaller.cpp</fileName>
                             </fileNames>
                         </source>
@@ -90,6 +108,7 @@
                     <compilerStartOptions>
                         <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
                         <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
+                        <compilerStartOption>-I ${project.parent.basedir}/native-utility/src/main/cpp/util/</compilerStartOption>
                     </compilerStartOptions>
                     <compilerEndOptions>
                         <compilerEndOption>-fPIC</compilerEndOption>
