@@ -176,13 +176,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         </configuration>
                     </execution>
                     <execution>
-                        <id>BufferingEffectBenchmark</id>
+                        <id>SequentialFileStreamBenchmark</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>BufferingEffectBenchmark-jmh-${jmh.version}</finalName>
+                            <finalName>SequentialFileStreamBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.SequentialFileStreamBenchmark</mainClass>
@@ -209,13 +209,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         </configuration>
                     </execution>
                     <execution>
-                        <id>MemoryMappingBenchmark</id>
+                        <id>SequentialMemoryMapBenchmark</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>MemoryMappingBenchmark-jmh-${jmh.version}</finalName>
+                            <finalName>SequentialMemoryMapBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.SequentialMemoryMapBenchmark</mainClass>

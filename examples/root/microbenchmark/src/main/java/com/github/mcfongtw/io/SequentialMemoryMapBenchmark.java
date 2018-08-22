@@ -6,14 +6,19 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.TimeUnit;
 
 public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
+
+    public static Logger LOG = LoggerFactory.getLogger(SequentialMemoryMapBenchmark.class);
 
     @State(Scope.Benchmark)
     public static class SequentialMemoryMapExecutionPlan extends AbstractSequentialExecutionPlan {
@@ -49,53 +54,85 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
 
     }
 
-
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void doHeapMemoryBackedChannelStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
-        FileChannel fout = new RandomAccessFile(plan.foutPath, "rw").getChannel();
-        FileChannel fin = new RandomAccessFile(plan.finPath, "r").getChannel();
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void doMemoryMapBackedStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
+        try (
+            RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+            RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+            FileChannel finChannel = fin.getChannel();
+            FileChannel foutChannel = fout.getChannel();
+        ) {
 
-        ByteBuffer bufIn = ByteBuffer.allocate(plan.bufferCapacity);
-        ByteBuffer bufOut = ByteBuffer.allocate(plan.bufferCapacity);
+            int finLength = (int) finChannel.size();
 
-        long beforeTime = System.nanoTime();
+            MappedByteBuffer bufIn = finChannel.map(FileChannel.MapMode.READ_ONLY, 0, finLength);
+            MappedByteBuffer bufOut = foutChannel.map(FileChannel.MapMode.READ_WRITE, 0, finLength);
 
-        for(int i = 0; i < plan.bufferCapacity; i++) {
-            bufOut.put(bufIn.get(plan.bufferCapacity - i - 1));
+            long beforeTime = System.nanoTime();
+
+            for (int bufIndex = 0; bufIndex < finLength; ) {
+                int bufLength = 0;
+
+                if (bufIndex + plan.bufferCapacity > finLength) {
+                    bufLength = finLength % plan.bufferCapacity;
+                } else {
+                    bufLength = plan.bufferCapacity;
+                }
+
+                byte buffer[] = new byte[bufLength];
+                bufIn.get(buffer, 0, bufLength);
+                bufOut.put(buffer);
+
+                bufIndex += plan.bufferCapacity;
+
+                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferCapacity});
+            }
+
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
-        long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
-
-        fin.close();
-        fout.close();
     }
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void doDirectMemoryBackedChannelStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
-        FileChannel fout = new RandomAccessFile(plan.foutPath, "rw").getChannel();
-        FileChannel fin = new RandomAccessFile(plan.finPath, "r").getChannel();
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void doFileBackedStreamWithVariedLocalBuffer(SequentialMemoryMapExecutionPlan plan) throws IOException {
+        try (
+            RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+            RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
 
-        ByteBuffer bufIn = ByteBuffer.allocateDirect(plan.bufferCapacity);
-        ByteBuffer bufOut = ByteBuffer.allocateDirect(plan.bufferCapacity);
+        ) {
+            long beforeTime = System.nanoTime();
 
-        long beforeTime = System.nanoTime();
+            byte[] buffer = new byte[plan.bufferCapacity];
 
-        for(int i = 0; i < plan.bufferCapacity; i++) {
-            bufOut.put(bufIn.get(plan.bufferCapacity - i - 1));
+            int bufLength = fin.read(buffer);
+
+            while (bufLength > 0) {
+                if (bufLength == buffer.length) {
+                    fout.write(buffer);
+                } else {
+                    fout.write(buffer, 0, bufLength);
+                }
+
+                //LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex + bufLength, finLength, plan.bufferCapacity});
+
+                bufLength = fin.read(buffer);
+            }
+
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
-        long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
-
-        fin.close();
-        fout.close();
     }
 
     @Benchmark
@@ -103,22 +140,24 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void doFileBackedStreamByteByByte(SequentialMemoryMapExecutionPlan plan) throws IOException {
-        RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
-        RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+        try(
+            RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+            RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+        ) {
+            long beforeTime = System.nanoTime();
 
-        long beforeTime = System.nanoTime();
 
+            for (int finIdx = 0; finIdx < fin.length(); finIdx++) {
+                fin.seek(finIdx);
+                fout.writeByte(fin.readByte());
+            }
 
-        for(int i = 0; i < plan.bufferCapacity; i++) {
-            fin.seek(fin.length()-4);
-            fout.writeInt(fin.readInt());
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
-        long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
-
-        fin.close();
-        fout.close();
     }
 
     public static void main(String[] args) throws RunnerException {
