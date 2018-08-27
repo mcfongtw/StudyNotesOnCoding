@@ -20,11 +20,13 @@ import static com.github.mcfongtw.io.AbstractIoBenchmark.AbstractRandomAccessExe
 
 public abstract class AbstractIoBenchmark {
 
-    protected static final int NUM_ITERATION = 10;
+    protected static final int NUM_ITERATION = 100;
 
     private static final int UNIT_ONE_KILO = 1024;
 
     private static final int UNIT_ONE_MEGA = UNIT_ONE_KILO * UNIT_ONE_KILO;
+
+    private static final int UNIT_ONE_GIGA = UNIT_ONE_KILO * UNIT_ONE_MEGA;
 
     protected static final int TOTAL_DATA_WRITEN = 1 * UNIT_ONE_MEGA;
 
