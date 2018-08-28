@@ -1,6 +1,7 @@
 package com.github.mcfongtw.io;
 
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -172,6 +173,8 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)
+                .resultFormat(ResultFormatType.JSON)
+                .result("SequentialFileStreamBenchmark-result.json")
                 .build();
 
         new Runner(opt).run();

@@ -2,6 +2,7 @@ package com.github.mcfongtw.io;
 
 import com.github.mcfongtw.metrics.LatencyMetric;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -169,6 +170,8 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)
+                .resultFormat(ResultFormatType.JSON)
+                .result("SequentialMemoryMapBenchmark-result.json")
                 .build();
 
         new Runner(opt).run();

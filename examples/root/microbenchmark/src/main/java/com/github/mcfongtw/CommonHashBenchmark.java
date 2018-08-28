@@ -3,6 +3,7 @@ package com.github.mcfongtw;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -54,6 +55,8 @@ public class CommonHashBenchmark {
         Options opt = new OptionsBuilder()
                 .include(CommonHashBenchmark.class.getSimpleName())
                 .forks(1)
+                .resultFormat(ResultFormatType.JSON)
+                .result("CommonHashBenchmark-result.json")
                 .build();
 
         new Runner(opt).run();
