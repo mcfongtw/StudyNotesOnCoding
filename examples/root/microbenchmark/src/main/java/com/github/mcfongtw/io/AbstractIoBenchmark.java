@@ -37,11 +37,17 @@ public abstract class AbstractIoBenchmark {
 
         private String sudoPassword = "";
 
+        private boolean isMetricReporterEnabled = false;
+
 
         public AbstractExecutionPlan() {
-            logger.info("Starting reporting metric...");
-            metricReporter.start(500, TimeUnit.MILLISECONDS);
-            logger.info("Starting reporting metric...DONE");
+            isMetricReporterEnabled = Boolean.valueOf(System.getProperty("isMetricReporterEnabled", "false"));
+
+            if(isMetricReporterEnabled) {
+                logger.info("Starting reporting metric...");
+                metricReporter.start(500, TimeUnit.MILLISECONDS);
+                logger.info("Starting reporting metric...DONE");
+            }
 
             String sudoPasswordVal = System.getProperty("sudoPassword");
             if(StringUtils.isNotEmpty(sudoPasswordVal)) {
@@ -90,7 +96,9 @@ public abstract class AbstractIoBenchmark {
         public void postTrialTearDown() throws Exception {
             logger.trace("[postTrialTearDown]");
             logger.info("Stopping reporting metric...");
-            metricReporter.stop();
+            if(isMetricReporterEnabled) {
+                metricReporter.stop();
+            }
             logger.info("Stopping reporting metric...DONE");
         }
 
