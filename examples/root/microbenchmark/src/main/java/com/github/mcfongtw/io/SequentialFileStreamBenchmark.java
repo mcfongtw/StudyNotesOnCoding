@@ -56,7 +56,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
-    public void doFileStreamByteByByte(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void doCopyingByteByByte(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
             FileInputStream fin = new FileInputStream(plan.finPath);
             FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -79,7 +79,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileStreamWithLocalBufferOfVariedSize(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void doCopyingWithLocalBuffer(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
             FileInputStream fin = new FileInputStream(plan.finPath);
             FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -103,7 +103,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doBufferedFileStreamWithVariedBufferSize(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void doCopyingWithBufferedFileStream(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
             BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.finPath), plan.bufferSize);
             BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.foutPath), plan.bufferSize);
@@ -127,7 +127,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doChannelledFileStreamWithVariedBufferSize(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void doCopyingWithFileChannel(SequentialFileStreamExecutionPlan plan) throws IOException {
         try(
             FileChannel finChannel = new FileInputStream(plan.finPath).getChannel();
             FileChannel foutChannel = new FileOutputStream(plan.foutPath).getChannel();

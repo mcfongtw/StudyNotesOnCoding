@@ -58,7 +58,7 @@ public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
-    public void doMemoryMapBackedRandomAccessSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
+    public void doMemoryMapBackedSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
                 BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));
@@ -133,7 +133,7 @@ public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileStreamedBackedRandomAccessSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
+    public void doFileStreamBackedSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
         try (
                 FileInputStream fis = new FileInputStream(plan.finPath);
                 BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));

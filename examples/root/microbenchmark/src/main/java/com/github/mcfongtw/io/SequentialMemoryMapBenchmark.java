@@ -59,7 +59,7 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doMemoryMapBackedStreamWithVariedBufferCapacity(SequentialMemoryMapExecutionPlan plan) throws IOException {
+    public void doMemoryMapBackedCopying(SequentialMemoryMapExecutionPlan plan) throws IOException {
         try (
             RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
             RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
@@ -104,7 +104,7 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileBackedStreamWithVariedLocalBuffer(SequentialMemoryMapExecutionPlan plan) throws IOException {
+    public void doFileBackedCopyingWithLocalBuffer(SequentialMemoryMapExecutionPlan plan) throws IOException {
         try (
             RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
             RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
@@ -140,7 +140,7 @@ public class SequentialMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileBackedStreamByteByByte(SequentialMemoryMapExecutionPlan plan) throws IOException {
+    public void doFileBackedCopyingByteByByte(SequentialMemoryMapExecutionPlan plan) throws IOException {
         try(
             RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
             RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
