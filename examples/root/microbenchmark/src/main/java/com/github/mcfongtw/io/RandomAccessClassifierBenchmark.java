@@ -19,14 +19,14 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.mcfongtw.io.AbstractIoBenchmark.AbstractRandomAccessExecutionPlan.DataType.COUNT;
 
-public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
+public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
-    public static Logger LOG = LoggerFactory.getLogger(RandomAccessMemoryMapBenchmark.class);
+    public static Logger LOG = LoggerFactory.getLogger(RandomAccessClassifierBenchmark.class);
 
     @State(Scope.Benchmark)
-    public static class RandomAccessMemoryMapExecutionPlan extends AbstractRandomAccessExecutionPlan {
+    public static class RandomAccessClassifierExecutionPlan extends AbstractRandomAccessExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessMemoryMapExecutionPlan.class.getName());
+        LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierExecutionPlan.class.getName());
 
         @Override
         @Setup(Level.Trial)
@@ -58,7 +58,7 @@ public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
-    public void doMemoryMapBackedSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
+    public void classifyWithMmap(RandomAccessClassifierExecutionPlan plan) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
                 BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));
@@ -133,7 +133,7 @@ public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doFileStreamBackedSorting(RandomAccessMemoryMapExecutionPlan plan) throws IOException {
+    public void classifyWithFileStream(RandomAccessClassifierExecutionPlan plan) throws IOException {
         try (
                 FileInputStream fis = new FileInputStream(plan.finPath);
                 BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));
@@ -196,12 +196,12 @@ public class RandomAccessMemoryMapBenchmark extends AbstractIoBenchmark {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
-                .include(RandomAccessMemoryMapBenchmark.class.getSimpleName())
+                .include(RandomAccessClassifierBenchmark.class.getSimpleName())
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
-                .result("RandomAccessMemoryMapBenchmark-result.json")
+                .result("RandomAccessClassifierBenchmark-result.json")
                 .build();
 
         new Runner(opt).run();

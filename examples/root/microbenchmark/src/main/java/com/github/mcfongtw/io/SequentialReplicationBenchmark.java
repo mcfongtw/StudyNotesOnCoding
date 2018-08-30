@@ -11,19 +11,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.TimeUnit;
 
-public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
+public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
-    public static Logger LOG = LoggerFactory.getLogger(SequentialFileStreamBenchmark.class);
+    public static Logger LOG = LoggerFactory.getLogger(SequentialReplicationBenchmark.class);
 
     @State(Scope.Benchmark)
-    public static class SequentialFileStreamExecutionPlan extends AbstractSequentialExecutionPlan {
+    public static class SequentialReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialFileStreamBenchmark.class.getName());
+        InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialReplicationBenchmark.class.getName());
 
-        @Param({"512", "4096", "10240"})
+        @Param({"512", "4096", "10240","102400"})
         public int bufferSize;
 
         @Override
@@ -52,34 +53,12 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
 
     }
 
-    @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
-    public void doCopyingByteByByte(SequentialFileStreamExecutionPlan plan) throws IOException {
-        try(
-            FileInputStream fin = new FileInputStream(plan.finPath);
-            FileOutputStream fout = new FileOutputStream(plan.foutPath);
-        ) {
-            long beforeTime = System.nanoTime();
-
-            int byteRead = 0;
-            while ((byteRead = fin.read()) != -1) {
-                fout.write(byteRead);
-            }
-
-            assert new File(plan.finPath).length() == new File(plan.foutPath).length();
-
-            long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
-        }
-    }
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doCopyingWithLocalBuffer(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void copyWithLocalBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
             FileInputStream fin = new FileInputStream(plan.finPath);
             FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -103,7 +82,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doCopyingWithBufferedFileStream(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void copyWithBufferedFileStream(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
             BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.finPath), plan.bufferSize);
             BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.foutPath), plan.bufferSize);
@@ -127,7 +106,7 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void doCopyingWithFileChannel(SequentialFileStreamExecutionPlan plan) throws IOException {
+    public void copyWithFileChannel(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
             FileChannel finChannel = new FileInputStream(plan.finPath).getChannel();
             FileChannel foutChannel = new FileOutputStream(plan.foutPath).getChannel();
@@ -163,18 +142,99 @@ public class SequentialFileStreamBenchmark extends AbstractIoBenchmark {
         }
     }
 
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void copyWithMmap(SequentialReplicationExecutionPlan plan) throws IOException {
+        try (
+                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+                RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+                FileChannel finChannel = fin.getChannel();
+                FileChannel foutChannel = fout.getChannel();
+        ) {
+
+            int finLength = (int) finChannel.size();
+
+            MappedByteBuffer bufIn = finChannel.map(FileChannel.MapMode.READ_ONLY, 0, finLength);
+            MappedByteBuffer bufOut = foutChannel.map(FileChannel.MapMode.READ_WRITE, 0, finLength);
+
+            long beforeTime = System.nanoTime();
+
+            for (int bufIndex = 0; bufIndex < finLength; ) {
+                int bufLength = 0;
+
+                if (bufIndex + plan.bufferSize > finLength) {
+                    bufLength = finLength % plan.bufferSize;
+                } else {
+                    bufLength = plan.bufferSize;
+                }
+
+                byte buffer[] = new byte[bufLength];
+                bufIn.get(buffer, 0, bufLength);
+                bufOut.put(buffer);
+
+                bufIndex += plan.bufferSize;
+
+                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferSize});
+            }
+
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
+
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void copyWithLocalBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
+        try (
+                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+                RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+
+        ) {
+            long beforeTime = System.nanoTime();
+
+            byte[] buffer = new byte[plan.bufferSize];
+
+            int bufLength = fin.read(buffer);
+
+            while (bufLength > 0) {
+                if (bufLength == buffer.length) {
+                    fout.write(buffer);
+                } else {
+                    fout.write(buffer, 0, bufLength);
+                }
+
+                //LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex + bufLength, finLength, plan.bufferSize});
+
+                bufLength = fin.read(buffer);
+            }
+
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
+
+    }
+
 
     public static void main(String[] args) throws RunnerException {
         //TODO: Need to recreate table via command line:
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=DROP DATABASE "demo"'
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
-                .include(SequentialFileStreamBenchmark.class.getSimpleName())
+                .include(SequentialReplicationBenchmark.class.getSimpleName())
                 .detectJvmArgs()
                 .warmupIterations(0)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
-                .result("SequentialFileStreamBenchmark-result.json")
+                .result("SequentialReplicationBenchmark-result.json")
                 .build();
 
         new Runner(opt).run();
