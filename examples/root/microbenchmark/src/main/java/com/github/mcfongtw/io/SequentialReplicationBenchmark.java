@@ -48,9 +48,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
         @Override
         @TearDown(Level.Iteration)
         public void doIterationTearDown() throws Exception {
-            super.doIterationSetup();
+            super.doIterationTearDown();
         }
-
     }
 
 

@@ -56,6 +56,14 @@ public abstract class AbstractIoBenchmark {
             logger.debug("SudoPassword: {}", sudoPassword);
         }
 
+        private void flushSystemCache() throws IOException, InterruptedException {
+            if(StringUtils.isNotEmpty(sudoPassword)) {
+                logger.info("Start to dropping free pagecache, dentries and inodes...");
+                SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
+                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+            }
+        }
+
         @Override
         public void preTrialSetUp() throws Exception {
             logger.trace("[preTrialSetUp]");
@@ -71,12 +79,6 @@ public abstract class AbstractIoBenchmark {
         @Override
         public void postTrialSetUp() throws IOException, InterruptedException {
             logger.trace("[postTrialSetUp]");
-
-            if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to dropping free pagecache, dentries and inodes...");
-                SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
-                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
-            }
         }
 
         @Override
@@ -132,8 +134,9 @@ public abstract class AbstractIoBenchmark {
         }
 
         @Override
-        public void postIterationTearDown()  throws Exception{
+        public void postIterationTearDown()  throws Exception {
             logger.trace("[postIterationTearDown]");
+            flushSystemCache();
         }
 
     }
