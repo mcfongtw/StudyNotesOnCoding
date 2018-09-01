@@ -24,7 +24,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
         InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialReplicationBenchmark.class.getName());
 
-        @Param({"512", "4096", "10240","102400"})
+        @Param({"256", "512", "1024", "8192","102400"})
         public int bufferSize;
 
         @Override
