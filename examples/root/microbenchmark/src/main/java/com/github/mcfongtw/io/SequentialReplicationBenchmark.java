@@ -210,8 +210,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
                     fout.write(buffer, 0, bufLength);
                 }
 
-                //LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex + bufLength, finLength, plan.bufferSize});
-
                 bufLength = fin.read(buffer);
             }
 
@@ -221,6 +219,94 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void zeroTransferToCopy(SequentialReplicationExecutionPlan plan) throws Exception {
+        try (
+                RandomAccessFile fromFile = new RandomAccessFile(plan.finPath, "r");
+                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rw");
+                FileChannel fromChannel = fromFile.getChannel();
+                FileChannel toChannel = toFile.getChannel();
+        ) {
+
+            int fromLength = (int) fromChannel.size();
+
+            long beforeTime = System.nanoTime();
+
+            for (int toIndex = 0; toIndex < fromLength; ) {
+                int bufLength = 0;
+
+                if (toIndex + plan.bufferSize > fromLength) {
+                    bufLength = fromLength % plan.bufferSize;
+                } else {
+                    bufLength = plan.bufferSize;
+                }
+
+
+                long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
+                if(returnCode >= 0 ) {
+                    LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, plan.bufferSize});
+                } else {
+                    LOG.warn("transferTo failed! error code: [{}]", returnCode);
+                }
+
+                toIndex += plan.bufferSize;
+            }
+
+
+            assert fromFile.length() == toFile.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void zeroTransferFromCopy(SequentialReplicationExecutionPlan plan) throws IOException {
+        try (
+                RandomAccessFile fromFile = new RandomAccessFile(plan.finPath, "r");
+                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rw");
+                FileChannel fromChannel = fromFile.getChannel();
+                FileChannel toChannel = toFile.getChannel();
+        ) {
+
+            int fromLength = (int) fromChannel.size();
+
+            long beforeTime = System.nanoTime();
+
+            for (int fromIndex = 0; fromIndex < fromLength; ) {
+                int bufLength = 0;
+
+                if (fromIndex + plan.bufferSize > fromLength) {
+                    bufLength = fromLength % plan.bufferSize;
+                } else {
+                    bufLength = plan.bufferSize;
+                }
+
+
+                long returnCode = toChannel.transferFrom(fromChannel, fromIndex, bufLength);
+
+                if(returnCode >= 0 ) {
+                    LOG.debug("transferFrom [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{fromIndex, fromLength, plan.bufferSize});
+                } else {
+                    LOG.warn("transferFrom failed! error code: [{}]", returnCode);
+                }
+
+                fromIndex += plan.bufferSize;
+            }
+
+            assert fromFile.length() == toFile.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
     }
 
 
