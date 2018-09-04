@@ -32,8 +32,8 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
 
         LatencyMetric ioLatencyMetric = new LatencyMetric(FileReplicationExecutionPlan.class.getName());
 
-        //1MB, 10MB, 100MB, 1GB
-        @Param({"1048576", "10485760", "104857600", "1073741824"})
+        //1MB, 10MB, 100MB
+        @Param({"1048576", "10485760", "104857600"})
         public int fileSize;
 
         @Override
