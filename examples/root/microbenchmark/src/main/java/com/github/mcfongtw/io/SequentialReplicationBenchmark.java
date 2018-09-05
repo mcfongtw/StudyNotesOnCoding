@@ -190,6 +190,51 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void copyWithMmapAndFsync(SequentialReplicationExecutionPlan plan) throws IOException {
+        try (
+                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+                RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rws");
+                FileChannel finChannel = fin.getChannel();
+                FileChannel foutChannel = fout.getChannel();
+        ) {
+
+            int finLength = (int) finChannel.size();
+
+            MappedByteBuffer bufIn = finChannel.map(FileChannel.MapMode.READ_ONLY, 0, finLength);
+            MappedByteBuffer bufOut = foutChannel.map(FileChannel.MapMode.READ_WRITE, 0, finLength);
+
+            long beforeTime = System.nanoTime();
+
+            for (int bufIndex = 0; bufIndex < finLength; ) {
+                int bufLength = 0;
+
+                if (bufIndex + plan.bufferSize > finLength) {
+                    bufLength = finLength % plan.bufferSize;
+                } else {
+                    bufLength = plan.bufferSize;
+                }
+
+                byte buffer[] = new byte[bufLength];
+                bufIn.get(buffer, 0, bufLength);
+                bufOut.put(buffer);
+
+                bufIndex += plan.bufferSize;
+
+                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferSize});
+            }
+
+            assert fin.length() == fout.length();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
+
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithLocalBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
