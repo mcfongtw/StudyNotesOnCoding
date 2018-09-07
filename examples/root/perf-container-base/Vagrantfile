@@ -20,6 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    	   ubuntu1604.vm.box = "mcfongtw/ubuntu-xenial-dbgsym"
 	   ubuntu1604.vm.box_version = "20180511.0.0.1"
 	   ubuntu1604.vm.network :private_network, ip: NETWORK_PRIVATE_IP_PREFIX + "0"
+	   ubuntu1604.disksize.size = "30GB"
     end
 
    config.vm.provision "docker"
