@@ -24,7 +24,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
         InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialReplicationBenchmark.class.getName());
 
-        @Param({"256", "512", "1024", "8192","102400"})
+        //32, 256, 1k, 8k, 100k
+        @Param({"32", "256", "1024", "8192", "102400"})
         public int bufferSize;
 
         @Override
@@ -57,7 +58,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithLocalBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithRawBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
             FileInputStream fin = new FileInputStream(plan.finPath);
             FileOutputStream fout = new FileOutputStream(plan.foutPath);
@@ -235,7 +236,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithLocalBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithRawBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
                 RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
