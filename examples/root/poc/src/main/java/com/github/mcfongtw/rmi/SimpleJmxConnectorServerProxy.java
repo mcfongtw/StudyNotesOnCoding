@@ -43,10 +43,6 @@ public class SimpleJmxConnectorServerProxy extends SimpleMBeanServerProxy {
         this.environment.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, rmiClientSocketFactory);
     }
 
-    public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
-    }
-
 
     public void start() throws JMException, IOException {
         if (this.mbeanServer == null) {
@@ -65,9 +61,11 @@ public class SimpleJmxConnectorServerProxy extends SimpleMBeanServerProxy {
         }
 
         // Do we want to register the connector with the MBean mbeanServer?
-        if (this.objectName != null) {
+//        this.objectName = ObjectName.getInstance(this.getClass().getName());
+        if(this.objectName != null) {
             this.doRegister(this.connectorServer, this.objectName);
         }
+
 
         try {
             this.connectorServer.start();
