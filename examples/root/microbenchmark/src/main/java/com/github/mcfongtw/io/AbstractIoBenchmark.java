@@ -56,6 +56,14 @@ public abstract class AbstractIoBenchmark {
             logger.debug("SudoPassword: {}", sudoPassword);
         }
 
+        private void persistCacheToStorage() throws IOException, InterruptedException {
+            if(StringUtils.isNotEmpty(sudoPassword)) {
+                logger.info("Start to dropping free pagecache, dentries and inodes...");
+                SudoExecutors.exec("persistCacheToStorage", sudoPassword);
+                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+            }
+        }
+
         private void flushSystemCache() throws IOException, InterruptedException {
             if(StringUtils.isNotEmpty(sudoPassword)) {
                 logger.info("Start to dropping free pagecache, dentries and inodes...");
@@ -136,6 +144,7 @@ public abstract class AbstractIoBenchmark {
         @Override
         public void postIterationTearDown()  throws Exception {
             logger.trace("[postIterationTearDown]");
+            persistCacheToStorage();
             flushSystemCache();
         }
 
@@ -336,10 +345,5 @@ public abstract class AbstractIoBenchmark {
             logger.debug("Temp dir deleted at [{}]", tempDir.getAbsolutePath());
         }
     }
-
-//    public static void main(String[] args) throws Exception {
-//        AbstractRandomAccessExecutionPlan plan = new AbstractRandomAccessExecutionPlan();
-//        plan.preTrialSetUp();
-//    }
 
 }
