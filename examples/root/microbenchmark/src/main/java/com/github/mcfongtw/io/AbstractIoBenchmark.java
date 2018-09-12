@@ -22,6 +22,8 @@ public abstract class AbstractIoBenchmark {
 
     protected static final int NUM_ITERATION = 100;
 
+    private static final int SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS = 30 * 1000;
+
     private static final int UNIT_ONE_KILO = 1024;
 
     private static final int UNIT_ONE_MEGA = UNIT_ONE_KILO * UNIT_ONE_KILO;
@@ -108,6 +110,7 @@ public abstract class AbstractIoBenchmark {
             logger.info("Stopping reporting metric...");
             if(isMetricReporterEnabled) {
                 metricReporter.stop();
+                Thread.sleep(SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS);
             }
             logger.info("Stopping reporting metric...DONE");
         }
