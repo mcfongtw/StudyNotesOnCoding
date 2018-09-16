@@ -252,7 +252,8 @@ public abstract class AbstractIoBenchmark {
                     case 8:
                         return DOUBLE;
                     default:
-                        return null;
+                        //return smallest data type - byte
+                        return BYTE;
                 }
             }
 
@@ -289,7 +290,9 @@ public abstract class AbstractIoBenchmark {
 
                     if(nextDataType.sizeOf + currentIndex >= TOTAL_DATA_WRITEN) {
                         int remainingByte = TOTAL_DATA_WRITEN - currentIndex;
-                        logger.debug("Remain bytes : [{}]", remainingByte);
+                        logger.debug("Remaining bytes from file: [{}]", finPath, remainingByte);
+
+                        //NOTE: get the next affordable data type
                         nextDataType = DataType.getDataTypeBySizeOf(remainingByte);
                     }
 

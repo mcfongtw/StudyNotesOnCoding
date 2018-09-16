@@ -89,7 +89,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(FileReplicationExecutionPlan plan) throws Exception {
@@ -119,7 +119,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void nioFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
@@ -137,7 +137,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void commonIoFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
@@ -155,7 +155,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void guavaFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
@@ -179,7 +179,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
         Options opt = new OptionsBuilder()
                 .include(FileReplicationBenchmark.class.getSimpleName())
                 .detectJvmArgs()
-                .warmupIterations(0)
+                .warmupIterations(10)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("FileReplicationBenchmark-result.json")

@@ -55,8 +55,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
+    @OutputTimeUnit(TimeUnit.SECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
@@ -79,7 +79,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithBufferedFileStream(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -103,7 +103,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithFileChannel(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -143,7 +143,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmap(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -188,7 +188,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmapAndFsync(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -233,7 +233,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -267,7 +267,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(SequentialReplicationExecutionPlan plan) throws Exception {
@@ -311,7 +311,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferFromCopy(SequentialReplicationExecutionPlan plan) throws IOException {
@@ -362,7 +362,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
         Options opt = new OptionsBuilder()
                 .include(SequentialReplicationBenchmark.class.getSimpleName())
                 .detectJvmArgs()
-                .warmupIterations(0)
+                .warmupIterations(10)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("SequentialReplicationBenchmark-result.json")

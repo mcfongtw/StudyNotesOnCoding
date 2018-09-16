@@ -55,7 +55,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithMmap(RandomAccessClassifierExecutionPlan plan) throws IOException {
@@ -130,7 +130,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SampleTime})
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithFileStream(RandomAccessClassifierExecutionPlan plan) throws IOException {
@@ -198,7 +198,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
         Options opt = new OptionsBuilder()
                 .include(RandomAccessClassifierBenchmark.class.getSimpleName())
                 .detectJvmArgs()
-                .warmupIterations(0)
+                .warmupIterations(10)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("RandomAccessClassifierBenchmark-result.json")
