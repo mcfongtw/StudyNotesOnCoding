@@ -60,17 +60,17 @@ public abstract class AbstractIoBenchmark {
 
         private void persistCacheToStorage() throws IOException, InterruptedException {
             if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to dropping free pagecache, dentries and inodes...");
-                SudoExecutors.exec("persistCacheToStorage", sudoPassword);
-                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+                logger.info("Start to sync page cache to disk...");
+                SudoExecutors.exec("sync", sudoPassword);
+                logger.info("Start to sync page cache to disk...DONE");
             }
         }
 
         private void flushSystemCache() throws IOException, InterruptedException {
             if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to dropping free pagecache, dentries and inodes...");
+                logger.info("Start to drop free pagecache, dentries and inodes...");
                 SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
-                logger.info("Start to dropping free pagecache, dentries and inodes...DONE");
+                logger.info("Start to drop free pagecache, dentries and inodes...DONE");
             }
         }
 
@@ -225,6 +225,10 @@ public abstract class AbstractIoBenchmark {
                 this.sizeOf = size;
             }
 
+            public int getSizeOf() {
+                return sizeOf;
+            }
+
 
             public static DataType getDataTypeByTypeId(int type) {
                 switch(type) {
@@ -287,39 +291,45 @@ public abstract class AbstractIoBenchmark {
 
                 for(int currentIndex = 0; currentIndex < TOTAL_DATA_WRITEN; ) {
                     DataType nextDataType = getDataTypeByTypeId(rand.nextInt(3) + 1);
+                    int nextDataTypeLength = rand.nextInt(10) + 1;
 
-                    if(nextDataType.sizeOf + currentIndex >= TOTAL_DATA_WRITEN) {
+                    if(nextDataTypeLength * nextDataType.getSizeOf() + currentIndex >= TOTAL_DATA_WRITEN) {
                         int remainingByte = TOTAL_DATA_WRITEN - currentIndex;
-                        logger.debug("Remaining bytes from file: [{}]", finPath, remainingByte);
+                        logger.debug("Remaining {} bytes in file: [{}]", remainingByte, finPath);
 
                         //NOTE: get the next affordable data type
-                        nextDataType = DataType.getDataTypeBySizeOf(remainingByte);
+                        nextDataType = DataType.BYTE;
+                        nextDataTypeLength = remainingByte;
                     }
 
-                    fmeta.println(finPath + "," + nextDataType.type + "," + currentIndex + "," + nextDataType.sizeOf);
+                    logger.debug("[{}] | [{}] |\t [{}] |\t [{}]", new Object[]{finPath, DataType.getDataTypeByTypeId(nextDataType.type), currentIndex, nextDataTypeLength});
+                    fmeta.println(finPath + "," + nextDataType.type + "," + currentIndex + "," + nextDataTypeLength);
 
-                    switch(nextDataType) {
-                        case INTEGER:
-                            buffer = buffer.putInt(currentIndex, rand.nextInt());
-                            foutFileSize[nextDataType.ordinal()]  += nextDataType.sizeOf;
-                            break;
-                        case DOUBLE:
-                            buffer = buffer.putDouble(currentIndex, rand.nextDouble());
-                            foutFileSize[nextDataType.ordinal()]  += nextDataType.sizeOf;
-                            break;
-                        case CHAR:
-                            buffer = buffer.putChar(currentIndex, (char)(rand.nextInt(26) + 'a'));
-                            foutFileSize[nextDataType.ordinal()]  += nextDataType.sizeOf;
-                            break;
-                        case BYTE:
-                            buffer = buffer.put(currentIndex, (byte) rand.nextInt());
-                            foutFileSize[nextDataType.ordinal()]  += nextDataType.sizeOf;
-                            break;
-                        default:
-                            break;
+                    for(int i = 0; i < nextDataTypeLength; i++) {
+                        switch (nextDataType) {
+                            case INTEGER:
+                                buffer = buffer.putInt(currentIndex, rand.nextInt());
+                                foutFileSize[nextDataType.ordinal()] += nextDataType.sizeOf;
+                                break;
+                            case DOUBLE:
+                                buffer = buffer.putDouble(currentIndex, rand.nextDouble());
+                                foutFileSize[nextDataType.ordinal()] += nextDataType.sizeOf;
+                                break;
+                            case CHAR:
+                                buffer = buffer.putChar(currentIndex, (char) (rand.nextInt(26) + 'a'));
+                                foutFileSize[nextDataType.ordinal()] += nextDataType.sizeOf;
+                                break;
+                            case BYTE:
+                                buffer = buffer.put(currentIndex, (byte) rand.nextInt());
+                                foutFileSize[nextDataType.ordinal()] += nextDataType.sizeOf;
+                                break;
+                            default:
+                                break;
+                        }
+                        currentIndex += nextDataType.sizeOf;
                     }
 
-                    currentIndex += nextDataType.sizeOf;
+
                 }
 
                 buffer.flip();

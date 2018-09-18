@@ -101,7 +101,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
                 LOG.debug("path: [{}] | datatype: [{}] | index: [{}] | length: [{}]", new Object[]{fpath, dataType.name(), index, length});
 
-                byte[] data = new byte[length];
+                byte[] data = new byte[length * dataType.getSizeOf()];
                 bufIn.get(data, 0, length);
                 MappedByteBuffer bufOut = listOfMappedOutputBuffer.get(dataType.ordinal());
                 bufOut.put(data);
@@ -166,8 +166,8 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
                 LOG.debug("path: [{}] | datatype: [{}] | index: [{}] | length: [{}]", new Object[]{fpath, dataType.name(), index, length});
 
-                byte[] data = new byte[length];
-                fis.read(data, 0, length);
+                byte[] data = new byte[length * dataType.getSizeOf()];
+                fis.read(data, 0, length * dataType.getSizeOf());
                 FileOutputStream fos = listOfFileOutputStream.get(dataType.ordinal());
                 fos.write(data);
             }
