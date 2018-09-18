@@ -56,7 +56,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.SECONDS)
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
