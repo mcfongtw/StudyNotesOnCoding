@@ -12,8 +12,15 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.AsynchronousByteChannel;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.TimeUnit;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
@@ -134,6 +141,69 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
                 LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferSize});
             }
+
+            assert finChannel.size() == foutChannel.size();
+
+            long afterTime = System.nanoTime();
+            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    public void copyWithAsyncFileChannel(SequentialReplicationExecutionPlan plan) throws IOException, InterruptedException, ExecutionException {
+        try(
+                AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(plan.finPath), StandardOpenOption.READ);
+                AsynchronousFileChannel foutChannel = AsynchronousFileChannel.open(Paths.get(plan.finPath), StandardOpenOption.WRITE);
+        ) {
+            long beforeTime = System.nanoTime();
+            int finLength = (int) finChannel.size();
+            BlockingQueue<Boolean> isBufferComplete = new ArrayBlockingQueue<>(1);
+
+            for (int bufIndex = 0; bufIndex < finLength; ) {
+                ByteBuffer buffer = ByteBuffer.allocate(plan.bufferSize);
+                int bufLength = 0;
+
+                if (bufIndex + plan.bufferSize > finLength) {
+                    bufLength = finLength % plan.bufferSize;
+                } else {
+                    bufLength = plan.bufferSize;
+                }
+
+
+                finChannel.read(buffer, 0).get();
+
+                final int position = bufIndex;
+
+                //switch to write mode for ByteBuffer
+                buffer.flip();
+                foutChannel.write(buffer, bufIndex, isBufferComplete, new CompletionHandler<Integer, BlockingQueue<Boolean>>() {
+
+                    @Override
+                    public void completed(Integer result, BlockingQueue<Boolean> lock) {
+                        LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, plan.bufferSize});
+
+                        try {
+                            lock.put(true);
+                        } catch (InterruptedException e) {
+                            LOG.error("[completed] Failed to write", e);
+                        }
+                    }
+
+                    @Override
+                    public void failed(Throwable exc, BlockingQueue<Boolean> latch) {
+                        LOG.error("[failed] Failed to write: ", exc);
+                    }
+                });
+
+                bufIndex += bufLength;
+
+                isBufferComplete.take();
+
+            }
+
 
             assert finChannel.size() == foutChannel.size();
 
