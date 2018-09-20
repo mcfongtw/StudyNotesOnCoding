@@ -30,7 +30,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     @State(Scope.Benchmark)
     public static class FileReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(FileReplicationExecutionPlan.class.getName());
+        LatencyMetric ioLatencyMetric = new LatencyMetric(FileReplicationBenchmark.class.getName());
 
         //1MB, 10MB, 100MB
         @Param({"1048576", "10485760", "104857600"})

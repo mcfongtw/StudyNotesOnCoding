@@ -26,7 +26,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     @State(Scope.Benchmark)
     public static class RandomAccessClassifierExecutionPlan extends AbstractRandomAccessExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierExecutionPlan.class.getName());
+        LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierBenchmark.class.getName());
 
         @Override
         @Setup(Level.Trial)

@@ -22,13 +22,15 @@ public abstract class AbstractIoBenchmark {
 
     protected static final int NUM_ITERATION = 100;
 
-    private static final int SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS = 30 * 1000;
+    protected static final int SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS = 30 * 1000;
 
-    private static final int UNIT_ONE_KILO = 1024;
+    protected static final int UNIT_ONE_KILO = 1024;
 
-    private static final int UNIT_ONE_MEGA = UNIT_ONE_KILO * UNIT_ONE_KILO;
+    protected static final int UNIT_ONE_MEGA = UNIT_ONE_KILO * UNIT_ONE_KILO;
 
-    private static final int UNIT_ONE_GIGA = UNIT_ONE_KILO * UNIT_ONE_MEGA;
+    protected static final int UNIT_ONE_GIGA = UNIT_ONE_KILO * UNIT_ONE_MEGA;
+
+    protected static final int UNIT_ONE_PAGE = 4 * UNIT_ONE_KILO;
 
     protected static final int TOTAL_DATA_WRITEN = 1 * UNIT_ONE_MEGA;
 
@@ -60,17 +62,17 @@ public abstract class AbstractIoBenchmark {
 
         private void persistCacheToStorage() throws IOException, InterruptedException {
             if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to sync page cache to disk...");
+                logger.debug("Start to sync page cache to disk...");
                 SudoExecutors.exec("sync", sudoPassword);
-                logger.info("Start to sync page cache to disk...DONE");
+                logger.debug("Start to sync page cache to disk...DONE");
             }
         }
 
         private void flushSystemCache() throws IOException, InterruptedException {
             if(StringUtils.isNotEmpty(sudoPassword)) {
-                logger.info("Start to drop free pagecache, dentries and inodes...");
+                logger.debug("Start to drop free pagecache, dentries and inodes...");
                 SudoExecutors.exec("echo 3 > /proc/sys/vm/drop_caches", sudoPassword);
-                logger.info("Start to drop free pagecache, dentries and inodes...DONE");
+                logger.debug("Start to drop free pagecache, dentries and inodes...DONE");
             }
         }
 
