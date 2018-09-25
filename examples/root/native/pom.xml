@@ -43,6 +43,7 @@
                             <directory>${basedir}/src/main/cpp</directory>
                             <fileNames>
                                 <fileName>MallocArenaUtils.cpp</fileName>
+                                <fileName>NativeSystemCaller.cpp</fileName>
                             </fileNames>
                         </source>
                         <source>
