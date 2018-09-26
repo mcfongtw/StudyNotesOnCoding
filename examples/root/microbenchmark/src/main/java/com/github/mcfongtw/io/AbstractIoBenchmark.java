@@ -20,7 +20,7 @@ import static com.github.mcfongtw.io.AbstractIoBenchmark.AbstractRandomAccessExe
 
 public abstract class AbstractIoBenchmark {
 
-    protected static final int NUM_ITERATION = 100;
+    protected static final int NUM_ITERATION = 20;
 
     protected static final int SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS = 30 * 1000;
 
@@ -31,8 +31,6 @@ public abstract class AbstractIoBenchmark {
     protected static final int UNIT_ONE_GIGA = UNIT_ONE_KILO * UNIT_ONE_MEGA;
 
     protected static final int UNIT_ONE_PAGE = 4 * UNIT_ONE_KILO;
-
-    protected static final int TOTAL_DATA_WRITEN = 1 * UNIT_ONE_MEGA;
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
@@ -164,6 +162,8 @@ public abstract class AbstractIoBenchmark {
 
         protected File tempDir;
 
+        private static final int TOTAL_DATA_WRITTEN = 16 * UNIT_ONE_MEGA;
+
         @Override
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
@@ -181,7 +181,7 @@ public abstract class AbstractIoBenchmark {
             try(
                     FileOutputStream fin = new FileOutputStream(finPath);
             ) {
-                for(int i = 0; i < TOTAL_DATA_WRITEN; i++) {
+                for(int i = 0; i < TOTAL_DATA_WRITTEN; i++) {
                     fin.write((byte) i);
                 }
             }
@@ -201,6 +201,7 @@ public abstract class AbstractIoBenchmark {
     }
 
     protected static class AbstractRandomAccessExecutionPlan extends AbstractExecutionPlan {
+        private static final int TOTAL_DATA_WRITTEN = 16 * UNIT_ONE_MEGA;
 
         protected String fmetaPath;
 
@@ -289,14 +290,14 @@ public abstract class AbstractIoBenchmark {
             ) {
                 int foutFileSize[] = new int[COUNT];
 
-                ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, TOTAL_DATA_WRITEN);
+                ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, TOTAL_DATA_WRITTEN);
 
-                for(int currentIndex = 0; currentIndex < TOTAL_DATA_WRITEN; ) {
+                for(int currentIndex = 0; currentIndex < TOTAL_DATA_WRITTEN; ) {
                     DataType nextDataType = getDataTypeByTypeId(rand.nextInt(3) + 1);
                     int nextDataTypeLength = rand.nextInt(10) + 1;
 
-                    if(nextDataTypeLength * nextDataType.getSizeOf() + currentIndex >= TOTAL_DATA_WRITEN) {
-                        int remainingByte = TOTAL_DATA_WRITEN - currentIndex;
+                    if(nextDataTypeLength * nextDataType.getSizeOf() + currentIndex >= TOTAL_DATA_WRITTEN) {
+                        int remainingByte = TOTAL_DATA_WRITTEN - currentIndex;
                         logger.debug("Remaining {} bytes in file: [{}]", remainingByte, finPath);
 
                         //NOTE: get the next affordable data type
