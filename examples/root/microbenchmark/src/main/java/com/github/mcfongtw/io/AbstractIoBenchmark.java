@@ -162,7 +162,7 @@ public abstract class AbstractIoBenchmark {
 
         protected File tempDir;
 
-        private static final int TOTAL_DATA_WRITTEN = 16 * UNIT_ONE_MEGA;
+        private static final int TOTAL_DATA_WRITTEN = 32 * UNIT_ONE_MEGA;
 
         @Override
         public void preTrialSetUp() throws Exception {
@@ -201,7 +201,7 @@ public abstract class AbstractIoBenchmark {
     }
 
     protected static class AbstractRandomAccessExecutionPlan extends AbstractExecutionPlan {
-        private static final int TOTAL_DATA_WRITTEN = 16 * UNIT_ONE_MEGA;
+        private static final int TOTAL_DATA_WRITTEN = 32 * UNIT_ONE_MEGA;
 
         protected String fmetaPath;
 
