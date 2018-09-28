@@ -32,6 +32,8 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
         @TearDown(Level.Trial)
         public void doTrialTearDown() throws Exception {
             super.doTrialTearDown();
+
+            assert tempDir.exists() == false;
         }
 
         @Override

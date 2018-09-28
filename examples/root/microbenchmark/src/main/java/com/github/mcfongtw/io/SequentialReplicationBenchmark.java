@@ -16,6 +16,7 @@ import java.nio.channels.AsynchronousByteChannel;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -45,6 +46,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
         @TearDown(Level.Trial)
         public void doTrialTearDown() throws Exception {
             super.doTrialTearDown();
+
+            assert tempDir.exists() == false;
         }
 
         @Override

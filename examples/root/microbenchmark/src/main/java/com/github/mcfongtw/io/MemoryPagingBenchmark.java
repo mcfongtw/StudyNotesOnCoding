@@ -81,6 +81,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
         @TearDown(Level.Trial)
         public void doTrialTearDown() throws Exception {
             super.doTrialTearDown();
+
+            assert tempDir.exists() == false;
         }
 
         @Override
@@ -116,7 +118,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
                     fout.write(buffer, 0, numBytesRead);
                 }
 
-                assert new File(plan.finPath).length() == new File(plan.foutPath).length();
+                assert new File(finPath).length() == new File(foutPath).length();
 
                 long afterTime = System.nanoTime();
                 plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
@@ -144,11 +146,13 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
                 }
                 fout.flush();
 
-                assert new File(plan.finPath).length() == new File(plan.foutPath).length();
+                assert new File(finPath).length() == new File(foutPath).length();
 
                 long afterTime = System.nanoTime();
                 plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
+
+
         }
     }
 
