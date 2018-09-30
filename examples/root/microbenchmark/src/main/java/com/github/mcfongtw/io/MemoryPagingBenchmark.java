@@ -27,7 +27,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
     @State(Scope.Benchmark)
     public static class MemoryPagingBenchmarkExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        private final static int MAX_NUM_FILES = 1024;
+        private final static int MAX_NUM_FILES = 100;
 
         private final static int BUFFER_SIZE = UNIT_ONE_PAGE;
 
@@ -36,8 +36,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
         protected List<String> listOfFinPath = new ArrayList<>();
         protected List<String> listOfFoutPath = new ArrayList<>();
 
-        //128, 1K, 4K, 20K
-        @Param({"128", "1024", "4096", "20480"})
+        //128, 1K, 4K, 128K, 1M
+        @Param({"128", "4096", "131072", "1048576"})
         public int fileSize;
 
         @Override
