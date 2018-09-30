@@ -26,7 +26,6 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
 
     public static Logger LOG = LoggerFactory.getLogger(FileReplicationBenchmark.class);
 
-
     @State(Scope.Benchmark)
     public static class FileReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
 
@@ -93,16 +92,16 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(FileReplicationExecutionPlan plan) throws Exception {
         try (
                 RandomAccessFile fromFile = new RandomAccessFile(plan.finPath, "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rwd");
+                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {
 
-            int fromLength = (int) fromChannel.size();
+            long fromLength = fromChannel.size();
 
             long beforeTime = System.nanoTime();
 
@@ -123,7 +122,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void nioFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
         Path srcPath = Paths.get(plan.finPath);
         Path dstPath = Paths.get(plan.foutPath);
@@ -141,7 +140,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void commonIoFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
         File srcFile = new File(plan.finPath);
         File dstFile = new File(plan.foutPath);
@@ -159,7 +158,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 10, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void guavaFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
         File srcFile = new File(plan.finPath);
         File dstFile = new File(plan.foutPath);
