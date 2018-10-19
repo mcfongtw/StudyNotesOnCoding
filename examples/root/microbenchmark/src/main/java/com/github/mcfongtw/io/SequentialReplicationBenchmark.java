@@ -163,7 +163,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
         ) {
             long beforeTime = System.nanoTime();
             int finLength = (int) finChannel.size();
-            BlockingQueue<Boolean> isBufferComplete = new ArrayBlockingQueue<>(1);
+            Semaphore semaphore = new Semaphore(1);
 
             for (int bufIndex = 0; bufIndex < finLength; ) {
                 ByteBuffer buffer = ByteBuffer.allocate(plan.bufferSize);
@@ -182,28 +182,24 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
                 //switch to write mode for ByteBuffer
                 buffer.flip();
-                foutChannel.write(buffer, bufIndex, isBufferComplete, new CompletionHandler<Integer, BlockingQueue<Boolean>>() {
+                foutChannel.write(buffer, bufIndex, semaphore, new CompletionHandler<Integer, Semaphore>() {
 
                     @Override
-                    public void completed(Integer result, BlockingQueue<Boolean> lock) {
+                    public void completed(Integer result, Semaphore lock) {
                         LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, plan.bufferSize});
 
-                        try {
-                            lock.put(true);
-                        } catch (InterruptedException e) {
-                            LOG.error("[completed] Failed to write", e);
-                        }
+                        lock.release();
                     }
 
                     @Override
-                    public void failed(Throwable exc, BlockingQueue<Boolean> latch) {
+                    public void failed(Throwable exc, Semaphore lock) {
                         LOG.error("[failed] Failed to write: ", exc);
                     }
                 });
 
                 bufIndex += bufLength;
 
-                isBufferComplete.take();
+                semaphore.acquire();
 
             }
 
