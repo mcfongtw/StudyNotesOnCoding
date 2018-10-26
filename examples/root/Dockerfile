@@ -1,7 +1,7 @@
 # A template Dockerfile for all program demonstration
 #
 #
-FROM mcfongtw/phusion_perf_openjdk:8
+FROM mcfongtw/phusion_perf_openjdk:latest
 
 MAINTAINER Michael Fong <mcfong.open@gmail.com>
 
@@ -27,8 +27,9 @@ ENV SDKMAN_DIR /workspace/.sdkman
 COPY docker-mvn-build.sh /vagrant/StudyNotesOnJavaPerformance/examples/root
 
 WORKDIR /vagrant/StudyNotesOnJavaPerformance/examples/
+
 ####################################################### 
-# Setup entry point
+# Setup POC program entry point
 COPY docker-entrypoint.sh /workspace/docker-entrypoint.sh
 
 RUN chmod +x /workspace/docker-entrypoint.sh

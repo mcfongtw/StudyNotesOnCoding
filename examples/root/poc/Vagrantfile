@@ -9,6 +9,7 @@ NETWORK_PRIVATE_IP_PREFIX = "172.16.3."
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	config.vm.define "SimplePocContainer" do |demo|
+		# Public IP: 172.17.0.2
 		demo.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "2"
 	# TODO: Sync maven reopsitory before building Docker container.
 		demo.vm.synced_folder "#{Dir.home}/.m2/", "/vagrant", id: "maven"
@@ -30,9 +31,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 	
 	config.vm.define "MonitorDbContainer" do |db|
+		# Public IP: 172.17.0.3
 		db.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "3"
  		db.vm.provider "docker" do |influxdb|
-			influxdb.image = "mcfongtw/phusion_perf_monitor_db:0.1"
+			influxdb.image = "mcfongtw/phusion_perf_monitor_db:latest"
 			influxdb.name = "influxdb"
 			influxdb.pull = true
 			influxdb.force_host_vm = true
@@ -42,7 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			influxdb.has_ssh = false
 			influxdb.remains_running = true
 			influxdb.create_args = ['--privileged=true']
-			influxdb.ports = ["8086:8086"]
+			influxdb.ports = ["8086:8086", "25826:25826"]
 			influxdb.volumes=["/proc:/mnt/proc"]
   		end
 		db.ssh.port = 22
@@ -52,6 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 	
 	config.vm.define "MonitorWebContainer" do |web|
+		# Public IP: 172.17.0.4
 		web.vm.network "private_network", ip: "#{NETWORK_PRIVATE_IP_PREFIX}" + "4"
  		web.vm.provider "docker" do |grafana|
 			grafana.image = "mcfongtw/phusion_perf_monitor_web:latest"
