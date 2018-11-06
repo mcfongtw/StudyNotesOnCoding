@@ -7,6 +7,12 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.ProviderNotFoundException;
 
+
+/*
+ * XXX: Need to
+ * export LD_LIBRARY_PATH=/tmp
+ * Ref: http://javaagile.blogspot.com/2014/04/jni-and-ldlibrarypath.html
+ */
 public class JniUtils {
 
     private JniUtils() {

@@ -11,11 +11,14 @@ public class NativeSystemCaller {
         //avoid instantiation
     }
 
-    public static final int MCL_CURRENT = 1;
+    /*
+     * //Flags for `mlockall'
+     * #define MCL_CURRENT	1		/* Lock all currently mapped pages.
+     * #define MCL_FUTURE	2		/* Lock all additions to address
+     */
+    public static final int MCL_CURRENT = 0b01;
 
-    public static final int MCL_FUTURE = 2;
-
-    //javah -o ../../../native/src/main/cpp/NativeSystemCaller.h com.github.mcfongtw.jni.utils.NativeSystemCaller
+    public static final int MCL_FUTURE = 0b10;
 
     public static native int mlockall(int flags);
 

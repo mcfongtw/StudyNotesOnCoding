@@ -1,5 +1,6 @@
 #include <sys/mman.h>
 #include "NativeSystemCaller.h"
+#include "ExceptionUtils.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +11,10 @@ JNIEXPORT jint JNICALL Java_com_github_mcfongtw_jni_utils_NativeSystemCaller_mlo
 
     int result = mlockall((int) jflags);
 
+    if(result < 0) {
+        jni::ExceptionUtils::throwInternalErrorFromErrnoString(env);
+    }
+
     return (jint) result;
   }
 
@@ -18,6 +23,10 @@ JNIEXPORT jint JNICALL Java_com_github_mcfongtw_jni_utils_NativeSystemCaller_mun
   (JNIEnv * env, jclass clazz) {
 
   int result = munlockall();
+
+  if(result < 0) {
+      jni::ExceptionUtils::throwInternalErrorFromErrnoString(env);
+  }
 
   return (jint) result;
   }

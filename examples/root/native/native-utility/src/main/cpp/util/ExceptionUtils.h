@@ -22,6 +22,8 @@ public:
 
 	static jboolean throwInternalError(JNIEnv *env, std::string errorMsg);
 
+	static jboolean throwInternalErrorFromErrnoString(JNIEnv *env);
+
 	static jboolean throwNullPointerException(JNIEnv *env,
 			std::string errorMsg);
 
@@ -39,6 +41,8 @@ private:
 			const char *message);
 
 	static void printExceptionMessage(JNIEnv *env, jthrowable throwable);
+
+	static char* getErrnoString();
 };
 
 }

@@ -5,10 +5,14 @@
  *      Author: Michael Fong
  */
 #include <iostream>
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
 
 #include "ExceptionUtils.h"
 #include "DataTypeUtils.h"
 #include "ConditionChecker.h"
+
 
 jboolean jni::ExceptionUtils::throwOutOfMemoryError(JNIEnv *env, std::string errorMsg) {
 	jboolean result = jni::ExceptionUtils::throwExceptionByClassName(env,
@@ -32,6 +36,26 @@ jboolean jni::ExceptionUtils::throwOutOfMemoryError(JNIEnv *env, std::string err
 jboolean jni::ExceptionUtils::throwInternalError(JNIEnv *env, std::string errorMsg) {
 	jboolean result = jni::ExceptionUtils::throwExceptionByClassName(env,
 			"java/lang/InternalError", errorMsg.c_str());
+
+	if (result == JNI_FALSE) {
+		std::cout << "FATAL ERROR:  JVM Internal: Thrown failed" << std::endl;
+	}
+
+	return result;
+}
+
+/*
+ *  A fatal error in a JNI call
+ *  Create and throw an 'InternalError'
+ *
+ *  Note:  This routine never returns from the 'throw',
+ *  and the Java native method immediately raises the
+ *  exception.
+ */
+jboolean jni::ExceptionUtils::throwInternalErrorFromErrnoString(JNIEnv *env) {
+    char* errorMsg = jni::ExceptionUtils::getErrnoString();
+	jboolean result = jni::ExceptionUtils::throwExceptionByClassName(env,
+			"java/lang/InternalError", errorMsg);
 
 	if (result == JNI_FALSE) {
 		std::cout << "FATAL ERROR:  JVM Internal: Thrown failed" << std::endl;
@@ -174,5 +198,11 @@ void jni::ExceptionUtils::printExceptionMessage(JNIEnv *env, jthrowable throwabl
 		std::cout << "ERROR: [" << message << "]" << std::endl;
 	}
 	env->DeleteLocalRef(jThrowableClazz);
+}
+
+
+char* jni::ExceptionUtils::getErrnoString() {
+    char* errString = strerror(errno);
+    return errString;
 }
 
