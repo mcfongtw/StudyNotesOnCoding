@@ -3,8 +3,8 @@ package com.github.mcfongtw.jni.utils;
 public class NativeSystemCaller {
 
     static {
-        JniUtils.loadLibrary("libnative-utility.so");
-        JniUtils.loadLibrary("libnative-jni.so");
+        JniUtils.loadLibraryFromResourceStream("libnative-jni.so");
+        JniUtils.loadLibraryFromResourceStream("libnative-utility.so");
     }
 
     private NativeSystemCaller() {

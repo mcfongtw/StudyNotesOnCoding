@@ -1,20 +1,16 @@
 package com.github.mcfongtw.jni;
 
 import com.github.mcfongtw.jni.utils.JniUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import test.JNIUtility;
 
-import java.io.IOException;
-
 public class JNIUtilityUnitTest {
 
     @BeforeAll
-    public static void init() throws IOException {
-        JniUtils.loadLibraryFromFile("../poc/target/classes/libnative-utility.so");
-        JniUtils.loadLibraryFromFile("../poc/target/classes/libnative-jni.so");
+    public static void init() throws Exception {
+        JniUtils.loadLibraryFromFileSystem("libnative-utility.so");
     }
 
     ////////////////////////////////////////////////////////////////////////////////////

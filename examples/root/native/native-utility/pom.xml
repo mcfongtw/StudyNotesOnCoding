@@ -61,7 +61,6 @@
                     <linkerEndOptions>
                         <linkerEndOption>-shared</linkerEndOption>
                         <linkerEndOption>-fPIC</linkerEndOption>
-                        <!--<linkerEndOption>-lnative-utility</linkerEndOption>-->
                     </linkerEndOptions>
                     <!-- DO NOT UNCOMMENT; OTHERWISE, BE AWARE OF ERROR  -->
                     <!-- The packaging for this project did not assign a file to the build artifact -->

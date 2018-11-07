@@ -1,130 +1,130 @@
 package com.github.mcfongtw.jni.utils;
 
 import com.github.fommil.jni.JniLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
-import java.nio.file.ProviderNotFoundException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /*
  * XXX: Need to
  * export LD_LIBRARY_PATH=/tmp
  * Ref: http://javaagile.blogspot.com/2014/04/jni-and-ldlibrarypath.html
+ *
+ * Inspired from com.github.fommil.jniloader
  */
 public class JniUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(JniUtils.class);
+
+    private static final Set<String> loadedFilePath = new HashSet<String>();
 
     private JniUtils() {
         // Avoid instantiations
     }
 
-    public static void  loadLibrary(String path) {
-        try {
-            loadLibraryFromJar("/" + path);
-        } catch (IOException ioe) {
-            try {
-                JniLoader.load(path);
-            } catch (UnsatisfiedLinkError ule) {
-                throw new RuntimeException(ule);
-            }
-        }
+    public static void loadLibraryFromResourceStream(String libPath) {
+        loadFromPath(libPath);
     }
 
-    public static void loadLibraryFromFile(String libFullPath) throws IOException {
-        File libFile = new File(libFullPath);
-
-        if (libFile.exists()) {
-            try {
-                System.load(libFile.getAbsolutePath());
-            } catch (UnsatisfiedLinkError ule) {
-                throw new RuntimeException(ule);
-            }
-        } else {
-            throw new IOException("[" + libFile.getAbsolutePath() + "] does not exist");
-        }
+    public static void loadLibraryFromFileSystem(String libPath) throws IOException {
+        loadFromPath(libPath);
     }
 
-    public static void loadLibraryFromJar(String path) throws IOException {
-
-        if (!path.startsWith("/")) {
-            throw new IllegalArgumentException("The path has to be absolute (start with '/').");
+    /**
+     * Attempts to loadFromPath a native library from the {@code java.library.path}
+     * and (if that fails) will extract the named file from the classpath
+     * into a temporary directory is created) and loadFromPath from there.
+     * <p/>
+     * Will stop on the first successful loadFromPath of a native library.
+     *
+     * @param path alternative relative path of the native library
+     *              on either the library path or classpath.
+     * @throws ExceptionInInitializerError if the input parameters are invalid or
+     *                                     all path failed to loadFromPath (making this
+     *                                     safe to use in static code blocks).
+     */
+    private synchronized static void loadFromPath(String path) {
+        String fileName = new File(path).getName();
+        if (loadedFilePath.contains(fileName)) {
+            logger.warn("[{}] already loaded. Skip!", path);
+            return;
         }
 
-        // Obtain filename from path
-        String[] parts = path.split("/");
-        String filename = (parts.length > 1) ? parts[parts.length - 1] : null;
-
-        // Split filename to prefix and suffix (extension)
-        String prefix = "";
-        String suffix = null;
-        if (filename != null) {
-            parts = filename.split("\\.", 2);
-            prefix = parts[0];
-            suffix = (parts.length > 1) ? "."+parts[parts.length - 1] : null; // Thanks, davs! :-)
+        //1. Check if so files exists in LD_LIBRARY_PATH. If yes, loadFromPath it.
+        String[] javaLibPath = System.getProperty("java.library.path").split(File.pathSeparator);
+        for (String ldLibraryPath : javaLibPath) {
+            File file = new File(ldLibraryPath, path).getAbsoluteFile();
+            logger.debug("Searching {} for {}", ldLibraryPath, file.getName());
+            if (file.exists() && file.isFile() && systemLoad(file, path))
+                return;
         }
 
-        // Check if the filename is okay
-        if (filename == null || prefix.length() < 3) {
-            throw new IllegalArgumentException("The filename has to be at least 3 characters long.");
-        }
+        //2. Extract the so files to /tmp/<temp-folder>/*.so and loadFromPath it.
+        File extracted = extract(path);
+        if (extracted != null && systemLoad(extracted, path))
+            return;
 
-        // Prepare temporary file
-        File temp = File.createTempFile(prefix, suffix);
+        throw new ExceptionInInitializerError("unable to loadFromPath from " + path);
+    }
 
-        if (!temp.exists()) {
-            throw new FileNotFoundException("File " + temp.getAbsolutePath() + " does not exist.");
-        }
-
-        boolean tempFileIsPosix = false;
+    // return true if the file was loaded; false, otherwise.
+    private static boolean systemLoad(File file, String filePath) {
         try {
-            if (FileSystems.getDefault()
-                    .supportedFileAttributeViews()
-                    .contains("posix")) {
-                // Assume POSIX compliant file system, can be deleted after loading.
-                tempFileIsPosix = true;
-            }
-        } catch (FileSystemNotFoundException
-                | ProviderNotFoundException
-                | SecurityException e) {
-            // Assume non-POSIX, and don't delete until last file descriptor closed.
-            e.printStackTrace();
-        }
-
-        // Prepare buffer for data copying
-        byte[] buffer = new byte[1024];
-        int readBytes;
-
-        // Open and check input stream
-        InputStream is = JniUtils.class.getResourceAsStream(path);
-        if (is == null) {
-            temp.delete();
-            throw new FileNotFoundException("File " + path + " was not found inside JAR.");
-        }
-
-        // Open output stream and copy data between source file in JAR and the temporary file
-        OutputStream os = new FileOutputStream(temp);
-        try {
-            while ((readBytes = is.read(buffer)) != -1) {
-                os.write(buffer, 0, readBytes);
-            }
+            logger.debug("Attempting to loadFromPath shared library [{}]", file);
+            System.load(file.getAbsolutePath());
+            logger.info("Successfully loaded shared library [{}]", file);
+            loadedFilePath.add(filePath);
+            return true;
+        } catch (UnsatisfiedLinkError e) {
+            logger.warn("Failed to loadFromPath [{}]. Reason: [{}]", file, e.getMessage());
+            return false;
+        } catch (SecurityException e) {
+            logger.warn("Failed to loadFromPath [{}]. Reason: [{}]", file, e.getMessage());
+            return false;
         } catch (Throwable e) {
-            temp.delete();
-            throw e;
-        } finally {
-            // If read/write fails, close streams safely before throwing an exception
-            os.close();
-            is.close();
+            throw new ExceptionInInitializerError(e);
         }
+    }
 
+    private static File extract(String path) {
         try {
-            // Load the library
-            System.load(temp.getAbsolutePath());
-        } finally {
-            if (tempFileIsPosix)
-                temp.delete();
-            else
-                temp.deleteOnExit();
+            long start = System.nanoTime();
+            URL url = JniLoader.class.getResource("/" + path);
+            if (url == null) {
+                return null;
+            }
+
+            InputStream is = JniUtils.class.getResourceAsStream("/" + path);
+            File tempFile = File.createTempFile("jni", path);
+            tempFile.deleteOnExit();
+
+            logger.info("Attempting to extract [{}] to [{}]", url, tempFile.getAbsoluteFile());
+
+            //copy src to dst using transferFrom
+            ReadableByteChannel src = Channels.newChannel(is);
+            FileChannel dst = new FileOutputStream(tempFile).getChannel();
+            dst.transferFrom(src, 0, Long.MAX_VALUE);
+
+            long end = System.nanoTime();
+            logger.info("Successfully extracted [{}] is [{}] millis", tempFile.getAbsolutePath(), ((end-start) / 1_000_000));
+
+            return tempFile;
+        } catch (Throwable e) {
+            if (e instanceof SecurityException || e instanceof IOException) {
+                logger.trace("Failed to extract [{}]. Reason: [{}]", path, e.getMessage());
+                return null;
+            } else throw new ExceptionInInitializerError(e);
         }
     }
 }

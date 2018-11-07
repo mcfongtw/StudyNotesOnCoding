@@ -51,7 +51,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         </dependency>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.jni</artifactId>
+            <artifactId>java.perf.java-jni</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Testing -->

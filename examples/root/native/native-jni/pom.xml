@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.jni</artifactId>
+            <artifactId>java.perf.java-jni</artifactId>
             <version>0.1-SNAPSHOT</version>
             <!-- trigger java-jni to compile java code -->
             <scope>compile</scope>
@@ -124,7 +124,6 @@
                     <linkerEndOptions>
                         <linkerEndOption>-shared</linkerEndOption>
                         <linkerEndOption>-fPIC</linkerEndOption>
-                        <!--<linkerEndOption>-lnative-jni</linkerEndOption>-->
                         <linkerEndOption>-lnative-utility</linkerEndOption>
                     </linkerEndOptions>
                     <!-- DO NOT UNCOMMENT; OTHERWISE, BE AWARE OF ERROR  -->

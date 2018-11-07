@@ -3,8 +3,8 @@ package com.github.mcfongtw.jni.utils;
 public class MallocUtils {
 
     static {
-        JniUtils.loadLibrary("libnative-utility.so");
-        JniUtils.loadLibrary("libnative-jni.so");
+        JniUtils.loadLibraryFromResourceStream("libnative-utility.so");
+        JniUtils.loadLibraryFromResourceStream("libnative-jni.so");
     }
 
     private MallocUtils() {
