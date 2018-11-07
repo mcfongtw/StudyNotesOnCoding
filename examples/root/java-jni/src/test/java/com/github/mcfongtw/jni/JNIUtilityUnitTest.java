@@ -9,7 +9,7 @@ import test.JNIUtility;
 
 import java.io.IOException;
 
-public class JNIUtilityTestUnit {
+public class JNIUtilityUnitTest {
 
     @BeforeAll
     public static void init() throws IOException {
