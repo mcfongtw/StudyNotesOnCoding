@@ -18,7 +18,7 @@ public class FutureTaskAsyncTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(FutureTaskAsyncTest.class);
 
-    private static final long AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS = 200;
+    private static final long AWAIT_BETWEEN_DELAY_BUFFER_IN_MILLIS = 500;
 
     private static final long BIG_PRIME = 1000000000000003L;
 

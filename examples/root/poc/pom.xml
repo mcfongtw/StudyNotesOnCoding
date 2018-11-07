@@ -257,6 +257,10 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <version>1.1.0</version>
                     </dependency>
                 </dependencies>
+                <!--https://issues.apache.org/jira/browse/SUREFIRE-1588-->
+                <configuration>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
