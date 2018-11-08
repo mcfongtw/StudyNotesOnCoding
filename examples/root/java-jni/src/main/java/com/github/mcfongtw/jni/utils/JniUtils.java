@@ -1,6 +1,5 @@
 package com.github.mcfongtw.jni.utils;
 
-import com.github.fommil.jni.JniLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +99,7 @@ public class JniUtils {
     private static File extract(String path) {
         try {
             long start = System.nanoTime();
-            URL url = JniLoader.class.getResource("/" + path);
+            URL url = JniUtils.class.getResource("/" + path);
             if (url == null) {
                 return null;
             }

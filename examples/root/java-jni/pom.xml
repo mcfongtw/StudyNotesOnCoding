@@ -18,11 +18,6 @@
     <name>Java Perf Java-JNI</name>
 
     <dependencies>
-        <dependency>
-            <groupId>com.github.fommil</groupId>
-            <artifactId>jniloader</artifactId>
-            <version>1.1</version>
-        </dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -44,6 +39,32 @@
                     <target>${javac.target}</target>
                 </configuration>
             </plugin>
+            <!-- Copy and Rename shared libraries -->
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-so</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <fileSets>
+                                <fileSet>
+                                    <sourceFile>
+                                        ../native/native-utility/target/java.perf.native-utility.so
+                                    </sourceFile>
+                                    <destinationFile>target/classes/libnative-utility.so</destinationFile>
+                                </fileSet>
+                            </fileSets>
+                            <overWrite>true</overWrite>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -60,7 +81,7 @@
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <!--https://stackoverflow.com/questions/9583292/how-can-i-append-to-the-system-path-for-maven-surefire-tests-that-use-dlls-->
                     <environmentVariables>
-                        <LD_LIBRARY_PATH>${basedir}/../poc/target/classes</LD_LIBRARY_PATH>
+                        <LD_LIBRARY_PATH>${basedir}/target/classes</LD_LIBRARY_PATH>
                     </environmentVariables>
                 </configuration>
             </plugin>

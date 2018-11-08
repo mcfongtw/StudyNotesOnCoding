@@ -257,9 +257,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <version>1.1.0</version>
                     </dependency>
                 </dependencies>
-                <!--https://issues.apache.org/jira/browse/SUREFIRE-1588-->
                 <configuration>
+                    <!--https://issues.apache.org/jira/browse/SUREFIRE-1588-->
                     <useSystemClassLoader>false</useSystemClassLoader>
+                    <!--https://stackoverflow.com/questions/9583292/how-can-i-append-to-the-system-path-for-maven-surefire-tests-that-use-dlls-->
+                    <environmentVariables>
+                        <LD_LIBRARY_PATH>${basedir}/target/classes</LD_LIBRARY_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>
