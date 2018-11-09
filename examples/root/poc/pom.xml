@@ -54,6 +54,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>java.perf.java-jni</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty4.version}</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.awaitility</groupId>

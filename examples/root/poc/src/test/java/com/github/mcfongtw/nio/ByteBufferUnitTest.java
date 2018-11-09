@@ -23,7 +23,7 @@ public class ByteBufferUnitTest {
     }
 
     @Test
-    public void testAllocateByteBuffer() {
+    public void testInitializedByteBuffer() {
         //       [_ _ _ _ _ _ _ _ _ _ ]
         //        ^                   ^
         //position                    limit & capacity
@@ -33,7 +33,7 @@ public class ByteBufferUnitTest {
     }
 
     @Test
-    public void testWriteThenReadDataFromBuffer() {
+    public void testWriteThenReadDataFromByteBuffer() {
         buffer.put((byte)1);
         Assertions.assertEquals(1, buffer.position());
         Assertions.assertEquals(10, buffer.limit());
@@ -65,7 +65,7 @@ public class ByteBufferUnitTest {
     }
 
     @Test
-    public void testNoMoreBufferToWrite() {
+    public void testNoMoreWriteToByteBuffer() {
         ByteBuffer zeroBuffer = ByteBuffer.allocate(0);
         Assertions.assertFalse(zeroBuffer.hasRemaining());
 
@@ -78,7 +78,7 @@ public class ByteBufferUnitTest {
     }
 
     @Test
-    public void testNoMoreBufferToRead() {
+    public void testNoMoreReadToByteBuffer() {
         buffer.put((byte)1);
 
         buffer.flip();
