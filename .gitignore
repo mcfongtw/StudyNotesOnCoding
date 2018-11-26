@@ -9,4 +9,9 @@
 examples/root/microbenchmark/target
 examples/root/poc/target
 
+# POC: snmp mib configuration
+conf.endpoint
+conf.listOfEps
+
+# java error
 hs_err_pid*.log
