@@ -10,6 +10,8 @@ import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.snmp.*;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.event.ResponseEvent;
+import org.snmp4j.mp.MPv1;
+import org.snmp4j.mp.MPv2c;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.security.SecurityLevel;
@@ -18,7 +20,8 @@ import org.snmp4j.security.USM;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.snmp4j.transport.TransportMappings;
+import org.snmp4j.util.MultiThreadedMessageDispatcher;
+import org.snmp4j.util.ThreadPool;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,8 +102,13 @@ class NetworkEndpointManager {
     public void start(SnmpUtils.SnmpTransportType type, String host, int port) throws IOException {
         TransportMapping serverTransport = SnmpUtils.getTransport(type, host, port);
         serverTransportString = type + "://" + host + ":" + port;
-        snmp = new Snmp(serverTransport);
-// Do not forget this line!
+
+        ThreadPool threadPool = ThreadPool.create("SnmpDispatcherPool", 1);
+        MessageDispatcher messageDispatcher = new MultiThreadedMessageDispatcher(threadPool, new MessageDispatcherImpl());
+        messageDispatcher.addMessageProcessingModel(new MPv1());
+        messageDispatcher.addMessageProcessingModel(new MPv2c());
+
+        snmp = new Snmp(messageDispatcher, serverTransport);
         try {
             serverTransport.listen();
         } catch (BindException e) {
@@ -162,10 +170,10 @@ class NetworkEndpointManager {
 
 }
 
-class NetworkManagementEndpoint extends BaseAgent {
+class NetworkDeviceAgent extends BaseAgent {
     private TransportMapping transport;
 
-    public NetworkManagementEndpoint()  {
+    public NetworkDeviceAgent()  {
 
         /**
          * Creates a base listOfEps with boot-counter, config file, and a
@@ -331,12 +339,12 @@ public class NioSnmpDemo {
 
     public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
-    private List<NetworkManagementEndpoint> listOfEps = Lists.newArrayList();
+    private List<NetworkDeviceAgent> listOfEps = Lists.newArrayList();
 
     /**
      * This is the listOfEpManagers which we have created earlier
      */
-    private List<NetworkEndpointManager> listOfEpManagers = Lists.newArrayList();
+    private NetworkEndpointManager manager;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         NioSnmpDemo demo = new NioSnmpDemo();
@@ -348,7 +356,7 @@ public class NioSnmpDemo {
     private void initEndPoints() throws IOException {
 
         for(int i = 0; i < NUMBER_OF_ENDPOINTS; i++) {
-            NetworkManagementEndpoint ep = new NetworkManagementEndpoint();
+            NetworkDeviceAgent ep = new NetworkDeviceAgent();
 
             ep.start(SnmpUtils.SnmpTransportType.TCP, "0.0.0.0", (ENDPOINT_START_PORT + i));
 
@@ -367,25 +375,23 @@ public class NioSnmpDemo {
     }
 
     private void initEpManager() throws IOException {
+        // Setup the manager to use our newly started listOfEps
+        manager = new NetworkEndpointManager();
+        //XXX: add 100 to avoid AddressAlreadyInUse
+        manager.start(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", (MANAGER_START_PORT));
+
         for (int i = 0; i < NUMBER_OF_ENDPOINTS ; i++) {
 
-            // Setup the listOfEpManagers to use our newly started listOfEps
-            NetworkEndpointManager epManager = new NetworkEndpointManager();
-            //XXX: add 100 to avoid AddressAlreadyInUse
-            epManager.start(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", (MANAGER_START_PORT + i * 100));
-            epManager.addEndPointAddress(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", (ENDPOINT_START_PORT + i));
+            manager.addEndPointAddress(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", (ENDPOINT_START_PORT + i));
 
-            listOfEpManagers.add(epManager);
         }
     }
 
 
     private void queryOidPeriodically() throws IOException, InterruptedException {
         while(true) {
-            for (NetworkEndpointManager epManager : listOfEpManagers) {
-                String oidResult = epManager.getAsString(OID_CURRENT_DATE);
-                LOG.info("{} | {} = {}", new Object[]{epManager.getServerTransport(), OID_CURRENT_DATE.getSyntaxString(), oidResult});
-            }
+            String oidResult = manager.getAsString(OID_CURRENT_DATE);
+            LOG.info("{} | {} = {}", new Object[]{manager.getServerTransport(), OID_CURRENT_DATE.getSyntaxString(), oidResult});
 
             Thread.sleep(3000);
         }
