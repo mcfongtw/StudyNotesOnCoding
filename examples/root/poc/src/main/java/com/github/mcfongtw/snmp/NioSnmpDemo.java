@@ -1,6 +1,7 @@
 package com.github.mcfongtw.snmp;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.*;
@@ -20,8 +21,7 @@ import org.snmp4j.security.USM;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.snmp4j.util.MultiThreadedMessageDispatcher;
-import org.snmp4j.util.ThreadPool;
+import org.snmp4j.util.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,8 +82,6 @@ class NetworkEndpointManager {
         return serverTransportString;
     }
 
-
-
     public void addEndPointAddress(SnmpUtils.SnmpTransportType type, String host, int port) {
         try {
             Address address = SnmpUtils.getAddress(type, host, port);
@@ -128,7 +126,7 @@ class NetworkEndpointManager {
         StringBuilder builder = new StringBuilder();
         for(Address epAddress: listOfEpAddress) {
             ResponseEvent event = get(new OID[]{oid}, epAddress);
-            builder.append(event.getResponse().get(0).getVariable().toString() + "\t");
+            builder.append(event.getResponse().get(0).getVariable().toString() + " | ");
         }
 
         return builder.toString();
@@ -140,7 +138,7 @@ class NetworkEndpointManager {
      * @return
      * @throws IOException
      */
-    public ResponseEvent get(OID oids[], Address epAddress) throws IOException {
+    private ResponseEvent get(OID oids[], Address epAddress) throws IOException {
         PDU pdu = new PDU();
         for (OID oid : oids) {
             pdu.add(new VariableBinding(oid));
@@ -168,6 +166,40 @@ class NetworkEndpointManager {
         return target;
     }
 
+    public String walk(OID[] rootOIDs) throws IOException {
+
+        TreeUtils treeUtils = new TreeUtils(snmp, new DefaultPDUFactory());
+        StringBuilder builder = new StringBuilder();
+        for(Address epAddress: listOfEpAddress) {
+            Target target = getTarget(epAddress);
+            List<TreeEvent> treeEvents = treeUtils.walk(target, rootOIDs);
+
+            for (TreeEvent event : treeEvents) {
+                if (event == null) {
+                    continue;
+                }
+                if (event.isError()) {
+                    System.out.println("Error: table OID [" + rootOIDs + "] " + event.getErrorMessage());
+                    continue;
+                }
+
+                VariableBinding[] varBindings = event.getVariableBindings();
+                if (varBindings == null || varBindings.length == 0) {
+                    continue;
+                }
+                for (VariableBinding varBinding : varBindings) {
+                    if (varBinding == null) {
+                        continue;
+                    }
+
+                    builder.append(varBinding.getVariable().toString() + " | ");
+                }
+
+            }
+        }
+
+        return builder.toString();
+    }
 }
 
 class NetworkDeviceAgent extends BaseAgent {
@@ -304,32 +336,13 @@ class NetworkDeviceAgent extends BaseAgent {
 
 }
 
-/**
- * This class creates and returns ManagedObjects
- * @author Shiva
- *
- */
-class MOCreator {
-    public static MOScalar createReadOnly(OID oid, Object value ){
-        return new MOScalar(oid,
-                MOAccessImpl.ACCESS_READ_ONLY,
-                getVariable(value));
-    }
-
-    private static Variable getVariable(Object value) {
-        if(value instanceof String) {
-            return new OctetString((String)value);
-        }
-        throw new IllegalArgumentException("Unmanaged Type: " + value.getClass());
-    }
-
-}
-
 public class NioSnmpDemo {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioSnmpDemo.class);
 
-    private static final OID OID_CURRENT_DATE = new OID(".1.3.6.1.2.1.1.1.0");
+    private static final OID OID_SYSTEM_UP_TIME = new OID(".1.3.6.1.2.1.1.3.0");
+
+    private static final OID OID_SYSTEM_DESCRIPTION = new OID(".1.3.6.1.2.1.1.1.0");
 
     private static int ENDPOINT_START_PORT = 2000;
 
@@ -337,7 +350,7 @@ public class NioSnmpDemo {
 
     private static int NUMBER_OF_ENDPOINTS = 10;
 
-    public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
     private List<NetworkDeviceAgent> listOfEps = Lists.newArrayList();
 
@@ -361,13 +374,14 @@ public class NioSnmpDemo {
             ep.start(SnmpUtils.SnmpTransportType.TCP, "0.0.0.0", (ENDPOINT_START_PORT + i));
 
             // Since BaseAgent registers some MIBs by default we need to unregister
-            // one before we register our own OID_CURRENT_DATE. Normally you would
+            // one before we register our own OID_SYSTEM_DESCRIPTION. Normally you would
             // override that method and register the MIBs that you need
             ep.unregisterManagedObject(ep.getSnmpv2MIB());
 
             // Register OID with current date
-            ep.registerManagedObject(MOCreator.createReadOnly(OID_CURRENT_DATE,
-                    now()));
+            ep.registerManagedObject(new MOScalar(OID_SYSTEM_UP_TIME, MOAccessImpl.ACCESS_READ_ONLY, new OctetString(
+                    now())));
+            ep.registerManagedObject(new MOScalar(OID_SYSTEM_DESCRIPTION, MOAccessImpl.ACCESS_READ_ONLY, new OctetString(RandomStringUtils.randomAlphabetic(8))));
 
             listOfEps.add(ep);
         }
@@ -390,8 +404,12 @@ public class NioSnmpDemo {
 
     private void queryOidPeriodically() throws IOException, InterruptedException {
         while(true) {
-            String oidResult = manager.getAsString(OID_CURRENT_DATE);
-            LOG.info("{} | {} = {}", new Object[]{manager.getServerTransport(), OID_CURRENT_DATE.getSyntaxString(), oidResult});
+            String getResult = manager.getAsString(OID_SYSTEM_UP_TIME);
+            LOG.info("GET {} | {} = {}", new Object[]{manager.getServerTransport(), OID_SYSTEM_UP_TIME.format(), getResult});
+
+            OID[] rootOID = new OID[]{new OID(".1.3.6.1.2.1.1.3"), new OID(".1.3.6.1.2.1.1.1")};
+            String walkResult = manager.walk(rootOID);
+            LOG.info("WALK {} | {}", new Object[]{manager.getServerTransport(), walkResult});
 
             Thread.sleep(3000);
         }
