@@ -266,17 +266,17 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         </configuration>
                     </execution>
                     <execution>
-                        <id>NioSnmpDemo</id>
+                        <id>SnmpTrapDemo</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>NioSnmpDemo</finalName>
+                            <finalName>SnmpTrapDemo</finalName>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.snmp.NioSnmpDemo</mainClass>
+                                    <mainClass>com.github.mcfongtw.snmp.SnmpTrapDemo</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>

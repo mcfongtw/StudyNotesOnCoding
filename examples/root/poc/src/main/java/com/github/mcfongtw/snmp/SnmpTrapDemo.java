@@ -11,6 +11,8 @@ import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.snmp.*;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.event.ResponseEvent;
+import org.snmp4j.log.ConsoleLogFactory;
+import org.snmp4j.log.LogFactory;
 import org.snmp4j.mp.MPv1;
 import org.snmp4j.mp.MPv2c;
 import org.snmp4j.mp.MPv3;
@@ -93,7 +95,7 @@ class NetworkEndpointManager {
 
     /**
      * Start the Snmp session. If you forget the listen() method you will not
-     * get any answers because the communication is asynchronous
+     * getResponseEvent any answers because the communication is asynchronous
      * and the listen() method listens for answers.
      * @throws IOException
      */
@@ -117,15 +119,15 @@ class NetworkEndpointManager {
     }
 
     /**
-     * Method which takes a single OID and returns the response from the agent as a String.
-     * @param oid
+     * Method which takes a set of OIDs and returns the response from the agent as a String.
+     * @param oids
      * @return
      * @throws IOException
      */
-    public String getAsString(OID oid) throws IOException {
+    public String getOIDs(OID... oids) throws IOException {
         StringBuilder builder = new StringBuilder();
         for(Address epAddress: listOfEpAddress) {
-            ResponseEvent event = get(new OID[]{oid}, epAddress);
+            ResponseEvent event = getResponseEvent(epAddress, oids);
             builder.append(event.getResponse().get(0).getVariable().toString() + " | ");
         }
 
@@ -138,13 +140,13 @@ class NetworkEndpointManager {
      * @return
      * @throws IOException
      */
-    private ResponseEvent get(OID oids[], Address epAddress) throws IOException {
+    private ResponseEvent getResponseEvent(Address epAddress, OID... oids) throws IOException {
         PDU pdu = new PDU();
         for (OID oid : oids) {
             pdu.add(new VariableBinding(oid));
         }
         pdu.setType(PDU.GET);
-        ResponseEvent event = snmp.send(pdu, getTarget(epAddress), null);
+        ResponseEvent event = snmp.get(pdu, getTarget(epAddress));
         if(event != null) {
             return event;
         }
@@ -336,9 +338,9 @@ class NetworkDeviceAgent extends BaseAgent {
 
 }
 
-public class NioSnmpDemo {
+public class SnmpTrapDemo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioSnmpDemo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SnmpTrapDemo.class);
 
     private static final OID OID_SYSTEM_UP_TIME = new OID(".1.3.6.1.2.1.1.3.0");
 
@@ -348,7 +350,7 @@ public class NioSnmpDemo {
 
     private static int MANAGER_START_PORT = 12000;
 
-    private static int NUMBER_OF_ENDPOINTS = 10;
+    private static int NUMBER_OF_ENDPOINTS = 1;
 
     private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 
@@ -360,7 +362,8 @@ public class NioSnmpDemo {
     private NetworkEndpointManager manager;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        NioSnmpDemo demo = new NioSnmpDemo();
+        LogFactory.setLogFactory(new ConsoleLogFactory());
+        SnmpTrapDemo demo = new SnmpTrapDemo();
         demo.initEndPoints();
         demo.initEpManager();
         demo.queryOidPeriodically();
@@ -392,7 +395,7 @@ public class NioSnmpDemo {
         // Setup the manager to use our newly started listOfEps
         manager = new NetworkEndpointManager();
         //XXX: add 100 to avoid AddressAlreadyInUse
-        manager.start(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", (MANAGER_START_PORT));
+        manager.start(SnmpUtils.SnmpTransportType.TCP, "127.0.0.1", MANAGER_START_PORT);
 
         for (int i = 0; i < NUMBER_OF_ENDPOINTS ; i++) {
 
@@ -404,7 +407,7 @@ public class NioSnmpDemo {
 
     private void queryOidPeriodically() throws IOException, InterruptedException {
         while(true) {
-            String getResult = manager.getAsString(OID_SYSTEM_UP_TIME);
+            String getResult = manager.getOIDs(OID_SYSTEM_UP_TIME);
             LOG.info("GET {} | {} = {}", new Object[]{manager.getServerTransport(), OID_SYSTEM_UP_TIME.format(), getResult});
 
             OID[] rootOID = new OID[]{new OID(".1.3.6.1.2.1.1.3"), new OID(".1.3.6.1.2.1.1.1")};
