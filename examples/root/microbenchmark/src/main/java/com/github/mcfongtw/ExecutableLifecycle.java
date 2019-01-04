@@ -1,4 +1,4 @@
-package com.github.mcfongtw.io;
+package com.github.mcfongtw;
 
 public interface ExecutableLifecycle {
 

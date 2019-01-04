@@ -1,6 +1,7 @@
 package com.github.mcfongtw.io;
 
 import com.codahale.metrics.ScheduledReporter;
+import com.github.mcfongtw.ExecutableLifecycle;
 import com.github.mcfongtw.utils.SudoExecutors;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
