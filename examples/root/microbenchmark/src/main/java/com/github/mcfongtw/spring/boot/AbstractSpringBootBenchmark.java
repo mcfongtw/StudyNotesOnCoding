@@ -10,7 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public abstract class AbstractSpringBootBenchmark {
 
-    public static final int NUMBER_OF_ENTITIES = 1024;
+    public static int NUMBER_OF_ENTITIES = 1024;
 
     public static class AbstractSpringBootExecutionPlan implements ExecutableLifecycle {
         protected ConfigurableApplicationContext configurableApplicationContext;
