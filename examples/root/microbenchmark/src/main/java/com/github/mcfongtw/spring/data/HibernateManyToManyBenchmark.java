@@ -16,6 +16,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
 import javax.persistence.*;
 import java.util.List;
@@ -149,6 +150,10 @@ class Boy {
 
     @ManyToMany(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            /*
+             * fetch = FetchType.LAZY
+             * for better performance
+             */
             fetch = FetchType.EAGER
     )
     @JoinTable(name = "boy_girl_list"
@@ -169,6 +174,10 @@ class Boy {
 
     @ManyToMany(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            /*
+             * fetch = FetchType.LAZY
+             * for better performance
+             */
             fetch = FetchType.EAGER
             )
     @JoinTable(name = "boy_girl_set"
@@ -214,10 +223,10 @@ class Girl {
     private Set<Boy> setOfBoys = Sets.newHashSet();
 }
 
-interface BoyRepository extends JpaRepository<Boy, String> {
+interface BoyRepository extends CrudRepository<Boy, String> {
 
 }
 
-interface GirlRepository extends JpaRepository<Girl, String> {
+interface GirlRepository extends CrudRepository<Girl, String> {
 
 }

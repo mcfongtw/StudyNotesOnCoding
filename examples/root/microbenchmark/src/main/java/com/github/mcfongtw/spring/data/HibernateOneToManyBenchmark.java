@@ -17,7 +17,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
@@ -40,8 +40,6 @@ public class HibernateOneToManyBenchmark {
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
             teacherRepository = configurableApplicationContext.getBean(TeacherRepository.class);
-
-            logger.warn("--------------->TeacherRepository: [{}]<----------------", teacherRepository);
         }
 
         @TearDown(Level.Trial)
@@ -190,18 +188,6 @@ class Student {
     private Teacher teacher;
 }
 
-@Transactional
-interface StudentRepository extends JpaRepository<Student, String> {
-
-    @Override
-    Student getOne(String id);
-
-    @Override
-    Student save(Student s);
-
-    @Override
-    void delete(Student s);
-}
 
 @Entity(name = "Teacher")
 @Table(name = "teacher")
@@ -263,15 +249,10 @@ class Teacher {
     }
 }
 
-@Transactional
-interface TeacherRepository extends JpaRepository<Teacher, String> {
+interface StudentRepository extends CrudRepository<Student, String> {
 
-    @Override
-    Teacher getOne(String id);
+}
 
-    @Override
-    Teacher save(Teacher s);
+interface TeacherRepository extends CrudRepository<Teacher, String> {
 
-    @Override
-    void delete(Teacher s);
 }

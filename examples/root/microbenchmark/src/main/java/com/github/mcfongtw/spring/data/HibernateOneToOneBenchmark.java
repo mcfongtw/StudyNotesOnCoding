@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
@@ -47,8 +48,6 @@ public class HibernateOneToOneBenchmark {
             womanRepository = configurableApplicationContext.getBean(WomanRepository.class);
             maleRepository = configurableApplicationContext.getBean(MaleRepository.class);
             femaleRepository = configurableApplicationContext.getBean(FemaleRepository.class);
-
-            logger.warn("--------------->ManRepository: [{}]<----------------", manRepository);
         }
 
         @TearDown(Level.Trial)
@@ -79,7 +78,6 @@ public class HibernateOneToOneBenchmark {
         assert executionPlan.womanRepository.findById(woman.getId()).get().getMan().getName() == man.getName();
 
         executionPlan.womanRepository.delete(woman);
-        executionPlan.womanRepository.flush();
 
 //        logger.debug("[{}]", executionPlan.manRepository.findById(man.getId()));
 //        logger.debug("[{}]", executionPlan.manRepository.findById(man.getId()).get());
@@ -147,19 +145,6 @@ class Man {
     private Woman woman;
 }
 
-@Transactional
-interface ManRepository extends JpaRepository<Man, String> {
-
-    @Override
-    Man getOne(String id);
-
-    @Override
-    Man save(Man s);
-
-    @Override
-    void delete(Man s);
-}
-
 @Entity(name = "Woman")
 @Table(name = "woman")
 @Data
@@ -183,17 +168,13 @@ class Woman {
     private Man man;
 }
 
-@Transactional
-interface WomanRepository extends JpaRepository<Woman, String> {
 
-    @Override
-    Woman getOne(String id);
+interface ManRepository extends CrudRepository<Man, String> {
 
-    @Override
-    Woman save(Woman s);
+}
 
-    @Override
-    void delete(Woman s);
+interface WomanRepository extends CrudRepository<Woman, String> {
+
 }
 
 //////////////////////
@@ -216,17 +197,6 @@ class Male {
     private Female female;
 }
 
-@Transactional
-interface MaleRepository extends JpaRepository<Male, Long> {
-    @Override
-    Male getOne(Long id);
-
-    @Override
-    Male save(Male s);
-
-    @Override
-    void delete(Male s);
-}
 
 @Entity(name = "Female")
 @Table(name = "female")
@@ -244,14 +214,10 @@ class Female {
 
 }
 
-@Transactional
-interface FemaleRepository extends JpaRepository<Female, Long> {
-    @Override
-    Female getOne(Long id);
+interface MaleRepository extends CrudRepository<Male, Long> {
 
-    @Override
-    Female save(Female s);
+}
 
-    @Override
-    void delete(Female s);
+interface FemaleRepository extends CrudRepository<Female, Long> {
+
 }
