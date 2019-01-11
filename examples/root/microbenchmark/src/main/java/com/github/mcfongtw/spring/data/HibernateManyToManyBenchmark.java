@@ -21,7 +21,8 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.NUMBER_OF_ENTITIES;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
 
 public class HibernateManyToManyBenchmark {
 
@@ -52,13 +53,13 @@ public class HibernateManyToManyBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureUnidirecitonalManyToMany(ExecutionPlan executionPlan) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
-        NUMBER_OF_ENTITIES = 128;
+        numberOfEntities = 128;
 
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Girl girl = new Girl();
             girl.setName(RandomStringUtils.randomAlphabetic(10));
             girls.add(girl);
@@ -74,7 +75,7 @@ public class HibernateManyToManyBenchmark {
 
 
         assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_1().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_1().size() == numberOfEntities;
 
         for(Girl girl: girls) {
             boy.getSetOfGirls_1().remove(girl);
@@ -86,13 +87,13 @@ public class HibernateManyToManyBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureBidirectionalManyToMany(ExecutionPlan executionPlan) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
-        NUMBER_OF_ENTITIES = 128;
+        numberOfEntities = 128;
 
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Girl girl = new Girl();
             girl.setName(RandomStringUtils.randomAlphabetic(10));
             girls.add(girl);
@@ -108,7 +109,7 @@ public class HibernateManyToManyBenchmark {
         }
 
         assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_2().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_2().size() == numberOfEntities;
 
         for(Girl girl: girls) {
             boy.removeGirlFromSet(girl);

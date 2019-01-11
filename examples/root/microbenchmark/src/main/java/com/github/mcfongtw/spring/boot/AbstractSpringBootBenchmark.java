@@ -10,7 +10,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public abstract class AbstractSpringBootBenchmark {
 
-    public static int NUMBER_OF_ENTITIES = 1024;
+    private static final int DEFAULT_NUMBER_OF_ENTITIES = 1024;
+
+    public static int numberOfEntities = 1;
+
+    public static final int DEFAULT_NUMBER_OF_ITERATIONS = 10;
 
     public static class AbstractSpringBootExecutionPlan implements ExecutableLifecycle {
         protected ConfigurableApplicationContext configurableApplicationContext;
@@ -25,6 +29,10 @@ public abstract class AbstractSpringBootBenchmark {
                 if(configurableApplicationContext == null) {
                     configurableApplicationContext = SpringApplication.run(SpringBootBenchmarkStater.class, args );
                 }
+
+                numberOfEntities = Integer.valueOf(System.getProperty("numberOfEntities", Integer.toString(DEFAULT_NUMBER_OF_ENTITIES)));
+
+                logger.info("Number Of Entities: [{}]", numberOfEntities);
             } catch(BeansException e) {
                 logger.error("Failed to created application context: ", e.getMessage());
             }

@@ -23,7 +23,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.NUMBER_OF_ENTITIES;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
 
 public class HibernateOneToManyBenchmark {
 
@@ -60,7 +60,7 @@ public class HibernateOneToManyBenchmark {
 
         List<Student> studentList = Lists.newArrayList();
         // prepare studentList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Student student = new Student();
             student.setName(RandomStringUtils.randomAlphabetic(10));
             studentList.add(student);
@@ -71,7 +71,7 @@ public class HibernateOneToManyBenchmark {
         }
         executionPlan.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
@@ -91,7 +91,7 @@ public class HibernateOneToManyBenchmark {
 
         List<Student> studentList = Lists.newArrayList();
         // prepare studentList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Student student = new Student();
             student.setName(RandomStringUtils.randomAlphabetic(10));
             studentList.add(student);
@@ -102,7 +102,7 @@ public class HibernateOneToManyBenchmark {
         }
         executionPlan.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
@@ -122,7 +122,7 @@ public class HibernateOneToManyBenchmark {
 
         List<Student> studentList = Lists.newArrayList();
         // prepare studentList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Student student = new Student();
             student.setName(RandomStringUtils.randomAlphabetic(10));
             studentList.add(student);
@@ -135,7 +135,7 @@ public class HibernateOneToManyBenchmark {
 
         logger.debug("get_3_OneToManyStudents 3 [{}]", executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size());
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
@@ -155,7 +155,7 @@ public class HibernateOneToManyBenchmark {
 
         List<Student> studentList = Lists.newArrayList();
         // prepare studentList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Student student = new Student();
             student.setName(RandomStringUtils.randomAlphabetic(10));
             studentList.add(student);
@@ -166,7 +166,7 @@ public class HibernateOneToManyBenchmark {
         }
         executionPlan.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {

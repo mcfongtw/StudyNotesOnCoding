@@ -22,7 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.NUMBER_OF_ENTITIES;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
 
 public class HibernateListVsSetBenchmark {
 
@@ -49,14 +50,14 @@ public class HibernateListVsSetBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureOneToManyWithSet(ExecutionPlan executionPlan) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
         List<Employee> employeeList = Lists.newArrayList();
         // prepare employeeList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Employee employee = new Employee();
             employee.setName(RandomStringUtils.randomAlphabetic(10));
             employeeList.add(employee);
@@ -68,7 +69,7 @@ public class HibernateListVsSetBenchmark {
 
         executionPlan.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == numberOfEntities;
 
 
         for(Employee employee: employeeList) {
@@ -83,14 +84,14 @@ public class HibernateListVsSetBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureOneToManyWithList(ExecutionPlan executionPlan) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
         List<Employee> employeeList = Lists.newArrayList();
         // prepare employeeList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Employee employee = new Employee();
             employee.setName(RandomStringUtils.randomAlphabetic(10));
             employeeList.add(employee);
@@ -102,7 +103,7 @@ public class HibernateListVsSetBenchmark {
 
         executionPlan.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
 
 
         for(Employee employee: employeeList) {
@@ -116,14 +117,14 @@ public class HibernateListVsSetBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureSortWithList(ExecutionPlan executionPlan) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
         List<Employee> employeeList = Lists.newArrayList();
         // prepare employeeList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Employee employee = new Employee();
             employee.setName(RandomStringUtils.randomAlphabetic(10));
             employeeList.add(employee);
@@ -135,21 +136,21 @@ public class HibernateListVsSetBenchmark {
 
         executionPlan.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
 
         employer.getListOfEmployeees().sort(Comparator.comparing(Employee::getName));
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureSortWithTreeSet(ExecutionPlan executionPlan) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
         List<Employee> employeeList = Lists.newArrayList();
         // prepare employeeList
-        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+        for(int i = 0; i < numberOfEntities; i++) {
             Employee employee = new Employee();
             employee.setName(RandomStringUtils.randomAlphabetic(10));
             employeeList.add(employee);
@@ -161,7 +162,7 @@ public class HibernateListVsSetBenchmark {
 
         executionPlan.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
     }
 
     public static void main(String[] args) throws RunnerException {

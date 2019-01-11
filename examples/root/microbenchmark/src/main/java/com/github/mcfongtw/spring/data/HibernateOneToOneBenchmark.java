@@ -15,11 +15,11 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
 
 public class HibernateOneToOneBenchmark {
 
@@ -60,7 +60,7 @@ public class HibernateOneToOneBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureBidirectionalOneToOne(HibernateOneToOneBenchmark.ExecutionPlan executionPlan) {
         Man man = new Man();
         man.setName(RandomStringUtils.randomAlphabetic(10));
@@ -89,7 +89,7 @@ public class HibernateOneToOneBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
+    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
     public void measureUniDirectionalOneToOneWithMapsId(HibernateOneToOneBenchmark.ExecutionPlan executionPlan) {
         Male male = new Male();
         male.setName(RandomStringUtils.randomAlphabetic(10));
