@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.List;
@@ -33,7 +32,7 @@ public class HibernateOneToManyBenchmark {
 
 
         @Autowired
-        public TeacherRepository teacherRepository;
+        private TeacherRepository teacherRepository;
 
         @Setup(Level.Trial)
         @Override
@@ -147,6 +146,37 @@ public class HibernateOneToManyBenchmark {
         assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == 0;
     }
 
+    @Benchmark
+    @BenchmarkMode({Mode.Throughput})
+    @Measurement(iterations=10)
+    public void measureUnidirectionalOneToManyAndOrderedColumn(ExecutionPlan executionPlan) {
+        Teacher teacher = new Teacher();
+        teacher.setName(RandomStringUtils.randomAlphabetic(10));
+
+        List<Student> studentList = Lists.newArrayList();
+        // prepare studentList
+        for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
+            Student student = new Student();
+            student.setName(RandomStringUtils.randomAlphabetic(10));
+            studentList.add(student);
+        }
+
+        for(Student student: studentList) {
+            teacher.get_4_OneToManyStudents().add(student);
+        }
+        executionPlan.teacherRepository.save(teacher);
+
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == NUMBER_OF_ENTITIES;
+
+
+        for(Student student: studentList) {
+            teacher.get_4_OneToManyStudents().remove(student);
+        }
+        executionPlan.teacherRepository.save(teacher);
+
+        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == 0;
+    }
+
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToManyBenchmark.class.getSimpleName())
@@ -247,6 +277,19 @@ class Teacher {
         this._3_OneToManyStudents.remove(student);
         student.setTeacher(null);
     }
+
+    // Unidirectional @OneToMany with @OrderColumn
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            /*
+             * fetch = FetchType.LAZY
+             * for better performance
+             */
+            fetch = FetchType.EAGER
+    )
+    @OrderColumn(name = "index")
+    private Set<Student> _4_OneToManyStudents = Sets.newHashSet();
 }
 
 interface StudentRepository extends CrudRepository<Student, String> {
