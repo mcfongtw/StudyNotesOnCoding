@@ -15,7 +15,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 import javax.persistence.*;
@@ -54,10 +53,10 @@ public class HibernateManyToManyBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
     @Measurement(iterations=10)
-    public void measureManyToManyWithList(HibernateManyToManyBenchmark.ExecutionPlan executionPlan) throws Exception {
+    public void measureUnidirecitonalManyToMany(ExecutionPlan executionPlan) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
-        NUMBER_OF_ENTITIES = 32;
+        NUMBER_OF_ENTITIES = 128;
 
         for(int i = 0; i < NUMBER_OF_ENTITIES; i++) {
             Girl girl = new Girl();
@@ -69,16 +68,16 @@ public class HibernateManyToManyBenchmark {
         boy.setName(RandomStringUtils.randomAlphabetic(10));
 
         for(Girl girl: girls) {
-            boy.addGirlToList(girl);
+            boy.getSetOfGirls_1().add(girl);
             executionPlan.boyRepository.save(boy);
         }
 
 
         assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getListOfGirls().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_1().size() == NUMBER_OF_ENTITIES;
 
         for(Girl girl: girls) {
-            boy.removeGirlFromList(girl);
+            boy.getSetOfGirls_1().remove(girl);
         }
 
         //FIXME: getGirl() != null
@@ -88,7 +87,7 @@ public class HibernateManyToManyBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
     @Measurement(iterations=10)
-    public void measureManyToManyWithSet(HibernateManyToManyBenchmark.ExecutionPlan executionPlan) throws Exception {
+    public void measureBidirectionalManyToMany(ExecutionPlan executionPlan) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
         NUMBER_OF_ENTITIES = 128;
@@ -109,7 +108,7 @@ public class HibernateManyToManyBenchmark {
         }
 
         assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls().size() == NUMBER_OF_ENTITIES;
+        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_2().size() == NUMBER_OF_ENTITIES;
 
         for(Girl girl: girls) {
             boy.removeGirlFromSet(girl);
@@ -148,6 +147,7 @@ class Boy {
     @Column(name = "name")
     private String name;
 
+    //Unidirectional @ManyToMany
     @ManyToMany(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             /*
@@ -156,22 +156,14 @@ class Boy {
              */
             fetch = FetchType.EAGER
     )
-    @JoinTable(name = "boy_girl_list"
+    @JoinTable(name = "boy_girl_set_1"
             , joinColumns = @JoinColumn(name = "boy_id")
             , inverseJoinColumns = @JoinColumn(name = "girl_id")
     )
-    private List<Girl> listOfGirls = Lists.newArrayList();
+    private Set<Girl> setOfGirls_1 = Sets.newHashSet();
 
-    public void addGirlToList(Girl girl) {
-        listOfGirls.add(girl);
-        girl.getListOfBoys().add(this);
-    }
 
-    public void removeGirlFromList(Girl girl) {
-        listOfGirls.remove(girl);
-        girl.getListOfBoys().remove(this);
-    }
-
+    //Bidirectional @ManyToMany
     @ManyToMany(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             /*
@@ -180,19 +172,19 @@ class Boy {
              */
             fetch = FetchType.EAGER
             )
-    @JoinTable(name = "boy_girl_set"
+    @JoinTable(name = "boy_girl_set_2"
             , joinColumns = @JoinColumn(name = "boy_id")
             , inverseJoinColumns = @JoinColumn(name = "girl_id")
     )
-    private Set<Girl> setOfGirls = Sets.newHashSet();
+    private Set<Girl> setOfGirls_2 = Sets.newHashSet();
 
     public void addGirlToSet(Girl girl) {
-        setOfGirls.add(girl);
+        setOfGirls_2.add(girl);
         girl.getSetOfBoys().add(this);
     }
 
     public void removeGirlFromSet(Girl girl) {
-        setOfGirls.remove(girl);
+        setOfGirls_2.remove(girl);
         girl.getSetOfBoys().remove(this);
     }
 }
@@ -212,14 +204,10 @@ class Girl {
     @Column(name = "name")
     private String name;
 
+    //Bidirectional @ManyToMany
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToMany(mappedBy = "listOfGirls")
-    private List<Boy> listOfBoys = Lists.newArrayList();
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @ManyToMany(mappedBy = "setOfGirls")
+    @ManyToMany(mappedBy = "setOfGirls_2")
     private Set<Boy> setOfBoys = Sets.newHashSet();
 }
 
