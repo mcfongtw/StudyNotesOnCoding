@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfWarmUpIterations;
 
 public class HibernateOneToManyBenchmark {
 
@@ -181,7 +180,6 @@ public class HibernateOneToManyBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToManyBenchmark.class.getSimpleName())
-                .warmupIterations(numberOfWarmUpIterations)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateOneToManyBenchmark-result.json")

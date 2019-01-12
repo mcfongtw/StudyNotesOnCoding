@@ -20,7 +20,6 @@ import org.springframework.data.repository.CrudRepository;
 import javax.persistence.*;
 
 import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfWarmUpIterations;
 
 public class HibernateOneToOneBenchmark {
 
@@ -109,7 +108,6 @@ public class HibernateOneToOneBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToOneBenchmark.class.getSimpleName())
-                .warmupIterations(numberOfWarmUpIterations)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateOneToOneBenchmark-result.json")
