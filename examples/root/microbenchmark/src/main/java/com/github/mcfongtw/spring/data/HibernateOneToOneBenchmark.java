@@ -193,8 +193,7 @@ class Male {
     @Column(name = "name")
     private String name;
 
-    @OneToOne()
-    @JoinColumn(name = "id")
+    @OneToOne
     @MapsId
     private Female female;
 }
@@ -223,3 +222,6 @@ interface MaleRepository extends CrudRepository<Male, Long> {
 interface FemaleRepository extends CrudRepository<Female, Long> {
 
 }
+
+////////////////////////////////////////////////
+
