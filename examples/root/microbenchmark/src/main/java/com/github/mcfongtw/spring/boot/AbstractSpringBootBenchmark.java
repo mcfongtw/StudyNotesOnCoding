@@ -16,6 +16,10 @@ public abstract class AbstractSpringBootBenchmark {
 
     public static final int DEFAULT_NUMBER_OF_ITERATIONS = 10;
 
+    private static final int DEFAULT_NUMBER_OF_WARMUP_ITERATIONS = 10;
+
+    public static int numberOfWarmUpIterations = 1;
+
     public static class AbstractSpringBootExecutionPlan implements ExecutableLifecycle {
         protected ConfigurableApplicationContext configurableApplicationContext;
 
@@ -31,6 +35,8 @@ public abstract class AbstractSpringBootBenchmark {
                 }
 
                 numberOfEntities = Integer.valueOf(System.getProperty("numberOfEntities", Integer.toString(DEFAULT_NUMBER_OF_ENTITIES)));
+
+                numberOfWarmUpIterations = Integer.valueOf(System.getProperty("numberOfWarmUpIterations", Integer.toString(DEFAULT_NUMBER_OF_WARMUP_ITERATIONS)));
 
                 logger.info("Number Of Entities: [{}]", numberOfEntities);
             } catch(BeansException e) {

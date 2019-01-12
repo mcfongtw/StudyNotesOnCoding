@@ -21,8 +21,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.*;
 
 public class HibernateManyToManyBenchmark {
 
@@ -122,6 +121,7 @@ public class HibernateManyToManyBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateManyToManyBenchmark.class.getSimpleName())
+                .warmupIterations(numberOfWarmUpIterations)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateManyToManyBenchmark-result.json")

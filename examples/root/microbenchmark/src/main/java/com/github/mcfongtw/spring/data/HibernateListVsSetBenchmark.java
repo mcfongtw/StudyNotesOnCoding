@@ -22,8 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.*;
 
 public class HibernateListVsSetBenchmark {
 
@@ -168,6 +167,7 @@ public class HibernateListVsSetBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateListVsSetBenchmark.class.getSimpleName())
+                .warmupIterations(numberOfWarmUpIterations)
                 .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateListVsSetBenchmark-result.json")
