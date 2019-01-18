@@ -7,6 +7,6 @@
 
 # target
 examples/root/microbenchmark/target
-examples/root/poc/target
+examples/root/poc-*/target
 
 hs_err_pid*.log
