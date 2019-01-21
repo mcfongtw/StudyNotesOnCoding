@@ -3,7 +3,7 @@ package com.github.mcfongtw.behavioral.visitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class DepthFirstVerifier extends DepthFirstVisitor {
+public class DepthFirstTraversalTest extends DepthFirstVisitor {
 
     /**
      *
@@ -47,15 +47,15 @@ public class DepthFirstVerifier extends DepthFirstVisitor {
      */
     @Test
     public void testSimpleMath() {
-        ASTNode num1 = new ASTNode("1", NodeType.NUMBER);
-        ASTNode num2 = new ASTNode("2", NodeType.NUMBER);
-        ASTNode op = new ASTNode("+", NodeType.ADD);
+        ASTNode num1 = ASTNode.builder().id(1).image("1").type(NodeType.NUMBER).build();
+        ASTNode num2 = ASTNode.builder().id(2).image("2").type(NodeType.NUMBER).build();
+        ASTNode op = ASTNode.builder().id(3).image("+").type(NodeType.ADD).build();
 
         op.insert(num1);
         op.insert(num2);
 
 
-        Visitor visitor = new DecoratorVisitor(new DepthFirstVerifier());
+        Visitor visitor = new DecoratorVisitor(new DepthFirstTraversalTest());
 
         op.accept(visitor);
 
@@ -72,11 +72,11 @@ public class DepthFirstVerifier extends DepthFirstVisitor {
      */
     @Test
     public void testComplexMath1() {
-        ASTNode num1 = new ASTNode("1", NodeType.NUMBER);
-        ASTNode num2 = new ASTNode("2", NodeType.NUMBER);
-        ASTNode num3 = new ASTNode("3", NodeType.NUMBER);
-        ASTNode op1 = new ASTNode("+", NodeType.ADD);
-        ASTNode op2 = new ASTNode("*", NodeType.MUL);
+        ASTNode num1 = ASTNode.builder().id(1).image("1").type(NodeType.NUMBER).build();
+        ASTNode num2 = ASTNode.builder().id(2).image("2").type(NodeType.NUMBER).build();
+        ASTNode op1 = ASTNode.builder().id(3).image("+").type(NodeType.ADD).build();
+        ASTNode num3 = ASTNode.builder().id(4).image("3").type(NodeType.NUMBER).build();
+        ASTNode op2 = ASTNode.builder().id(5).image("*").type(NodeType.MUL).build();
 
         op1.insert(num1);
         op1.insert(num2);
@@ -84,11 +84,11 @@ public class DepthFirstVerifier extends DepthFirstVisitor {
         op2.insert(num3);
 
 
-        Visitor visitor = new DecoratorVisitor(new DepthFirstVerifier());
+        Visitor visitor = new DecoratorVisitor(new DepthFirstTraversalTest());
 
         op2.accept(visitor);
 
-        Assertions.assertArrayEquals(new Integer[]{8, 7, 4, 4, 5, 5, 7, 6, 6, 8}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
+        Assertions.assertArrayEquals(new Integer[]{5, 3, 1, 1, 2, 2, 3, 4, 4, 5}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
 
 
     }
@@ -102,13 +102,13 @@ public class DepthFirstVerifier extends DepthFirstVisitor {
      */
     @Test
     public void testComplexMath2() {
-        ASTNode num1 = new ASTNode("1", NodeType.NUMBER);
-        ASTNode num2 = new ASTNode("2", NodeType.NUMBER);
-        ASTNode num3 = new ASTNode("3", NodeType.NUMBER);
-        ASTNode num4 = new ASTNode("4", NodeType.NUMBER);
-        ASTNode op1 = new ASTNode("+", NodeType.ADD);
-        ASTNode op2 = new ASTNode("*", NodeType.MUL);
-        ASTNode op3 = new ASTNode("+", NodeType.MUL);
+        ASTNode num1 = ASTNode.builder().id(1).image("1").type(NodeType.NUMBER).build();
+        ASTNode num2 = ASTNode.builder().id(2).image("2").type(NodeType.NUMBER).build();
+        ASTNode op1 = ASTNode.builder().id(3).image("+").type(NodeType.ADD).build();
+        ASTNode num3 = ASTNode.builder().id(4).image("3").type(NodeType.NUMBER).build();
+        ASTNode op2 = ASTNode.builder().id(5).image("*").type(NodeType.MUL).build();
+        ASTNode num4 = ASTNode.builder().id(6).image("4").type(NodeType.NUMBER).build();
+        ASTNode op3 = ASTNode.builder().id(7).image("+").type(NodeType.ADD).build();
 
         op1.insert(num1);
         op1.insert(num2);
@@ -118,11 +118,11 @@ public class DepthFirstVerifier extends DepthFirstVisitor {
         op3.insert(num4);
 
 
-        Visitor visitor = new DecoratorVisitor(new DepthFirstVerifier());
+        Visitor visitor = new DecoratorVisitor(new DepthFirstTraversalTest());
 
         op2.accept(visitor);
 
-        Assertions.assertArrayEquals(new Integer[]{14, 13, 9, 9, 10, 10, 13, 15, 11, 11, 12, 12, 15, 14}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
+        Assertions.assertArrayEquals(new Integer[]{5, 3, 1, 1, 2, 2, 3, 7, 4, 4, 6, 6, 7, 5}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
 
 
     }

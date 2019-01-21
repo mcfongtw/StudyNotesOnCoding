@@ -1,45 +1,35 @@
 package com.github.mcfongtw.behavioral.visitor;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import com.google.common.primitives.Ints;
+import lombok.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
 
 
+@Data
 public class ASTNode extends Node {
- 
-    private List<ASTNode> children;
-    
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Include
+    @Singular
+    private List<ASTNode> children = Lists.newArrayList();
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Include
     private ASTNode parent;
-    
+
     private NodeType type;
 
-    public ASTNode(String name, NodeType type) {
-        super(name);
-        this.children = new ArrayList<ASTNode>();
-        this.parent = null;
+    @Builder(builderClassName = "ASTNodeBuilder")
+    public ASTNode(int id, String image, NodeType type) {
+        super(id, image);
         this.type = type;
     }
-    
-    /**
-     ***************
-     * Getter/Setter
-     ***************
-     */
-    public ASTNode getParent() {
-        return this.parent;
-    }
-    
-    public void setParent(ASTNode node) {
-        this.parent = node;
-    }
-    
-    public NodeType getType() {
-        return this.type;
-    }
-     
+
+
     /*
      * *************************
      * AST Manipulation

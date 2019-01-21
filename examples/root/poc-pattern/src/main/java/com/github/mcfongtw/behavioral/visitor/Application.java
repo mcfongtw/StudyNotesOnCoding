@@ -10,9 +10,9 @@ import java.io.PrintStream;
 public class Application {
 
     public static void main(String[] args) {
-        ASTNode num1 = new ASTNode("1", NodeType.NUMBER);
-        ASTNode num2 = new ASTNode("2", NodeType.NUMBER);
-        ASTNode op = new ASTNode("+", NodeType.ADD);
+        ASTNode num1 = ASTNode.builder().id(1).image("1").type(NodeType.NUMBER).build();
+        ASTNode num2 = ASTNode.builder().id(2).image("2").type(NodeType.NUMBER).build();
+        ASTNode op = ASTNode.builder().id(3).image("+").type(NodeType.ADD).build();
 
         op.insert(num1);
         op.insert(num2);
