@@ -3,9 +3,6 @@ package com.github.mcfongtw.behavioral.visitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Stack;
-
-//FIXME: Recursive BFS algorithm is wrong!
 public class BreadthFiirstVerifier extends BreadthFirstVisitor {
     /**
      *
@@ -17,47 +14,30 @@ public class BreadthFiirstVerifier extends BreadthFirstVisitor {
      */
     private int level = -1;
 
-    /**
-     *
-     */
-    private int visitedOrder = 1;
-
-    /**
-     *
-     */
-    private Stack<Integer> visitedOrderStack = new Stack<Integer>();
 
     /**
      *
      * OUT = IN + (# of SIBLING) + 1
      */
     @Override
-    public Object visit(ASTNode root, VisitAction action) {
-//        super.visit(root, action);
-
+    public Object visit(ASTNode node, VisitAction action) {
         if(action == VisitAction.IN) {
-            this.visitedOrderStack.push(this.visitedOrder);
-            this.visitedOrder++;
 
             this.level++;
             for(int i = 0; i < this.level; i++) {
                 System.out.print(this.TAB);
             }
-            System.out.println("'" + root.getImage() + "'" + " >>>: " + (visitedOrder -1));
+            System.out.println("'" + node.getImage() + "'" + " >>>: " + node.getId());
         } else if(action == VisitAction.OUT) {
-            //OUT_degree = IN_degree + (# of descendent) + 1
-            int inOrder = this.visitedOrderStack.pop();
-            int outOrder = inOrder + 1;
-            Assertions.assertEquals(outOrder, this.visitedOrder++);
 
             for(int i = 0; i < this.level; i++) {
                 System.out.print(this.TAB);
             }
 
-            System.out.println("'" + root.getImage() + "'" + " <<<: " +  (visitedOrder -1));
+            System.out.println("'" + node.getImage() + "'" + " <<<: " +  node.getId());
             this.level--;
         }
-        return root;
+        return node;
     }
 
     /*
@@ -75,9 +55,12 @@ public class BreadthFiirstVerifier extends BreadthFirstVisitor {
         op.insert(num2);
 
 
-        Visitor visitor = new BreadthFiirstVerifier();
+        Visitor visitor = new DecoratorVisitor(new BreadthFiirstVerifier());
 
         op.accept(visitor);
+
+        Assertions.assertArrayEquals(new Integer[]{3, 1, 2}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
+
 
     }
 
@@ -102,9 +85,13 @@ public class BreadthFiirstVerifier extends BreadthFirstVisitor {
         op2.insert(num3);
 
 
-        Visitor visitor = new BreadthFiirstVerifier();
+        Visitor visitor = new DecoratorVisitor(new BreadthFiirstVerifier());
 
         op2.accept(visitor);
+
+        Assertions.assertArrayEquals(new Integer[]{8, 7, 6, 4, 5}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
+
+
 
     }
 
@@ -133,9 +120,13 @@ public class BreadthFiirstVerifier extends BreadthFirstVisitor {
         op3.insert(num4);
 
 
-        Visitor visitor = new BreadthFiirstVerifier();
+        Visitor visitor = new DecoratorVisitor(new BreadthFiirstVerifier());
 
         op2.accept(visitor);
+
+        Assertions.assertArrayEquals(new Integer[]{14, 13, 15, 9, 10, 11, 12}, ((DecoratorVisitor) visitor).visitedIdOrder.toArray());
+
+
 
     }
 }

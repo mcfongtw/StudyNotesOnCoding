@@ -114,25 +114,29 @@ public class ASTNode extends Node {
 
 	public Object accept(Visitor visitor) {
 
+        Object result = null;
+
 		//move to children / siblings
 		if(visitor.getStrategy() == TraverseStrategy.DEPTH_FIRST) {
-            //IN
-            visitor.visit(this, VisitAction.IN);
-
-			this.acceptChildren(visitor);
-
-            //OUT
-            visitor.visit(this, VisitAction.OUT);
+            result = performDepthFirstTraversal(visitor);
 		} else if (visitor.getStrategy() == TraverseStrategy.BREADTH_FIRST) {
-
-		    int height = getMaximumHeight(this);
-
-            breathFirstSearchRecursively(visitor, this, height);
-
+            result = performBreadthFirstTraversal(visitor);
         }
 
-        return null;
+        return result;
 	}
+
+	private Object performDepthFirstTraversal(Visitor visitor) {
+        //IN
+        visitor.visit(this, VisitAction.IN);
+
+        this.acceptChildren(visitor);
+
+        //OUT
+        visitor.visit(this, VisitAction.OUT);
+
+        return null;
+    }
 	
 	/**
 	 * accept all children node of this {@code ASTNode} 
@@ -144,6 +148,32 @@ public class ASTNode extends Node {
             child.accept(visitor);
         }
 	}
+
+	/*
+	 * [ITERATIVE] For breadth first traversal. While adding all children
+	 * to the queue, then poll the head and visit on it.
+	 */
+	private Object performBreadthFirstTraversal(Visitor visitor) {
+	    Object result = null;
+
+	    Queue<ASTNode> queue = Lists.newLinkedList();
+
+	    queue.add(this);
+
+	    while( queue.isEmpty() == false) {
+
+	        ASTNode candidate = queue.poll();
+
+	        visitor.visit(candidate, VisitAction.IN);
+
+	        for(int i = 0; i < candidate.getChildCount(); i++) {
+	            ASTNode child = candidate.getChildNode(i);
+	            queue.add(child);
+            }
+        }
+
+	    return result;
+    }
 
 
     private void breathFirstSearchRecursively(Visitor visitor, ASTNode node, int level) {
