@@ -79,12 +79,7 @@ public class HibernateOneToOneBenchmark {
 
         executionPlan.womanRepository.delete(woman);
 
-//        logger.debug("[{}]", executionPlan.manRepository.findById(man.getId()));
-//        logger.debug("[{}]", executionPlan.manRepository.findById(man.getId()).get());
-//        logger.debug("[{}]", executionPlan.manRepository.findById(man.getId()).get().getWoman());
-
-        //FIXME: getWoman() != null
-//        assert executionPlan.manRepository.findById(man.getId()).get().getWoman() == null;
+        assert executionPlan.manRepository.findById(man.getId()).isPresent() == false;
     }
 
     @Benchmark
@@ -136,7 +131,7 @@ class Man {
     //Bidirectional OneToOne
     @OneToOne(
             mappedBy = "man",
-            cascade = {CascadeType.ALL},
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER,
             orphanRemoval = true
     )
@@ -161,7 +156,10 @@ class Woman {
     private String name;
 
     //Bidirectional OneToOne
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "man_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
