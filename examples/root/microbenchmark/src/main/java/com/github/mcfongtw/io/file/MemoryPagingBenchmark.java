@@ -1,7 +1,9 @@
-package com.github.mcfongtw.io;
+package com.github.mcfongtw.io.file;
 
+import com.github.mcfongtw.io.AbstractIoBenchmark;
 import com.github.mcfongtw.metrics.LatencyMetric;
 import com.google.common.io.Files;
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -20,10 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
+public class MemoryPagingBenchmark extends AbstractIoBenchmark {
 
     public static Logger LOG = LoggerFactory.getLogger(MemoryPagingBenchmark.class);
 
+    @Getter
     @State(Scope.Benchmark)
     public static class MemoryPagingBenchmarkExecutionPlan extends AbstractSequentialExecutionPlan {
 
@@ -31,10 +34,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark  {
 
         private final static int BUFFER_SIZE = UNIT_ONE_PAGE;
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(MemoryPagingBenchmark.class.getName());
+        private LatencyMetric ioLatencyMetric = new LatencyMetric(MemoryPagingBenchmark.class.getName());
 
-        protected List<String> listOfFinPath = new ArrayList<>();
-        protected List<String> listOfFoutPath = new ArrayList<>();
+        private List<String> listOfFinPath = new ArrayList<>();
+        private List<String> listOfFoutPath = new ArrayList<>();
 
         //128, 1K, 4K, 128K, 1M
         @Param({"128", "4096", "131072", "1048576"})

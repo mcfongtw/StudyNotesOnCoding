@@ -254,7 +254,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>SequentialReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.SequentialReplicationBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.file.SequentialReplicationBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
@@ -289,7 +289,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>ByteByByteReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.ByteByByteReplicationBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.file.ByteByByteReplicationBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
@@ -322,7 +322,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>RandomAccessClassifierBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.RandomAccessClassifierBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.file.RandomAccessClassifierBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
@@ -355,7 +355,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>FileReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.FileReplicationBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.file.FileReplicationBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
@@ -388,7 +388,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <finalName>MemoryPagingBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.io.MemoryPagingBenchmark</mainClass>
+                                    <mainClass>com.github.mcfongtw.io.file.MemoryPagingBenchmark</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>

@@ -1,5 +1,7 @@
-package com.github.mcfongtw.io;
+package com.github.mcfongtw.io.file;
 
+import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.InfluxdbLatencyMetric;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -12,16 +14,12 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.AsynchronousByteChannel;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
@@ -70,8 +68,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
-            FileInputStream fin = new FileInputStream(plan.finPath);
-            FileOutputStream fout = new FileOutputStream(plan.foutPath);
+            FileInputStream fin = new FileInputStream(plan.getFinPath());
+            FileOutputStream fout = new FileOutputStream(plan.getFoutPath());
         ) {
             long beforeTime = System.nanoTime();
 
@@ -81,7 +79,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
                 fout.write(buffer, 0, numBytesRead);
             }
 
-            assert new File(plan.finPath).length() == new File(plan.foutPath).length();
+            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
             plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
@@ -94,8 +92,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithBufferedFileStream(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
-            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.finPath), plan.bufferSize);
-            BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.foutPath), plan.bufferSize);
+            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.getFinPath()), plan.bufferSize);
+            BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.getFoutPath()), plan.bufferSize);
         ) {
             long beforeTime = System.nanoTime();
 
@@ -105,7 +103,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             }
             fout.flush();
 
-            assert new File(plan.finPath).length() == new File(plan.foutPath).length();
+            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
             plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
@@ -118,8 +116,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithFileChannel(SequentialReplicationExecutionPlan plan) throws IOException {
         try(
-            FileChannel finChannel = new FileInputStream(plan.finPath).getChannel();
-            FileChannel foutChannel = new FileOutputStream(plan.foutPath).getChannel();
+            FileChannel finChannel = new FileInputStream(plan.getFinPath()).getChannel();
+            FileChannel foutChannel = new FileOutputStream(plan.getFoutPath()).getChannel();
         ) {
             long beforeTime = System.nanoTime();
             int finLength = (int) finChannel.size();
@@ -158,8 +156,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithAsyncFileChannel(SequentialReplicationExecutionPlan plan) throws IOException, InterruptedException, ExecutionException {
         try(
-                AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(plan.finPath), StandardOpenOption.READ);
-                AsynchronousFileChannel foutChannel = AsynchronousFileChannel.open(Paths.get(plan.finPath), StandardOpenOption.WRITE);
+                AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(plan.getFinPath()), StandardOpenOption.READ);
+                AsynchronousFileChannel foutChannel = AsynchronousFileChannel.open(Paths.get(plan.getFoutPath()), StandardOpenOption.WRITE);
         ) {
             long beforeTime = System.nanoTime();
             int finLength = (int) finChannel.size();
@@ -217,8 +215,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmap(SequentialReplicationExecutionPlan plan) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
-                RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
+                RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
                 FileChannel finChannel = fin.getChannel();
                 FileChannel foutChannel = fout.getChannel();
         ) {
@@ -262,8 +260,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
-                RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
+                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
+                RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
 
         ) {
             long beforeTime = System.nanoTime();
@@ -296,8 +294,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(SequentialReplicationExecutionPlan plan) throws Exception {
         try (
-                RandomAccessFile fromFile = new RandomAccessFile(plan.finPath, "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rw");
+                RandomAccessFile fromFile = new RandomAccessFile(plan.getFinPath(), "r");
+                RandomAccessFile toFile = new RandomAccessFile(plan.getFoutPath(), "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {
@@ -340,8 +338,8 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferFromCopy(SequentialReplicationExecutionPlan plan) throws IOException {
         try (
-                RandomAccessFile fromFile = new RandomAccessFile(plan.finPath, "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.foutPath, "rw");
+                RandomAccessFile fromFile = new RandomAccessFile(plan.getFinPath(), "r");
+                RandomAccessFile toFile = new RandomAccessFile(plan.getFoutPath(), "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {

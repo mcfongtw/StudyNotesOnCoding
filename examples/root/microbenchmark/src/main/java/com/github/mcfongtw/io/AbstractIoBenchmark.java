@@ -4,6 +4,7 @@ import com.codahale.metrics.ScheduledReporter;
 import com.github.mcfongtw.ExecutableLifecycle;
 import com.github.mcfongtw.utils.SudoExecutors;
 import com.google.common.io.Files;
+import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -155,6 +156,7 @@ public abstract class AbstractIoBenchmark {
     }
 
 
+    @Getter
     protected static abstract class AbstractSequentialExecutionPlan extends AbstractExecutionPlan {
 
         protected String finPath;
@@ -201,7 +203,8 @@ public abstract class AbstractIoBenchmark {
         }
     }
 
-    protected static class AbstractRandomAccessExecutionPlan extends AbstractExecutionPlan {
+    @Getter
+    public static class AbstractRandomAccessExecutionPlan extends AbstractExecutionPlan {
         private static final int TOTAL_DATA_WRITTEN = 32 * UNIT_ONE_MEGA;
 
         protected String fmetaPath;
@@ -214,7 +217,7 @@ public abstract class AbstractIoBenchmark {
 
         protected File tempDir;
 
-        protected enum DataType {
+        public enum DataType {
             INTEGER(1, 4),
             DOUBLE(2, 8),
             CHAR(3, 2),

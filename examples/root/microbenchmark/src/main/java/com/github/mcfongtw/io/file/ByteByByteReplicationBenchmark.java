@@ -1,6 +1,8 @@
-package com.github.mcfongtw.io;
+package com.github.mcfongtw.io.file;
 
+import com.github.mcfongtw.io.AbstractIoBenchmark;
 import com.github.mcfongtw.metrics.LatencyMetric;
+import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -17,10 +19,11 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
 
     public static Logger LOG = LoggerFactory.getLogger(ByteByByteReplicationBenchmark.class);
 
+    @Getter
     @State(Scope.Benchmark)
     public static class ByteByByteReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(ByteByByteReplicationBenchmark.class.getName());
+        private LatencyMetric ioLatencyMetric = new LatencyMetric(ByteByByteReplicationBenchmark.class.getName());
 
         @Override
         @Setup(Level.Trial)
@@ -56,8 +59,8 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
     public void copyWithFileStream(ByteByByteReplicationExecutionPlan plan) throws IOException {
         try(
-                FileInputStream fin = new FileInputStream(plan.finPath);
-                FileOutputStream fout = new FileOutputStream(plan.foutPath);
+                FileInputStream fin = new FileInputStream(plan.getFinPath());
+                FileOutputStream fout = new FileOutputStream(plan.getFoutPath());
         ) {
             long beforeTime = System.nanoTime();
 
@@ -66,7 +69,7 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
                 fout.write(byteRead);
             }
 
-            assert new File(plan.finPath).length() == new File(plan.foutPath).length();
+            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
             plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
@@ -81,8 +84,8 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRandomAccessFile(ByteByByteReplicationExecutionPlan plan) throws IOException {
         try(
-            RandomAccessFile fout = new RandomAccessFile(plan.foutPath, "rw");
-            RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
+            RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
+            RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
         ) {
             long beforeTime = System.nanoTime();
 

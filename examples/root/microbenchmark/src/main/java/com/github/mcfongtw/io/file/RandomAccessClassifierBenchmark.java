@@ -1,6 +1,8 @@
-package com.github.mcfongtw.io;
+package com.github.mcfongtw.io.file;
 
+import com.github.mcfongtw.io.AbstractIoBenchmark;
 import com.github.mcfongtw.metrics.LatencyMetric;
+import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -23,10 +25,11 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
     public static Logger LOG = LoggerFactory.getLogger(RandomAccessClassifierBenchmark.class);
 
+    @Getter
     @State(Scope.Benchmark)
     public static class RandomAccessClassifierExecutionPlan extends AbstractRandomAccessExecutionPlan {
 
-        LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierBenchmark.class.getName());
+        private LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierBenchmark.class.getName());
 
         @Override
         @Setup(Level.Trial)
@@ -62,9 +65,9 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithMmap(RandomAccessClassifierExecutionPlan plan) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.finPath, "r");
-                BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));
-                BufferedReader fsummary = new BufferedReader(new FileReader(plan.fsummaryPath));
+                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
+                BufferedReader fmeta = new BufferedReader(new FileReader(plan.getFmetaPath()));
+                BufferedReader fsummary = new BufferedReader(new FileReader(plan.getFsummaryPath()));
 
                 FileChannel finChannel = fin.getChannel();
         ) {
@@ -81,8 +84,8 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             List<RandomAccessFile> listOfRandomAccessFile = new ArrayList<>();
             List<FileChannel> listOfFileChannel = new ArrayList<>();
             List<MappedByteBuffer> listOfMappedOutputBuffer = new ArrayList<>();
-            for(int i = 0; i < plan.listOfFoutPath.size(); i++) {
-                String fout = plan.listOfFoutPath.get(i);
+            for(int i = 0; i < plan.getListOfFoutPath().size(); i++) {
+                String fout = plan.getListOfFoutPath().get(i);
                 RandomAccessFile raf = new RandomAccessFile(fout, "rw");
                 FileChannel fc = raf.getChannel();
                 MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, foutFileSize[i]);
@@ -137,9 +140,9 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithFileStream(RandomAccessClassifierExecutionPlan plan) throws IOException {
         try (
-                FileInputStream fis = new FileInputStream(plan.finPath);
-                BufferedReader fmeta = new BufferedReader(new FileReader(plan.fmetaPath));
-                BufferedReader fsummary = new BufferedReader(new FileReader(plan.fsummaryPath));
+                FileInputStream fis = new FileInputStream(plan.getFinPath());
+                BufferedReader fmeta = new BufferedReader(new FileReader(plan.getFmetaPath()));
+                BufferedReader fsummary = new BufferedReader(new FileReader(plan.getFsummaryPath()));
         ) {
 
             int foutFileSize[] = new int[COUNT];
@@ -149,8 +152,8 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
 
             List<FileOutputStream> listOfFileOutputStream = new ArrayList<>();
-            for(int i = 0; i < plan.listOfFoutPath.size(); i++) {
-                String fout = plan.listOfFoutPath.get(i);
+            for(int i = 0; i < plan.getListOfFoutPath().size(); i++) {
+                String fout = plan.getListOfFoutPath().get(i);
                 FileOutputStream fos = new FileOutputStream(fout);
                 listOfFileOutputStream.add(fos);
             }
