@@ -18,8 +18,11 @@ public class ObjectReferenceBenchmark {
 
     @State(Scope.Benchmark)
     public static class ExecutionPlan {
-        public final int NUM_OF_REFS = 10000;
+        public static final int NUM_OF_REFS = 1000;
+        public static final Object[] refs = new Object[NUM_OF_REFS];
     }
+
+    public static final int NUM_OF_ITERATIONS = 100;
 
     private static class FinalizedObject {
 
@@ -37,88 +40,129 @@ public class ObjectReferenceBenchmark {
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnWeakReference(ExecutionPlan executionPlan) {
         /*
          * A weakly referenced object will be available ONLY when the first / original referent exists.
          */
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             Object referent = new Object();
-            WeakReference<Object> weakReference = new WeakReference<Object>(referent);
-            referent = null;
+            executionPlan.refs[i] = new WeakReference<Object>(referent);
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnSoftReference(ExecutionPlan executionPlan) {
         /*
          * Soft Reference utilizes a LRU cache which leads to the effect that the referent is retained
          * as long as there is enough memory AND as long as it is reachable by someone.
          */
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             Object referent = new Object();
-            SoftReference<Object> softReference = new SoftReference<Object>(referent);
-            referent = null;
+            executionPlan.refs[i] = new SoftReference<Object>(referent);
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnPhantomReference(ExecutionPlan executionPlan) {
         final ReferenceQueue<Object> objectReferenceQueue = new ReferenceQueue<>();
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             Object referent = new Object();
-            PhantomReference<Object> phantomReference = new PhantomReference<Object>(referent, objectReferenceQueue);
-            referent = null;
+            executionPlan.refs[i] = new PhantomReference<Object>(referent, objectReferenceQueue);
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnHeapObject(ExecutionPlan executionPlan) {
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            Object referent = new Object();
-            referent = null;
+            executionPlan.refs[i] = new Object();
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnHeapBuffer(ExecutionPlan executionPlan) {
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
             byteBuffer.get();
+
+            executionPlan.refs[i] = byteBuffer;
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnDirectBuffer(ExecutionPlan executionPlan) {
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
             byteBuffer.get();
+
+            executionPlan.refs[i] = byteBuffer;
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=100)
+    @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnFinalizedObject(ExecutionPlan executionPlan) {
+        //create
         for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
             Object referent = new Object();
-            FinalizedObject finalizedObject = new FinalizedObject(referent);
-            finalizedObject = null;
+            executionPlan.refs[i]  = new FinalizedObject(referent);
+        }
+
+        //destroy
+        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+            executionPlan.refs[i] = null;
         }
     }
 
