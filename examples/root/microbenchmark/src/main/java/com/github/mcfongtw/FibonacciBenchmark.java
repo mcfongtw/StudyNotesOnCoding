@@ -88,7 +88,7 @@ public class FibonacciBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations=100)
+    @Measurement(iterations=10)
     public void tailRecursive(){
         fibTailRecursive(STARTING_FIB_NUMBER);
     }
@@ -96,7 +96,7 @@ public class FibonacciBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations=100)
+    @Measurement(iterations=10)
     public void memoization() {
         fibMemoization(STARTING_FIB_NUMBER,new int[STARTING_FIB_NUMBER+1]);
     }
@@ -104,7 +104,7 @@ public class FibonacciBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations=100)
+    @Measurement(iterations=10)
     public void bottomUp() {
         fibBottomUp(STARTING_FIB_NUMBER);
     }
@@ -112,7 +112,7 @@ public class FibonacciBenchmark {
     @Benchmark
     @BenchmarkMode({Mode.Throughput, Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations=100)
+    @Measurement(iterations=10)
     public void stream() {
         fibStream(STARTING_FIB_NUMBER);
     }

@@ -1,6 +1,7 @@
 package com.github.mcfongtw;
 
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -12,17 +13,17 @@ import java.util.concurrent.TimeUnit;
 public class SystemTimeBenchmark {
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
+    @BenchmarkMode({Mode.Throughput})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 1000, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = 20, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void measureCurrentTimeMillis() {
         System.currentTimeMillis();
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
+    @BenchmarkMode({Mode.Throughput})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 1000, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = 20, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void measureNanoTime() {
         System.nanoTime();
     }
@@ -31,6 +32,8 @@ public class SystemTimeBenchmark {
         Options opt = new OptionsBuilder()
                 .include(SystemTimeBenchmark.class.getSimpleName())
                 .forks(1)
+                .warmupIterations(10)
+                .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("SystemTimeBenchmark-result.json")
                 .build();
