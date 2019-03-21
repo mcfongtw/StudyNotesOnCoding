@@ -95,6 +95,24 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>compress-lzf</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <!-- Reactive Dependencies -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-stream</artifactId>
+            <version>2.0.8.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava2</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>2.2.7</version>
+        </dependency>
+
+
 
         <!-- Spring Dependencies -->
         <dependency>
@@ -687,6 +705,35 @@ THE POSSIBILITY OF SUCH DAMAGE.
                                     <resource>corpus/urls.10K</resource>
                                     <resource>corpus/fireworks.jpeg</resource>
                                     <resource>corpus/geo.protodata</resource>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!--
+                                        Shading signed JARs will fail without this.
+                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                    -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>FibonacciBenchmark</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>FibonacciBenchmark-jmh-${jmh.version}</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.mcfongtw.FibonacciBenchmark</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
