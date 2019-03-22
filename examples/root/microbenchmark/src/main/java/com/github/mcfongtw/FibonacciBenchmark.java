@@ -77,17 +77,20 @@ public class FibonacciBenchmark {
 
     @VisibleForTesting
     static int doJava8Stream(int n) {
-        return Stream.iterate(new Integer[]{0, 1}, s -> new Integer[]{s[1], s[0]+s[1]})
+        return Stream
+                .iterate(new int[]{0, 1}, f -> new int[]{f[1], f[0] + f[1]})
                 .limit(n)
-                .reduce((x, y) -> y).orElse(null)[1];
+                .reduce((x, y) -> y)
+                .orElse(null)[1];
     }
 
     @VisibleForTesting
     static int doRxStream(int x) {
-        return Observable.fromArray(0)
+        return Observable
+                .fromArray(0) // base condition
                 .repeat()
-                .scan(new int[]{0, 1}, (a, b) -> new int[]{a[1], a[0] + a[1]})
-                .map(a -> a[1])
+                .scan(new int[]{0, 1}, (f, b) -> new int[]{f[1], f[0] + f[1]})
+                .map(f -> f[1])
                 .take(x)
                 .blockingLast();
     }
@@ -95,18 +98,13 @@ public class FibonacciBenchmark {
 
     @VisibleForTesting
     static int doReactorStream(int x) {
-        List<Integer> sequence = Lists.newArrayList();
-        Flux<Integer> integerFlux = Flux.generate(
-                () -> Tuples.<Integer, Integer>of(1, 1),
-                (state, sink) -> {
-                    sink.next(state.getT1());
-                    return Tuples.of(state.getT2(), state.getT1() + state.getT2());
-                });
-
-        integerFlux
+        return Flux
+                .fromArray(new Integer[]{0}) // base condition
+                .repeat()
+                .scan(new int[]{0, 1}, (f, b) -> new int[]{f[1], f[0] + f[1]})
+                .map(f -> f[1])
                 .take(x)
-                .subscribe(number -> sequence.add(number));
-        return sequence.get(x - 1);
+                .blockLast();
     }
 
 
