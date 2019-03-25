@@ -30,3 +30,8 @@ spring:
         trace: false
         web-allow-others: false
 
+###
+# Tomcat settings
+###
+server: 
+  port: 8181
