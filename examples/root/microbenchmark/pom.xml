@@ -111,8 +111,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>rxjava</artifactId>
             <version>2.2.7</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
 
         <!-- Spring Dependencies -->
         <dependency>
