@@ -10,6 +10,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Defaults;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -180,7 +181,8 @@ public class HibernateOneToManyBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToManyBenchmark.class.getSimpleName())
-                .forks(1)
+                .forks(3)
+                .warmupIterations(Defaults.WARMUP_ITERATIONS)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateOneToManyBenchmark-result.json")
                 .build();
