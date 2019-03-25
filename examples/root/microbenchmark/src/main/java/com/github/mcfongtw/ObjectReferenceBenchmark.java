@@ -18,11 +18,12 @@ public class ObjectReferenceBenchmark {
 
     @State(Scope.Benchmark)
     public static class ExecutionPlan {
-        public static final int NUM_OF_REFS = 1000;
-        public static final Object[] refs = new Object[NUM_OF_REFS];
+
+        @Param({"100", "10000", "1000000"})
+        public int numOfRefs;
     }
 
-    public static final int NUM_OF_ITERATIONS = 100;
+    public static final int NUM_OF_ITERATIONS = 10;
 
     private static class FinalizedObject {
 
@@ -46,14 +47,15 @@ public class ObjectReferenceBenchmark {
          * A weakly referenced object will be available ONLY when the first / original referent exists.
          */
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             Object referent = new Object();
-            executionPlan.refs[i] = new WeakReference<Object>(referent);
+            refs[i] = new WeakReference<Object>(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
@@ -66,14 +68,15 @@ public class ObjectReferenceBenchmark {
          * as long as there is enough memory AND as long as it is reachable by someone.
          */
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             Object referent = new Object();
-            executionPlan.refs[i] = new SoftReference<Object>(referent);
+            refs[i] = new SoftReference<Object>(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
@@ -82,30 +85,33 @@ public class ObjectReferenceBenchmark {
     @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnPhantomReference(ExecutionPlan executionPlan) {
         final ReferenceQueue<Object> objectReferenceQueue = new ReferenceQueue<>();
+
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             Object referent = new Object();
-            executionPlan.refs[i] = new PhantomReference<Object>(referent, objectReferenceQueue);
+            refs[i] = new PhantomReference<Object>(referent, objectReferenceQueue);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
     @Benchmark
     @BenchmarkMode({Mode.Throughput})
     @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnHeapObject(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnStrongReference(ExecutionPlan executionPlan) {
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = new Object();
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = new Object();
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
@@ -115,18 +121,19 @@ public class ObjectReferenceBenchmark {
     @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnHeapBuffer(ExecutionPlan executionPlan) {
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
             byteBuffer.get();
 
-            executionPlan.refs[i] = byteBuffer;
+            refs[i] = byteBuffer;
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
@@ -135,18 +142,19 @@ public class ObjectReferenceBenchmark {
     @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnDirectBuffer(ExecutionPlan executionPlan) {
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
             byteBuffer.get();
 
-            executionPlan.refs[i] = byteBuffer;
+            refs[i] = byteBuffer;
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+                refs[i] = null;
         }
     }
 
@@ -155,14 +163,15 @@ public class ObjectReferenceBenchmark {
     @Measurement(iterations=NUM_OF_ITERATIONS)
     public void measureGcImpactOnFinalizedObject(ExecutionPlan executionPlan) {
         //create
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
+        final Object[] refs = new Object[executionPlan.numOfRefs];
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
             Object referent = new Object();
-            executionPlan.refs[i]  = new FinalizedObject(referent);
+            refs[i]  = new FinalizedObject(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.NUM_OF_REFS; i++) {
-            executionPlan.refs[i] = null;
+        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+            refs[i] = null;
         }
     }
 
@@ -170,8 +179,8 @@ public class ObjectReferenceBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(ObjectReferenceBenchmark.class.getSimpleName())
-                .forks(1)
-                .warmupIterations(10)
+                .forks(3)
+                .warmupIterations(5)
                 .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("ObjectReferenceBenchmark-result.json")
