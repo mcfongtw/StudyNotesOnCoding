@@ -90,7 +90,7 @@ class ObjectEventProducer {
 
 public class RingBufferBenchmark {
 
-    private static final int NUM_ITERATION = 1;
+    private static final int NUM_ITERATION = 10;
 
     @State(Scope.Benchmark)
     public static class ExecutionPlan {
