@@ -1,6 +1,6 @@
 package com.github.mcfongtw.io.file;
 
-import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
 import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
@@ -19,15 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.io.AbstractIoBenchmark.AbstractRandomAccessExecutionPlan.DataType.COUNT;
+import static com.github.mcfongtw.io.AbstractIoBenchmarkBase.AbstractRandomAccessIoBenchmarkLifecycle.DataType.COUNT;
 
-public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
+public class RandomAccessClassifierBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(RandomAccessClassifierBenchmark.class);
 
     @Getter
     @State(Scope.Benchmark)
-    public static class RandomAccessClassifierExecutionPlan extends AbstractRandomAccessExecutionPlan {
+    public static class BenchmarkState extends AbstractRandomAccessIoBenchmarkLifecycle {
 
         private LatencyMetric ioLatencyMetric = new LatencyMetric(RandomAccessClassifierBenchmark.class.getName());
 
@@ -63,11 +63,11 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
-    public void classifyWithMmap(RandomAccessClassifierExecutionPlan plan) throws IOException {
+    public void classifyWithMmap(BenchmarkState state) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
-                BufferedReader fmeta = new BufferedReader(new FileReader(plan.getFmetaPath()));
-                BufferedReader fsummary = new BufferedReader(new FileReader(plan.getFsummaryPath()));
+                RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
+                BufferedReader fmeta = new BufferedReader(new FileReader(state.getFmetaPath()));
+                BufferedReader fsummary = new BufferedReader(new FileReader(state.getFsummaryPath()));
 
                 FileChannel finChannel = fin.getChannel();
         ) {
@@ -84,8 +84,8 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             List<RandomAccessFile> listOfRandomAccessFile = new ArrayList<>();
             List<FileChannel> listOfFileChannel = new ArrayList<>();
             List<MappedByteBuffer> listOfMappedOutputBuffer = new ArrayList<>();
-            for(int i = 0; i < plan.getListOfFoutPath().size(); i++) {
-                String fout = plan.getListOfFoutPath().get(i);
+            for(int i = 0; i < state.getListOfFoutPath().size(); i++) {
+                String fout = state.getListOfFoutPath().get(i);
                 RandomAccessFile raf = new RandomAccessFile(fout, "rw");
                 FileChannel fc = raf.getChannel();
                 MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, foutFileSize[i]);
@@ -100,7 +100,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             while( (line = fmeta.readLine()) != null) {
                 String parts[] = line.split(",");
                 String fpath = parts[0];
-                AbstractRandomAccessExecutionPlan.DataType dataType = AbstractRandomAccessExecutionPlan.DataType.getDataTypeByTypeId(Integer.valueOf(parts[1]));
+                AbstractRandomAccessIoBenchmarkLifecycle.DataType dataType = AbstractRandomAccessIoBenchmarkLifecycle.DataType.getDataTypeByTypeId(Integer.valueOf(parts[1]));
                 int index = Integer.valueOf(parts[2]);
                 int length = Integer.valueOf(parts[3]);
 
@@ -113,7 +113,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             }
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
 
 
 
@@ -138,11 +138,11 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void classifyWithFileStream(RandomAccessClassifierExecutionPlan plan) throws IOException {
+    public void classifyWithFileStream(BenchmarkState state) throws IOException {
         try (
-                FileInputStream fis = new FileInputStream(plan.getFinPath());
-                BufferedReader fmeta = new BufferedReader(new FileReader(plan.getFmetaPath()));
-                BufferedReader fsummary = new BufferedReader(new FileReader(plan.getFsummaryPath()));
+                FileInputStream fis = new FileInputStream(state.getFinPath());
+                BufferedReader fmeta = new BufferedReader(new FileReader(state.getFmetaPath()));
+                BufferedReader fsummary = new BufferedReader(new FileReader(state.getFsummaryPath()));
         ) {
 
             int foutFileSize[] = new int[COUNT];
@@ -152,8 +152,8 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
 
 
             List<FileOutputStream> listOfFileOutputStream = new ArrayList<>();
-            for(int i = 0; i < plan.getListOfFoutPath().size(); i++) {
-                String fout = plan.getListOfFoutPath().get(i);
+            for(int i = 0; i < state.getListOfFoutPath().size(); i++) {
+                String fout = state.getListOfFoutPath().get(i);
                 FileOutputStream fos = new FileOutputStream(fout);
                 listOfFileOutputStream.add(fos);
             }
@@ -165,7 +165,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             while( (line = fmeta.readLine()) != null) {
                 String parts[] = line.split(",");
                 String fpath = parts[0];
-                AbstractRandomAccessExecutionPlan.DataType dataType = AbstractRandomAccessExecutionPlan.DataType.getDataTypeByTypeId(Integer.valueOf(parts[1]));
+                AbstractRandomAccessIoBenchmarkLifecycle.DataType dataType = AbstractRandomAccessIoBenchmarkLifecycle.DataType.getDataTypeByTypeId(Integer.valueOf(parts[1]));
                 int index = Integer.valueOf(parts[2]);
                 int length = Integer.valueOf(parts[3]);
 
@@ -178,7 +178,7 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmark {
             }
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
 
 
 

@@ -6,7 +6,6 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.results.RunResult;
@@ -88,34 +87,58 @@ class ObjectEventProducer {
 //    }
 //}
 
-public class RingBufferBenchmark {
-
-    private static final int NUM_ITERATION = 10;
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Measurement(iterations = 10)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class RingBufferBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan {
+    public static class BenchmarkState extends SimpleBenchmarkLifecycle {
 
         @Param({"1024", "10240", "102400"})
         public int size;
 
         private static final int BUFFER_SIZE = 1024;
 
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
+        @TearDown(Level.Trial)
+        @Override
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
+        }
+
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
-    @OutputTimeUnit(TimeUnit.MICROSECONDS)
-    @Measurement(iterations = NUM_ITERATION)
-    @Warmup(iterations = 5)
-    public void measureRingBuffer(ExecutionPlan executionPlan) {
+    public void measureRingBuffer(BenchmarkState benchmarkState) {
         ObjectEventFactory objectEventFactory = new ObjectEventFactory();
-        Disruptor<ObjectEvent> disruptor = new Disruptor<>(objectEventFactory, executionPlan.BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
+        Disruptor<ObjectEvent> disruptor = new Disruptor<>(objectEventFactory, benchmarkState.BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
         disruptor.start();
 
         RingBuffer<ObjectEvent> ringBuffer = disruptor.getRingBuffer();
         ObjectEventProducer producer = new ObjectEventProducer(ringBuffer);
 
-        for (long i = 0; i < executionPlan.size; i++) {
+        for (long i = 0; i < benchmarkState.size; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(8);
             byteBuffer.putLong(0, i);
             producer.onData(byteBuffer);
@@ -125,20 +148,16 @@ public class RingBufferBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
-    @OutputTimeUnit(TimeUnit.MICROSECONDS)
-    @Measurement(iterations = NUM_ITERATION)
-    @Warmup(iterations = 5)
-    public void measureCleanableRingBuffer(ExecutionPlan executionPlan) {
+    public void measureCleanableRingBuffer(BenchmarkState benchmarkState) {
         ObjectEventFactory objectEventFactory = new ObjectEventFactory();
-        Disruptor<ObjectEvent> disruptor = new Disruptor<>(objectEventFactory, executionPlan.BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
+        Disruptor<ObjectEvent> disruptor = new Disruptor<>(objectEventFactory, benchmarkState.BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
         disruptor.handleEventsWith(new ClearEventHandler());
         disruptor.start();
 
         RingBuffer<ObjectEvent> ringBuffer = disruptor.getRingBuffer();
         ObjectEventProducer producer = new ObjectEventProducer(ringBuffer);
 
-        for (long i = 0; i < executionPlan.size; i++) {
+        for (long i = 0; i < benchmarkState.size; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(8);
             byteBuffer.putLong(0, i);
             producer.onData(byteBuffer);
@@ -152,7 +171,7 @@ public class RingBufferBenchmark {
 //    @OutputTimeUnit(TimeUnit.MICROSECONDS)
 //    @Measurement(iterations = NUM_ITERATION)
 //    @Warmup(iterations = 5)
-//    public void measureWeaklyReferencedRingBuffer(ExecutionPlan executionPlan) {
+//    public void measureWeaklyReferencedRingBuffer(BenchmarkState executionPlan) {
 //        WeakRefedObjectEventFactory weakRefedObjectEventFactory = new WeakRefedObjectEventFactory();
 //        Disruptor<WeakReference<ObjectEvent>> disruptor = new Disruptor<>(weakRefedObjectEventFactory, executionPlan.BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
 //        disruptor.start();
@@ -175,8 +194,6 @@ public class RingBufferBenchmark {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(RingBufferBenchmark.class.getSimpleName())
-                .detectJvmArgs()
-                .forks(3)
                 .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("RingBufferBenchmark-result.json")

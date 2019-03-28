@@ -1,6 +1,7 @@
 package com.github.mcfongtw.spring.data;
 
-import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark;
+import com.github.mcfongtw.BenchmarkBase;
+import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,21 +13,22 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
 import javax.persistence.*;
+import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-
-public class HibernateOneToOneBenchmark {
-
-    private static Logger logger = LoggerFactory.getLogger(HibernateOneToOneBenchmark.class);
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 10)
+@Fork(3)
+@Threads(1)
+public class HibernateOneToOneBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan extends AbstractSpringBootBenchmark.AbstractSpringBootExecutionPlan {
+    public static class BenchmarkState extends AbstractSpringBootBenchmarkLifecycle {
 
         @Autowired
         private ManRepository manRepository;
@@ -40,7 +42,6 @@ public class HibernateOneToOneBenchmark {
         @Autowired
         private FemaleRepository femaleRepository;
 
-        @Setup(Level.Trial)
         @Override
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
@@ -50,18 +51,34 @@ public class HibernateOneToOneBenchmark {
             femaleRepository = configurableApplicationContext.getBean(FemaleRepository.class);
         }
 
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
         @TearDown(Level.Trial)
         @Override
-        public void preTrialTearDown() throws Exception {
-            super.preTrialTearDown();
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
         }
 
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureBidirectionalOneToOne(HibernateOneToOneBenchmark.ExecutionPlan executionPlan) {
+    public void measureBidirectionalOneToOne(BenchmarkState benchmarkState) {
         Man man = new Man();
         man.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -71,21 +88,19 @@ public class HibernateOneToOneBenchmark {
         man.setWoman(woman);
         woman.setMan(man);
 
-        executionPlan.manRepository.save(man);
+        benchmarkState.manRepository.save(man);
 
 
-        assert executionPlan.manRepository.findById(man.getId()).get().getWoman().getName() == woman.getName();
-        assert executionPlan.womanRepository.findById(woman.getId()).get().getMan().getName() == man.getName();
+        assert benchmarkState.manRepository.findById(man.getId()).get().getWoman().getName() == woman.getName();
+        assert benchmarkState.womanRepository.findById(woman.getId()).get().getMan().getName() == man.getName();
 
-        executionPlan.womanRepository.delete(woman);
+        benchmarkState.womanRepository.delete(woman);
 
-        assert executionPlan.manRepository.findById(man.getId()).isPresent() == false;
+        assert benchmarkState.manRepository.findById(man.getId()).isPresent() == false;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureUniDirectionalOneToOneWithMapsId(HibernateOneToOneBenchmark.ExecutionPlan executionPlan) {
+    public void measureUniDirectionalOneToOneWithMapsId(BenchmarkState benchmarkState) {
         Male male = new Male();
         male.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -94,16 +109,15 @@ public class HibernateOneToOneBenchmark {
 
         male.setFemale(female);
 
-        executionPlan.maleRepository.save(male);
+        benchmarkState.maleRepository.save(male);
 
 
-        assert executionPlan.maleRepository.findById(male.getId()).get().getFemale().getName() == female.getName();
+        assert benchmarkState.maleRepository.findById(male.getId()).get().getFemale().getName() == female.getName();
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToOneBenchmark.class.getSimpleName())
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateOneToOneBenchmark-result.json")
                 .build();

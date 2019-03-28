@@ -1,6 +1,7 @@
 package com.github.mcfongtw.spring.data;
 
-import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark;
+import com.github.mcfongtw.BenchmarkBase;
+import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Data;
@@ -20,14 +21,20 @@ import org.springframework.data.repository.CrudRepository;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle.numberOfEntities;
 
-public class HibernateManyToManyBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 10)
+@Fork(3)
+@Threads(1)
+public class HibernateManyToManyBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan extends AbstractSpringBootBenchmark.AbstractSpringBootExecutionPlan {
+    public static class BenchmarkState extends AbstractSpringBootBenchmarkLifecycle {
 
         @Autowired
         private BoyRepository boyRepository;
@@ -35,7 +42,6 @@ public class HibernateManyToManyBenchmark {
         @Autowired
         private GirlRepository girlRepository;
 
-        @Setup(Level.Trial)
         @Override
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
@@ -43,18 +49,34 @@ public class HibernateManyToManyBenchmark {
             girlRepository = configurableApplicationContext.getBean(GirlRepository.class);
         }
 
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
         @TearDown(Level.Trial)
         @Override
-        public void preTrialTearDown() throws Exception {
-            super.preTrialTearDown();
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
         }
     }
 
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureUnidirecitonalManyToMany(ExecutionPlan executionPlan) throws Exception {
+    public void measureUnidirecitonalManyToMany(BenchmarkState benchmarkState) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
         numberOfEntities = 128;
@@ -70,25 +92,23 @@ public class HibernateManyToManyBenchmark {
 
         for(Girl girl: girls) {
             boy.getSetOfGirls_1().add(girl);
-            executionPlan.boyRepository.save(boy);
+            benchmarkState.boyRepository.save(boy);
         }
 
 
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_1().size() == numberOfEntities;
+        assert benchmarkState.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
+        assert benchmarkState.boyRepository.findById(boy.getId()).get().getSetOfGirls_1().size() == numberOfEntities;
 
         for(Girl girl: girls) {
             boy.getSetOfGirls_1().remove(girl);
         }
 
         //FIXME: getGirl() != null
-//        assert executionPlan.girlRepository.findById(girl.getId()).get() == null;
+//        assert benchmarkState.girlRepository.findById(girl.getId()).get() == null;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureBidirectionalManyToMany(ExecutionPlan executionPlan) throws Exception {
+    public void measureBidirectionalManyToMany(BenchmarkState benchmarkState) throws Exception {
         List<Girl> girls = Lists.newArrayList();
 
         numberOfEntities = 128;
@@ -105,24 +125,23 @@ public class HibernateManyToManyBenchmark {
 
         for(Girl girl: girls) {
             boy.addGirlToSet(girl);
-            executionPlan.boyRepository.save(boy);
+            benchmarkState.boyRepository.save(boy);
         }
 
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
-        assert executionPlan.boyRepository.findById(boy.getId()).get().getSetOfGirls_2().size() == numberOfEntities;
+        assert benchmarkState.boyRepository.findById(boy.getId()).get().getName() == boy.getName();
+        assert benchmarkState.boyRepository.findById(boy.getId()).get().getSetOfGirls_2().size() == numberOfEntities;
 
         for(Girl girl: girls) {
             boy.removeGirlFromSet(girl);
         }
 
         //FIXME: getGirl() != null
-//        assert executionPlan.girlRepository.findById(girl.getId()).get() == null;
+//        assert benchmarkState.girlRepository.findById(girl.getId()).get() == null;
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateManyToManyBenchmark.class.getSimpleName())
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateManyToManyBenchmark-result.json")
                 .build();

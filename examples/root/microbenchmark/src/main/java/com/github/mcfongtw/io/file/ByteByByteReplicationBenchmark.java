@@ -1,6 +1,6 @@
 package com.github.mcfongtw.io.file;
 
-import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
 import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 
-public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
+public class ByteByByteReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(ByteByByteReplicationBenchmark.class);
 
     @Getter
     @State(Scope.Benchmark)
-    public static class ByteByByteReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
+    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
 
         private LatencyMetric ioLatencyMetric = new LatencyMetric(ByteByByteReplicationBenchmark.class.getName());
 
@@ -57,10 +57,10 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
-    public void copyWithFileStream(ByteByByteReplicationExecutionPlan plan) throws IOException {
+    public void copyWithFileStream(BenchmarkState state) throws IOException {
         try(
-                FileInputStream fin = new FileInputStream(plan.getFinPath());
-                FileOutputStream fout = new FileOutputStream(plan.getFoutPath());
+                FileInputStream fin = new FileInputStream(state.getFinPath());
+                FileOutputStream fout = new FileOutputStream(state.getFoutPath());
         ) {
             long beforeTime = System.nanoTime();
 
@@ -69,10 +69,10 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
                 fout.write(byteRead);
             }
 
-            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
+            assert new File(state.getFinPath()).length() == new File(state.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -82,10 +82,10 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRandomAccessFile(ByteByByteReplicationExecutionPlan plan) throws IOException {
+    public void copyWithRandomAccessFile(BenchmarkState state) throws IOException {
         try(
-            RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
-            RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
+            RandomAccessFile fout = new RandomAccessFile(state.getFoutPath(), "rw");
+            RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
         ) {
             long beforeTime = System.nanoTime();
 
@@ -98,7 +98,7 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmark {
             assert fin.length() == fout.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
     }

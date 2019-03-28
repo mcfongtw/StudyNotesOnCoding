@@ -1,6 +1,6 @@
 package com.github.mcfongtw;
 
-public interface ExecutableLifecycle {
+public interface BenchmarkLifecycle {
 
     void preTrialSetUp() throws Exception;
 

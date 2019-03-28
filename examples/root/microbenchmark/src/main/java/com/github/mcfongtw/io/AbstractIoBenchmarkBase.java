@@ -1,7 +1,8 @@
 package com.github.mcfongtw.io;
 
 import com.codahale.metrics.ScheduledReporter;
-import com.github.mcfongtw.ExecutableLifecycle;
+import com.github.mcfongtw.AbstractBenchmarkLifecycle;
+import com.github.mcfongtw.BenchmarkBase;
 import com.github.mcfongtw.utils.SudoExecutors;
 import com.google.common.io.Files;
 import lombok.Getter;
@@ -18,9 +19,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.io.AbstractIoBenchmark.AbstractRandomAccessExecutionPlan.DataType.*;
+import static com.github.mcfongtw.io.AbstractIoBenchmarkBase.AbstractRandomAccessIoBenchmarkLifecycle.DataType.*;
 
-public abstract class AbstractIoBenchmark {
+public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
 
     protected static final int NUM_ITERATION = 20;
 
@@ -36,7 +37,7 @@ public abstract class AbstractIoBenchmark {
 
     protected static ScheduledReporter metricReporter = InfluxdbReporterSingleton.newInstance();
 
-    protected static abstract class AbstractExecutionPlan implements ExecutableLifecycle {
+    protected static abstract class AbstractIoBenchmarkLifecycle extends AbstractBenchmarkLifecycle {
         protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
         private String sudoPassword = "";
@@ -44,7 +45,7 @@ public abstract class AbstractIoBenchmark {
         private boolean isMetricReporterEnabled = false;
 
 
-        public AbstractExecutionPlan() {
+        public AbstractIoBenchmarkLifecycle() {
             isMetricReporterEnabled = Boolean.valueOf(System.getProperty("isMetricReporterEnabled", "false"));
 
             if(isMetricReporterEnabled) {
@@ -76,39 +77,10 @@ public abstract class AbstractIoBenchmark {
             }
         }
 
-        @Override
-        public void preTrialSetUp() throws Exception {
-            logger.trace("[preTrialSetUp]");
-        }
-
-        @Override
-        public void doTrialSetUp() throws Exception {
-            this.preTrialSetUp();
-            logger.trace("[doTrialSetUp]");
-            this.postTrialSetUp();
-        }
-
-        @Override
-        public void postTrialSetUp() throws IOException, InterruptedException {
-            logger.trace("[postTrialSetUp]");
-        }
-
-        @Override
-        public void preTrialTearDown() throws Exception {
-            logger.trace("[preTrialTearDown]");
-
-        }
-
-        @Override
-        public void doTrialTearDown() throws Exception {
-            this.preTrialTearDown();
-            logger.trace("[doTrialTearDown]");
-            this.postTrialTearDown();
-        }
 
         @Override
         public void postTrialTearDown() throws Exception {
-            logger.trace("[postTrialTearDown]");
+            super.postTrialTearDown();
             logger.info("Stopping reporting metric...");
             if(isMetricReporterEnabled) {
                 metricReporter.stop();
@@ -117,38 +89,10 @@ public abstract class AbstractIoBenchmark {
             logger.info("Stopping reporting metric...DONE");
         }
 
-        @Override
-        public void preIterationSetup() throws Exception {
-            logger.trace("[preIterationSetup]");
-        }
-
-        @Override
-        public void doIterationSetup() throws Exception {
-            this.preIterationSetup();
-            logger.trace("[doIterationSetup]");
-            this.postIterationSetup();
-        }
-
-        @Override
-        public void postIterationSetup()  throws Exception {
-            logger.trace("[postIterationSetup]");
-        }
-
-        @Override
-        public void preIterationTearDown() throws Exception{
-            logger.trace("[preIterationTearDown]");
-        }
-
-        @Override
-        public void doIterationTearDown() throws Exception{
-            this.preIterationTearDown();
-            logger.trace("[doIterationTearDown]");
-            this.postIterationTearDown();
-        }
 
         @Override
         public void postIterationTearDown()  throws Exception {
-            logger.trace("[postIterationTearDown]");
+            super.postIterationTearDown();
             persistCacheToStorage();
             flushSystemCache();
         }
@@ -157,7 +101,7 @@ public abstract class AbstractIoBenchmark {
 
 
     @Getter
-    protected static abstract class AbstractSequentialExecutionPlan extends AbstractExecutionPlan {
+    protected static abstract class AbstractSequentialIoBenchmarkLifecycle extends AbstractIoBenchmarkLifecycle {
 
         protected String finPath;
 
@@ -204,7 +148,7 @@ public abstract class AbstractIoBenchmark {
     }
 
     @Getter
-    public static class AbstractRandomAccessExecutionPlan extends AbstractExecutionPlan {
+    public static class AbstractRandomAccessIoBenchmarkLifecycle extends AbstractIoBenchmarkLifecycle {
         private static final int TOTAL_DATA_WRITTEN = 32 * UNIT_ONE_MEGA;
 
         protected String fmetaPath;

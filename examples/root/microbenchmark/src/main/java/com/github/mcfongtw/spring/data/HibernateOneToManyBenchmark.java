@@ -1,6 +1,7 @@
 package com.github.mcfongtw.spring.data;
 
-import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark;
+import com.github.mcfongtw.BenchmarkBase;
+import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Data;
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
-import org.openjdk.jmh.runner.Defaults;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -23,29 +23,54 @@ import org.springframework.data.repository.CrudRepository;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle.numberOfEntities;
 
-public class HibernateOneToManyBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 10)
+@Fork(3)
+@Threads(1)
+public class HibernateOneToManyBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan extends AbstractSpringBootBenchmark.AbstractSpringBootExecutionPlan {
+    public static class BenchmarkState extends AbstractSpringBootBenchmarkLifecycle {
 
 
         @Autowired
         private TeacherRepository teacherRepository;
 
-        @Setup(Level.Trial)
         @Override
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
             teacherRepository = configurableApplicationContext.getBean(TeacherRepository.class);
         }
 
+
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
         @TearDown(Level.Trial)
         @Override
-        public void preTrialTearDown() throws Exception {
-            super.preTrialTearDown();
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
         }
 
     }
@@ -53,9 +78,7 @@ public class HibernateOneToManyBenchmark {
     private static Logger logger = LoggerFactory.getLogger(HibernateOneToManyBenchmark.class);
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
-    public void measureUnidirectionalOneToMany(ExecutionPlan executionPlan) {
+    public void measureUnidirectionalOneToMany(BenchmarkState benchmarkState) {
         Teacher teacher = new Teacher();
         teacher.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -70,23 +93,21 @@ public class HibernateOneToManyBenchmark {
         for(Student student: studentList) {
             teacher.get_1_OneToManyStudents().add(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == numberOfEntities;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
             teacher.get_1_OneToManyStudents().remove(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == 0;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_1_OneToManyStudents().size() == 0;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
-    public void measureUnidirectionalOneToManyAndJoinColumn(ExecutionPlan executionPlan) {
+    public void measureUnidirectionalOneToManyAndJoinColumn(BenchmarkState benchmarkState) {
         Teacher teacher = new Teacher();
         teacher.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -101,23 +122,21 @@ public class HibernateOneToManyBenchmark {
         for(Student student: studentList) {
             teacher.get_2_OneToManyStudents().add(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == numberOfEntities;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
             teacher.get_2_OneToManyStudents().remove(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == 0;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_2_OneToManyStudents().size() == 0;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
-    public void measureBidirectionalOneToManyAndJoinColumn(ExecutionPlan executionPlan) {
+    public void measureBidirectionalOneToManyAndJoinColumn(BenchmarkState benchmarkState) {
         Teacher teacher = new Teacher();
         teacher.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -132,25 +151,23 @@ public class HibernateOneToManyBenchmark {
         for(Student student: studentList) {
             teacher.addStudent(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        logger.debug("get_3_OneToManyStudents 3 [{}]", executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size());
+        logger.debug("get_3_OneToManyStudents 3 [{}]", benchmarkState.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size());
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == numberOfEntities;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
             teacher.removeStudent(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == 0;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_3_OneToManyStudents().size() == 0;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=10)
-    public void measureUnidirectionalOneToManyAndOrderedColumn(ExecutionPlan executionPlan) {
+    public void measureUnidirectionalOneToManyAndOrderedColumn(BenchmarkState benchmarkState) {
         Teacher teacher = new Teacher();
         teacher.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -165,24 +182,22 @@ public class HibernateOneToManyBenchmark {
         for(Student student: studentList) {
             teacher.get_4_OneToManyStudents().add(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == numberOfEntities;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == numberOfEntities;
 
 
         for(Student student: studentList) {
             teacher.get_4_OneToManyStudents().remove(student);
         }
-        executionPlan.teacherRepository.save(teacher);
+        benchmarkState.teacherRepository.save(teacher);
 
-        assert executionPlan.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == 0;
+        assert benchmarkState.teacherRepository.findById(teacher.getId()).get().get_4_OneToManyStudents().size() == 0;
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateOneToManyBenchmark.class.getSimpleName())
-                .forks(3)
-                .warmupIterations(Defaults.WARMUP_ITERATIONS)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateOneToManyBenchmark-result.json")
                 .build();

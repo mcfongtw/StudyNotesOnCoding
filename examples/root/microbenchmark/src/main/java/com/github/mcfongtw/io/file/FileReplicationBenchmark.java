@@ -1,6 +1,6 @@
 package com.github.mcfongtw.io.file;
 
-import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
 import com.google.common.io.Files;
 import lombok.Getter;
@@ -23,13 +23,19 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
-public class FileReplicationBenchmark extends AbstractIoBenchmark {
+@BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(FileReplicationBenchmark.class);
 
     @Getter
     @State(Scope.Benchmark)
-    public static class FileReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
+    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
 
         private LatencyMetric ioLatencyMetric = new LatencyMetric(FileReplicationBenchmark.class.getName());
 
@@ -92,13 +98,10 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void zeroTransferToCopy(FileReplicationExecutionPlan plan) throws Exception {
+    public void zeroTransferToCopy(BenchmarkState state) throws Exception {
         try (
-                RandomAccessFile fromFile = new RandomAccessFile(plan.getFinPath(), "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.getFoutPath(), "rw");
+                RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
+                RandomAccessFile toFile = new RandomAccessFile(state.getFoutPath(), "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {
@@ -117,17 +120,14 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
             assert fromFile.length() == toFile.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void nioFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
-        Path srcPath = Paths.get(plan.getFinPath());
-        Path dstPath = Paths.get(plan.getFoutPath());
+    public void nioFilesCopy(BenchmarkState state) throws Exception {
+        Path srcPath = Paths.get(state.getFinPath());
+        Path dstPath = Paths.get(state.getFoutPath());
 
         long beforeTime = System.nanoTime();
 
@@ -136,16 +136,13 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
         assert srcPath.toFile().length()== dstPath.toFile().length();
 
         long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void commonIoFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
-        File srcFile = new File(plan.getFinPath());
-        File dstFile = new File(plan.getFoutPath());
+    public void commonIoFilesCopy(BenchmarkState state) throws Exception {
+        File srcFile = new File(state.getFinPath());
+        File dstFile = new File(state.getFoutPath());
 
         long beforeTime = System.nanoTime();
 
@@ -154,16 +151,13 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
         assert srcFile.length()== dstFile.length();
 
         long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void guavaFilesCopy(FileReplicationExecutionPlan plan) throws Exception {
-        File srcFile = new File(plan.getFinPath());
-        File dstFile = new File(plan.getFoutPath());
+    public void guavaFilesCopy(BenchmarkState state) throws Exception {
+        File srcFile = new File(state.getFinPath());
+        File dstFile = new File(state.getFoutPath());
 
         long beforeTime = System.nanoTime();
 
@@ -172,7 +166,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
         assert srcFile.length()== dstFile.length();
 
         long afterTime = System.nanoTime();
-        plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+        state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
     }
 
     public static void main(String[] args) throws RunnerException {
@@ -182,8 +176,6 @@ public class FileReplicationBenchmark extends AbstractIoBenchmark {
         Options opt = new OptionsBuilder()
                 .include(FileReplicationBenchmark.class.getSimpleName())
                 .detectJvmArgs()
-                .warmupIterations(10)
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("FileReplicationBenchmark-result.json")
                 .build();

@@ -13,17 +13,46 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
-public class ObjectReferenceBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 10)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class ObjectReferenceBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan {
+    public static class BenchmarkState extends SimpleBenchmarkLifecycle {
 
         @Param({"100", "10000", "1000000"})
         public int numOfRefs;
-    }
 
-    public static final int NUM_OF_ITERATIONS = 10;
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
+        @TearDown(Level.Trial)
+        @Override
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
+        }
+    }
 
     private static class FinalizedObject {
 
@@ -40,89 +69,79 @@ public class ObjectReferenceBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnWeakReference(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnWeakReference(BenchmarkState benchmarkState) {
         /*
          * A weakly referenced object will be available ONLY when the first / original referent exists.
          */
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             Object referent = new Object();
             refs[i] = new WeakReference<Object>(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnSoftReference(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnSoftReference(BenchmarkState benchmarkState) {
         /*
          * Soft Reference utilizes a LRU cache which leads to the effect that the referent is retained
          * as long as there is enough memory AND as long as it is reachable by someone.
          */
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             Object referent = new Object();
             refs[i] = new SoftReference<Object>(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnPhantomReference(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnPhantomReference(BenchmarkState benchmarkState) {
         final ReferenceQueue<Object> objectReferenceQueue = new ReferenceQueue<>();
 
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             Object referent = new Object();
             refs[i] = new PhantomReference<Object>(referent, objectReferenceQueue);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnStrongReference(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnStrongReference(BenchmarkState benchmarkState) {
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = new Object();
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
 
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnHeapBuffer(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnHeapBuffer(BenchmarkState benchmarkState) {
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
@@ -132,18 +151,16 @@ public class ObjectReferenceBenchmark {
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnDirectBuffer(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnDirectBuffer(BenchmarkState benchmarkState) {
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
             byteBuffer.put((byte) 1);
             byteBuffer.flip();
@@ -153,24 +170,22 @@ public class ObjectReferenceBenchmark {
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
                 refs[i] = null;
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureGcImpactOnFinalizedObject(ExecutionPlan executionPlan) {
+    public void measureGcImpactOnFinalizedObject(BenchmarkState benchmarkState) {
         //create
-        final Object[] refs = new Object[executionPlan.numOfRefs];
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        final Object[] refs = new Object[benchmarkState.numOfRefs];
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             Object referent = new Object();
             refs[i]  = new FinalizedObject(referent);
         }
 
         //destroy
-        for(int i = 0; i < executionPlan.numOfRefs; i++) {
+        for(int i = 0; i < benchmarkState.numOfRefs; i++) {
             refs[i] = null;
         }
     }
@@ -179,8 +194,6 @@ public class ObjectReferenceBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(ObjectReferenceBenchmark.class.getSimpleName())
-                .forks(3)
-                .warmupIterations(5)
                 .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("ObjectReferenceBenchmark-result.json")

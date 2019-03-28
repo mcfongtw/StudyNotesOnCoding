@@ -1,6 +1,6 @@
 package com.github.mcfongtw.io.file;
 
-import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.io.InfluxdbLatencyMetric;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -21,12 +21,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.*;
 
-public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
+public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(SequentialReplicationBenchmark.class);
 
     @State(Scope.Benchmark)
-    public static class SequentialReplicationExecutionPlan extends AbstractSequentialExecutionPlan {
+    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
 
         InfluxdbLatencyMetric ioLatencyMetric = new InfluxdbLatencyMetric(SequentialReplicationBenchmark.class.getName());
 
@@ -66,23 +66,23 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRawBuffer(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithRawBuffer(BenchmarkState state) throws IOException {
         try(
-            FileInputStream fin = new FileInputStream(plan.getFinPath());
-            FileOutputStream fout = new FileOutputStream(plan.getFoutPath());
+            FileInputStream fin = new FileInputStream(state.getFinPath());
+            FileOutputStream fout = new FileOutputStream(state.getFoutPath());
         ) {
             long beforeTime = System.nanoTime();
 
-            byte[] buffer = new byte[plan.bufferSize];
+            byte[] buffer = new byte[state.bufferSize];
             int numBytesRead = 0;
             while ((numBytesRead = fin.read(buffer)) != -1) {
                 fout.write(buffer, 0, numBytesRead);
             }
 
-            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
+            assert new File(state.getFinPath()).length() == new File(state.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -90,10 +90,10 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithBufferedFileStream(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithBufferedFileStream(BenchmarkState state) throws IOException {
         try(
-            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(plan.getFinPath()), plan.bufferSize);
-            BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(plan.getFoutPath()), plan.bufferSize);
+            BufferedInputStream fin = new BufferedInputStream(new FileInputStream(state.getFinPath()), state.bufferSize);
+            BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(state.getFoutPath()), state.bufferSize);
         ) {
             long beforeTime = System.nanoTime();
 
@@ -103,10 +103,10 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             }
             fout.flush();
 
-            assert new File(plan.getFinPath()).length() == new File(plan.getFoutPath()).length();
+            assert new File(state.getFinPath()).length() == new File(state.getFoutPath()).length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -114,22 +114,22 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithFileChannel(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithFileChannel(BenchmarkState state) throws IOException {
         try(
-            FileChannel finChannel = new FileInputStream(plan.getFinPath()).getChannel();
-            FileChannel foutChannel = new FileOutputStream(plan.getFoutPath()).getChannel();
+            FileChannel finChannel = new FileInputStream(state.getFinPath()).getChannel();
+            FileChannel foutChannel = new FileOutputStream(state.getFoutPath()).getChannel();
         ) {
             long beforeTime = System.nanoTime();
             int finLength = (int) finChannel.size();
 
             for (int bufIndex = 0; bufIndex < finLength; ) {
-                ByteBuffer buffer = ByteBuffer.allocate(plan.bufferSize);
+                ByteBuffer buffer = ByteBuffer.allocate(state.bufferSize);
                 int bufLength = 0;
 
-                if (bufIndex + plan.bufferSize > finLength) {
-                    bufLength = finLength % plan.bufferSize;
+                if (bufIndex + state.bufferSize > finLength) {
+                    bufLength = finLength % state.bufferSize;
                 } else {
-                    bufLength = plan.bufferSize;
+                    bufLength = state.bufferSize;
                 }
 
                 finChannel.read(buffer);
@@ -140,13 +140,13 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
                 bufIndex += bufLength;
 
-                LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferSize});
+                LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
             }
 
             assert finChannel.size() == foutChannel.size();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -154,23 +154,23 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithAsyncFileChannel(SequentialReplicationExecutionPlan plan) throws IOException, InterruptedException, ExecutionException {
+    public void copyWithAsyncFileChannel(BenchmarkState state) throws IOException, InterruptedException, ExecutionException {
         try(
-                AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(plan.getFinPath()), StandardOpenOption.READ);
-                AsynchronousFileChannel foutChannel = AsynchronousFileChannel.open(Paths.get(plan.getFoutPath()), StandardOpenOption.WRITE);
+                AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(state.getFinPath()), StandardOpenOption.READ);
+                AsynchronousFileChannel foutChannel = AsynchronousFileChannel.open(Paths.get(state.getFoutPath()), StandardOpenOption.WRITE);
         ) {
             long beforeTime = System.nanoTime();
             int finLength = (int) finChannel.size();
             Semaphore semaphore = new Semaphore(1);
 
             for (int bufIndex = 0; bufIndex < finLength; ) {
-                ByteBuffer buffer = ByteBuffer.allocate(plan.bufferSize);
+                ByteBuffer buffer = ByteBuffer.allocate(state.bufferSize);
                 int bufLength = 0;
 
-                if (bufIndex + plan.bufferSize > finLength) {
-                    bufLength = finLength % plan.bufferSize;
+                if (bufIndex + state.bufferSize > finLength) {
+                    bufLength = finLength % state.bufferSize;
                 } else {
-                    bufLength = plan.bufferSize;
+                    bufLength = state.bufferSize;
                 }
 
 
@@ -184,7 +184,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
 
                     @Override
                     public void completed(Integer result, Semaphore lock) {
-                        LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, plan.bufferSize});
+                        LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, state.bufferSize});
 
                         lock.release();
                     }
@@ -205,7 +205,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             assert finChannel.size() == foutChannel.size();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -213,10 +213,10 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithMmap(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithMmap(BenchmarkState state) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
-                RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
+                RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
+                RandomAccessFile fout = new RandomAccessFile(state.getFoutPath(), "rw");
                 FileChannel finChannel = fin.getChannel();
                 FileChannel foutChannel = fout.getChannel();
         ) {
@@ -231,25 +231,25 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             for (int bufIndex = 0; bufIndex < finLength; ) {
                 int bufLength = 0;
 
-                if (bufIndex + plan.bufferSize > finLength) {
-                    bufLength = finLength % plan.bufferSize;
+                if (bufIndex + state.bufferSize > finLength) {
+                    bufLength = finLength % state.bufferSize;
                 } else {
-                    bufLength = plan.bufferSize;
+                    bufLength = state.bufferSize;
                 }
 
                 byte buffer[] = new byte[bufLength];
                 bufIn.get(buffer, 0, bufLength);
                 bufOut.put(buffer);
 
-                bufIndex += plan.bufferSize;
+                bufIndex += state.bufferSize;
 
-                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.bufferSize});
+                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
             }
 
             assert fin.length() == fout.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
     }
@@ -258,15 +258,15 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRawBufferedRandomAccessFile(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void copyWithRawBufferedRandomAccessFile(BenchmarkState state) throws IOException {
         try (
-                RandomAccessFile fin = new RandomAccessFile(plan.getFinPath(), "r");
-                RandomAccessFile fout = new RandomAccessFile(plan.getFoutPath(), "rw");
+                RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
+                RandomAccessFile fout = new RandomAccessFile(state.getFoutPath(), "rw");
 
         ) {
             long beforeTime = System.nanoTime();
 
-            byte[] buffer = new byte[plan.bufferSize];
+            byte[] buffer = new byte[state.bufferSize];
 
             int bufLength = fin.read(buffer);
 
@@ -283,7 +283,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             assert fin.length() == fout.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
 
     }
@@ -292,10 +292,10 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void zeroTransferToCopy(SequentialReplicationExecutionPlan plan) throws Exception {
+    public void zeroTransferToCopy(BenchmarkState state) throws Exception {
         try (
-                RandomAccessFile fromFile = new RandomAccessFile(plan.getFinPath(), "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.getFoutPath(), "rw");
+                RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
+                RandomAccessFile toFile = new RandomAccessFile(state.getFoutPath(), "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {
@@ -307,28 +307,28 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             for (int toIndex = 0; toIndex < fromLength; ) {
                 int bufLength = 0;
 
-                if (toIndex + plan.bufferSize > fromLength) {
-                    bufLength = fromLength % plan.bufferSize;
+                if (toIndex + state.bufferSize > fromLength) {
+                    bufLength = fromLength % state.bufferSize;
                 } else {
-                    bufLength = plan.bufferSize;
+                    bufLength = state.bufferSize;
                 }
 
 
                 long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                 if(returnCode >= 0 ) {
-                    LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, plan.bufferSize});
+                    LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.bufferSize});
                 } else {
                     LOG.warn("transferTo failed! error code: [{}]", returnCode);
                 }
 
-                toIndex += plan.bufferSize;
+                toIndex += state.bufferSize;
             }
 
 
             assert fromFile.length() == toFile.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -336,10 +336,10 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void zeroTransferFromCopy(SequentialReplicationExecutionPlan plan) throws IOException {
+    public void zeroTransferFromCopy(BenchmarkState state) throws IOException {
         try (
-                RandomAccessFile fromFile = new RandomAccessFile(plan.getFinPath(), "r");
-                RandomAccessFile toFile = new RandomAccessFile(plan.getFoutPath(), "rw");
+                RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
+                RandomAccessFile toFile = new RandomAccessFile(state.getFoutPath(), "rw");
                 FileChannel fromChannel = fromFile.getChannel();
                 FileChannel toChannel = toFile.getChannel();
         ) {
@@ -351,28 +351,28 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmark {
             for (int fromIndex = 0; fromIndex < fromLength; ) {
                 int bufLength = 0;
 
-                if (fromIndex + plan.bufferSize > fromLength) {
-                    bufLength = fromLength % plan.bufferSize;
+                if (fromIndex + state.bufferSize > fromLength) {
+                    bufLength = fromLength % state.bufferSize;
                 } else {
-                    bufLength = plan.bufferSize;
+                    bufLength = state.bufferSize;
                 }
 
 
                 long returnCode = toChannel.transferFrom(fromChannel, fromIndex, bufLength);
 
                 if(returnCode >= 0 ) {
-                    LOG.debug("transferFrom [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{fromIndex, fromLength, plan.bufferSize});
+                    LOG.debug("transferFrom [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{fromIndex, fromLength, state.bufferSize});
                 } else {
                     LOG.warn("transferFrom failed! error code: [{}]", returnCode);
                 }
 
-                fromIndex += plan.bufferSize;
+                fromIndex += state.bufferSize;
             }
 
             assert fromFile.length() == toFile.length();
 
             long afterTime = System.nanoTime();
-            plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+            state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
         }
     }
 

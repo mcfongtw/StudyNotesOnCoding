@@ -1,6 +1,7 @@
 package com.github.mcfongtw.spring.data;
 
-import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark;
+import com.github.mcfongtw.BenchmarkBase;
+import com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Data;
@@ -21,19 +22,24 @@ import javax.persistence.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.DEFAULT_NUMBER_OF_ITERATIONS;
-import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmark.numberOfEntities;
+import static com.github.mcfongtw.spring.boot.AbstractSpringBootBenchmarkLifecycle.numberOfEntities;
 
-public class HibernateListVsSetBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 10)
+@Fork(3)
+@Threads(1)
+public class HibernateListVsSetBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan extends AbstractSpringBootBenchmark.AbstractSpringBootExecutionPlan {
+    public static class BenchmarkState extends AbstractSpringBootBenchmarkLifecycle {
 
         @Autowired
         private EmployerRepository employerRepository;
 
-        @Setup(Level.Trial)
         @Override
         public void preTrialSetUp() throws Exception {
             super.preTrialSetUp();
@@ -41,17 +47,33 @@ public class HibernateListVsSetBenchmark {
             employerRepository = configurableApplicationContext.getBean(EmployerRepository.class);
         }
 
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
         @TearDown(Level.Trial)
         @Override
-        public void preTrialTearDown() throws Exception {
-            super.preTrialTearDown();
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
         }
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureOneToManyWithSet(ExecutionPlan executionPlan) {
+    public void measureOneToManyWithSet(BenchmarkState benchmarkState) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -67,25 +89,23 @@ public class HibernateListVsSetBenchmark {
             employer.addEmployeeToSet(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == numberOfEntities;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == numberOfEntities;
 
 
         for(Employee employee: employeeList) {
             employer.removeEmployeeFromSet(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == 0;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getSetOfEmployeees().size() == 0;
 
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureOneToManyWithList(ExecutionPlan executionPlan) {
+    public void measureOneToManyWithList(BenchmarkState benchmarkState) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -101,24 +121,22 @@ public class HibernateListVsSetBenchmark {
             employer.addEmployeeToList(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
 
 
         for(Employee employee: employeeList) {
             employer.removeEmployeeFromList(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == 0;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == 0;
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureSortWithList(ExecutionPlan executionPlan) {
+    public void measureSortWithList(BenchmarkState benchmarkState) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -134,17 +152,15 @@ public class HibernateListVsSetBenchmark {
             employer.addEmployeeToList(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
 
         employer.getListOfEmployeees().sort(Comparator.comparing(Employee::getName));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations = DEFAULT_NUMBER_OF_ITERATIONS)
-    public void measureSortWithTreeSet(ExecutionPlan executionPlan) {
+    public void measureSortWithTreeSet(BenchmarkState benchmarkState) {
         Employer employer = new Employer();
         employer.setName(RandomStringUtils.randomAlphabetic(10));
 
@@ -160,15 +176,14 @@ public class HibernateListVsSetBenchmark {
             employer.addEmployeeToSet(employee);
         }
 
-        executionPlan.employerRepository.save(employer);
+        benchmarkState.employerRepository.save(employer);
 
-        assert executionPlan.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
+        assert benchmarkState.employerRepository.findById(employer.getId()).get().getListOfEmployeees().size() == numberOfEntities;
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(HibernateListVsSetBenchmark.class.getSimpleName())
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("HibernateListVsSetBenchmark-result.json")
                 .build();

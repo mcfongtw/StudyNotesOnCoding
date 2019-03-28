@@ -1,6 +1,6 @@
 package com.github.mcfongtw.io.file;
 
-import com.github.mcfongtw.io.AbstractIoBenchmark;
+import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
 import com.google.common.io.Files;
 import lombok.Getter;
@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MemoryPagingBenchmark extends AbstractIoBenchmark {
+public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(MemoryPagingBenchmark.class);
 
     @Getter
     @State(Scope.Benchmark)
-    public static class MemoryPagingBenchmarkExecutionPlan extends AbstractSequentialExecutionPlan {
+    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
 
         private final static int MAX_NUM_FILES = 100;
 
@@ -105,17 +105,17 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRawBuffer(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithRawBuffer(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     FileInputStream fin = new FileInputStream(finPath);
                     FileOutputStream fout = new FileOutputStream(foutPath);
             ) {
                 long beforeTime = System.nanoTime();
 
-                byte[] buffer = new byte[plan.BUFFER_SIZE];
+                byte[] buffer = new byte[state.BUFFER_SIZE];
                 int numBytesRead = 0;
                 while ((numBytesRead = fin.read(buffer)) != -1) {
                     fout.write(buffer, 0, numBytesRead);
@@ -124,7 +124,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 assert new File(finPath).length() == new File(foutPath).length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }
@@ -133,13 +133,13 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithBufferedFileStream(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithBufferedFileStream(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
-                    BufferedInputStream fin = new BufferedInputStream(new FileInputStream(finPath), plan.BUFFER_SIZE);
-                    BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(foutPath), plan.BUFFER_SIZE);
+                    BufferedInputStream fin = new BufferedInputStream(new FileInputStream(finPath), state.BUFFER_SIZE);
+                    BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(foutPath), state.BUFFER_SIZE);
             ) {
                 long beforeTime = System.nanoTime();
 
@@ -152,7 +152,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 assert new File(finPath).length() == new File(foutPath).length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
 
 
@@ -163,10 +163,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithFileChannel(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithFileChannel(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     FileChannel finChannel = new FileInputStream(finPath).getChannel();
                     FileChannel foutChannel = new FileOutputStream(foutPath).getChannel();
@@ -175,13 +175,13 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 int finLength = (int) finChannel.size();
 
                 for (int bufIndex = 0; bufIndex < finLength; ) {
-                    ByteBuffer buffer = ByteBuffer.allocate(plan.BUFFER_SIZE);
+                    ByteBuffer buffer = ByteBuffer.allocate(state.BUFFER_SIZE);
                     int bufLength = 0;
 
-                    if (bufIndex + plan.BUFFER_SIZE > finLength) {
-                        bufLength = finLength % plan.BUFFER_SIZE;
+                    if (bufIndex + state.BUFFER_SIZE > finLength) {
+                        bufLength = finLength % state.BUFFER_SIZE;
                     } else {
-                        bufLength = plan.BUFFER_SIZE;
+                        bufLength = state.BUFFER_SIZE;
                     }
 
                     finChannel.read(buffer);
@@ -192,13 +192,13 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
 
                     bufIndex += bufLength;
 
-                    LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.BUFFER_SIZE});
+                    LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert finChannel.size() == foutChannel.size();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }
@@ -207,10 +207,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithMmap(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithMmap(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
 
             try (
 
@@ -230,25 +230,25 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 for (int bufIndex = 0; bufIndex < finLength; ) {
                     int bufLength = 0;
 
-                    if (bufIndex + plan.BUFFER_SIZE > finLength) {
-                        bufLength = finLength % plan.BUFFER_SIZE;
+                    if (bufIndex + state.BUFFER_SIZE > finLength) {
+                        bufLength = finLength % state.BUFFER_SIZE;
                     } else {
-                        bufLength = plan.BUFFER_SIZE;
+                        bufLength = state.BUFFER_SIZE;
                     }
 
                     byte buffer[] = new byte[bufLength];
                     bufIn.get(buffer, 0, bufLength);
                     bufOut.put(buffer);
 
-                    bufIndex += plan.BUFFER_SIZE;
+                    bufIndex += state.BUFFER_SIZE;
 
-                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.BUFFER_SIZE});
+                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert fin.length() == fout.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
 
@@ -258,10 +258,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithMmapAndFsync(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithMmapAndFsync(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
 
             try (
 
@@ -281,25 +281,25 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 for (int bufIndex = 0; bufIndex < finLength; ) {
                     int bufLength = 0;
 
-                    if (bufIndex + plan.BUFFER_SIZE > finLength) {
-                        bufLength = finLength % plan.BUFFER_SIZE;
+                    if (bufIndex + state.BUFFER_SIZE > finLength) {
+                        bufLength = finLength % state.BUFFER_SIZE;
                     } else {
-                        bufLength = plan.BUFFER_SIZE;
+                        bufLength = state.BUFFER_SIZE;
                     }
 
                     byte buffer[] = new byte[bufLength];
                     bufIn.get(buffer, 0, bufLength);
                     bufOut.put(buffer);
 
-                    bufIndex += plan.BUFFER_SIZE;
+                    bufIndex += state.BUFFER_SIZE;
 
-                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, plan.BUFFER_SIZE});
+                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert fin.length() == fout.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
 
@@ -309,10 +309,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRawBufferedRandomAccessFile(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithRawBufferedRandomAccessFile(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     RandomAccessFile fin = new RandomAccessFile(finPath, "r");
                     RandomAccessFile fout = new RandomAccessFile(foutPath, "rw");
@@ -320,7 +320,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
             ) {
                 long beforeTime = System.nanoTime();
 
-                byte[] buffer = new byte[plan.BUFFER_SIZE];
+                byte[] buffer = new byte[state.BUFFER_SIZE];
 
                 int bufLength = fin.read(buffer);
 
@@ -337,7 +337,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 assert fin.length() == fout.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }
@@ -346,10 +346,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void copyWithRawBufferedRandomAccessFileAndFsync(MemoryPagingBenchmarkExecutionPlan plan) throws IOException {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void copyWithRawBufferedRandomAccessFileAndFsync(BenchmarkState state) throws IOException {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     RandomAccessFile fin = new RandomAccessFile(finPath, "r");
                     RandomAccessFile fout = new RandomAccessFile(foutPath, "rws");
@@ -357,7 +357,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
             ) {
                 long beforeTime = System.nanoTime();
 
-                byte[] buffer = new byte[plan.BUFFER_SIZE];
+                byte[] buffer = new byte[state.BUFFER_SIZE];
 
                 int bufLength = fin.read(buffer);
 
@@ -374,7 +374,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 assert fin.length() == fout.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }
@@ -383,10 +383,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void zeroTransferToCopy(MemoryPagingBenchmarkExecutionPlan plan) throws Exception {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void zeroTransferToCopy(BenchmarkState state) throws Exception {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     RandomAccessFile fromFile = new RandomAccessFile(finPath, "r");
                     RandomAccessFile toFile = new RandomAccessFile(foutPath, "rw");
@@ -401,28 +401,28 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 for (int toIndex = 0; toIndex < fromLength; ) {
                     int bufLength = 0;
 
-                    if (toIndex + plan.BUFFER_SIZE > fromLength) {
-                        bufLength = fromLength % plan.BUFFER_SIZE;
+                    if (toIndex + state.BUFFER_SIZE > fromLength) {
+                        bufLength = fromLength % state.BUFFER_SIZE;
                     } else {
-                        bufLength = plan.BUFFER_SIZE;
+                        bufLength = state.BUFFER_SIZE;
                     }
 
 
                     long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                     if (returnCode >= 0) {
-                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, plan.BUFFER_SIZE});
+                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
                     } else {
                         LOG.warn("transferTo failed! error code: [{}]", returnCode);
                     }
 
-                    toIndex += plan.BUFFER_SIZE;
+                    toIndex += state.BUFFER_SIZE;
                 }
 
 
                 assert fromFile.length() == toFile.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }
@@ -431,10 +431,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
     @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-    public void zeroTransferToCopyAndFsync(MemoryPagingBenchmarkExecutionPlan plan) throws Exception {
-        for(int index = 0; index < plan.MAX_NUM_FILES; index++) {
-            String finPath = plan.listOfFinPath.get(index);
-            String foutPath = plan.listOfFoutPath.get(index);
+    public void zeroTransferToCopyAndFsync(BenchmarkState state) throws Exception {
+        for(int index = 0; index < state.MAX_NUM_FILES; index++) {
+            String finPath = state.listOfFinPath.get(index);
+            String foutPath = state.listOfFoutPath.get(index);
             try (
                     RandomAccessFile fromFile = new RandomAccessFile(finPath, "r");
                     RandomAccessFile toFile = new RandomAccessFile(foutPath, "rws");
@@ -449,28 +449,28 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmark {
                 for (int toIndex = 0; toIndex < fromLength; ) {
                     int bufLength = 0;
 
-                    if (toIndex + plan.BUFFER_SIZE > fromLength) {
-                        bufLength = fromLength % plan.BUFFER_SIZE;
+                    if (toIndex + state.BUFFER_SIZE > fromLength) {
+                        bufLength = fromLength % state.BUFFER_SIZE;
                     } else {
-                        bufLength = plan.BUFFER_SIZE;
+                        bufLength = state.BUFFER_SIZE;
                     }
 
 
                     long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                     if (returnCode >= 0) {
-                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, plan.BUFFER_SIZE});
+                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
                     } else {
                         LOG.warn("transferTo failed! error code: [{}]", returnCode);
                     }
 
-                    toIndex += plan.BUFFER_SIZE;
+                    toIndex += state.BUFFER_SIZE;
                 }
 
 
                 assert fromFile.length() == toFile.length();
 
                 long afterTime = System.nanoTime();
-                plan.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+                state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
             }
         }
     }

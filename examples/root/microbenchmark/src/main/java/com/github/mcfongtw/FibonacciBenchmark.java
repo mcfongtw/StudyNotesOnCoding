@@ -1,7 +1,6 @@
 package com.github.mcfongtw;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import io.reactivex.Observable;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -12,20 +11,47 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import reactor.core.publisher.Flux;
-import reactor.util.function.Tuples;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class FibonacciBenchmark {
-
-    private static final int NUM_ITERATION = 10;
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 10)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class FibonacciBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan {
+    public static class BenchmarkState extends SimpleBenchmarkLifecycle {
         @Param({"10", "50"})
         public int FIB_NUMBER_INDEX;
+
+
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
+        @TearDown(Level.Trial)
+        @Override
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
+        }
     }
 
     /*          1              , if x = 1
@@ -124,78 +150,49 @@ public class FibonacciBenchmark {
         return fib;
     }
 
-
-
-
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureRecursive(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doRecursion(executionPlan.FIB_NUMBER_INDEX));
+    public void measureRecursive(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doRecursion(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureTailRecursive(ExecutionPlan executionPlan, Blackhole blackhole){
-        blackhole.consume(doTailRecursive(executionPlan.FIB_NUMBER_INDEX));
+    public void measureTailRecursive(BenchmarkState benchmarkState, Blackhole blackhole){
+        blackhole.consume(doTailRecursive(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureIterative(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doIterative(executionPlan.FIB_NUMBER_INDEX));
+    public void measureIterative(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doIterative(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureDynamicProgrammingTopDown(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doDpTopDown(executionPlan.FIB_NUMBER_INDEX));
+    public void measureDynamicProgrammingTopDown(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doDpTopDown(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureDynamicProgrammingBottomUp(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doDpBottomUp(executionPlan.FIB_NUMBER_INDEX));
+    public void measureDynamicProgrammingBottomUp(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doDpBottomUp(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureJavaStream(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doJava8Stream(executionPlan.FIB_NUMBER_INDEX));
+    public void measureJavaStream(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doJava8Stream(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureRxStream(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doRxStream(executionPlan.FIB_NUMBER_INDEX));
+    public void measureRxStream(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doRxStream(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    @Measurement(iterations=NUM_ITERATION)
-    public void measureReactorStream(ExecutionPlan executionPlan, Blackhole blackhole) {
-        blackhole.consume(doReactorStream(executionPlan.FIB_NUMBER_INDEX));
+    public void measureReactorStream(BenchmarkState benchmarkState, Blackhole blackhole) {
+        blackhole.consume(doReactorStream(benchmarkState.FIB_NUMBER_INDEX));
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(FibonacciBenchmark.class.getSimpleName())
-                .forks(3)
-                .warmupIterations(5)
                 .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("FibonacciBenchmark-result.json")
