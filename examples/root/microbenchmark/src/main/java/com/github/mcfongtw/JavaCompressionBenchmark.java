@@ -20,29 +20,57 @@ import org.xerial.snappy.Snappy;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
-public class JavaCompressionBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 10)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class JavaCompressionBenchmark extends BenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(JavaCompressionBenchmark.class);
 
-    public static final int NUM_OF_ITERATIONS = 10;
-
     @State(Scope.Benchmark)
-    public static class ExecutionPlan {
-        public final String CORPUS_URL_TEXT = "corpus/urls.10K";
+    public static class BenchmarkState extends SimpleBenchmarkLifecycle {
 
-        public final String CORPUS_URL_GPB = "corpus/geo.protodata";
+        public static final String CORPUS_URL_TEXT = "corpus/urls.10K";
 
-        public final String CORPUS_URL_IMAGE = "corpus/fireworks.jpeg";
+        public static final String CORPUS_URL_GPB = "corpus/geo.protodata";
+
+        public static final String CORPUS_URL_IMAGE = "corpus/fireworks.jpeg";
+
+        @Setup(Level.Trial)
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
+        }
+
+        @TearDown(Level.Trial)
+        @Override
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+        }
+
+        @Setup(Level.Iteration)
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
+        }
+
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
+        }
     }
     
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureSnappyWithTextCorpus(ExecutionPlan plan) throws IOException {
+    public void measureSnappyWithTextCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_TEXT);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_TEXT);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -63,11 +91,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureSnappyWithGpbCorpus(ExecutionPlan plan) throws IOException {
+    public void measureSnappyWithGpbCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_GPB);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_GPB);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -88,11 +114,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureSnappyWithImageCorpus(ExecutionPlan plan) throws IOException {
+    public void measureSnappyWithImageCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_IMAGE);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_IMAGE);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -113,11 +137,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLz4WithTextCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLz4WithTextCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_TEXT);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_TEXT);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -147,11 +169,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLz4WithGpbCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLz4WithGpbCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_GPB);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_GPB);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -181,11 +201,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.Throughput})
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLz4WithImageCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLz4WithImageCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_IMAGE);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_IMAGE);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -215,11 +233,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLzfWithTextCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLzfWithTextCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_TEXT);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_TEXT);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -240,11 +256,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLzfWithGpbCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLzfWithGpbCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_GPB);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_GPB);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 
@@ -265,11 +279,9 @@ public class JavaCompressionBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.Throughput)
-    @Measurement(iterations=NUM_OF_ITERATIONS)
-    public void measureLzfWithImageCorpus(ExecutionPlan plan) throws IOException {
+    public void measureLzfWithImageCorpus(BenchmarkState benchmarkState) throws IOException {
         try(
-                InputStream fin = getClass().getClassLoader().getResourceAsStream(plan.CORPUS_URL_IMAGE);
+                InputStream fin = getClass().getClassLoader().getResourceAsStream(benchmarkState.CORPUS_URL_IMAGE);
         ) {
             byte[] uncompressed = IOUtils.toByteArray(fin);
 

@@ -23,8 +23,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Measurement(iterations = 20)
 @Warmup(iterations = 5)
 @Fork(3)
@@ -175,7 +175,6 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(FileReplicationBenchmark.class.getSimpleName())
-                .detectJvmArgs()
                 .resultFormat(ResultFormatType.JSON)
                 .result("FileReplicationBenchmark-result.json")
                 .build();

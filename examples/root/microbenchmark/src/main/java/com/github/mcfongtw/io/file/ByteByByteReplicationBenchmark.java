@@ -15,6 +15,12 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
 public class ByteByByteReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(ByteByByteReplicationBenchmark.class);
@@ -54,9 +60,6 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 2, timeUnit = TimeUnit.SECONDS)
     public void copyWithFileStream(BenchmarkState state) throws IOException {
         try(
                 FileInputStream fin = new FileInputStream(state.getFinPath());
@@ -79,9 +82,6 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmarkBase {
 
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRandomAccessFile(BenchmarkState state) throws IOException {
         try(
             RandomAccessFile fout = new RandomAccessFile(state.getFoutPath(), "rw");
@@ -109,9 +109,6 @@ public class ByteByByteReplicationBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(ByteByByteReplicationBenchmark.class.getSimpleName())
-                .detectJvmArgs()
-                .warmupIterations(10)
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("ByteByByteReplicationBenchmark-result.json")
                 .build();

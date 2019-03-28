@@ -23,8 +23,6 @@ import static com.github.mcfongtw.io.AbstractIoBenchmarkBase.AbstractRandomAcces
 
 public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
 
-    protected static final int NUM_ITERATION = 20;
-
     protected static final int SLEEP_TIME_BETWEEN_TRIALS_IN_MILLIS = 30 * 1000;
 
     protected static final int UNIT_ONE_KILO = 1024;

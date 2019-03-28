@@ -3,6 +3,7 @@ package com.github.mcfongtw;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -16,10 +17,16 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
-public class TryWithResourceBenchmark {
+@BenchmarkMode({Mode.Throughput})
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 10)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
+public class TryWithResourceBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
-    public static class ExecutionPlan {
+    public static class BenchmarkState extends SimpleBenchmarkLifecycle {
 
         File tryWithResourceTempDir;
 
@@ -28,7 +35,9 @@ public class TryWithResourceBenchmark {
         int count = 1;
 
         @Setup(Level.Trial)
-        public void setUp() {
+        @Override
+        public void doTrialSetUp() throws Exception {
+            super.doTrialSetUp();
             tryWithResourceTempDir = Files.createTempDir();
             new File(tryWithResourceTempDir.getAbsolutePath() + "/in/").mkdirs();
             new File(tryWithResourceTempDir.getAbsolutePath() + "/out/").mkdirs();
@@ -41,7 +50,10 @@ public class TryWithResourceBenchmark {
         }
 
         @TearDown(Level.Trial)
-        public void tearDown() throws IOException {
+        @Override
+        public void doTrialTearDown() throws Exception {
+            super.doTrialTearDown();
+
             FileUtils.deleteDirectory(tryWithResourceTempDir);
             System.out.println("Temp dir deleted at [" + tryWithResourceTempDir.getAbsolutePath() + "]");
 
@@ -50,7 +62,9 @@ public class TryWithResourceBenchmark {
         }
 
         @Setup(Level.Iteration)
-        public void iterate() throws IOException {
+        @Override
+        public void doIterationSetup() throws Exception {
+            super.doIterationSetup();
             count++;
             FileUtils.touch(new File(tryWithResourceTempDir.getAbsolutePath() + "/in/" + count + ".data"));
             FileUtils.touch(new File(tryWithResourceTempDir.getAbsolutePath() + "/out/" + count + ".data"));
@@ -58,17 +72,20 @@ public class TryWithResourceBenchmark {
             FileUtils.touch(new File(tryCatchFinallyTempDir.getAbsolutePath() + "/out/" + count + ".data"));
         }
 
+        @TearDown(Level.Iteration)
+        @Override
+        public void doIterationTearDown() throws Exception {
+            super.doIterationTearDown();
+        }
+
     }
 
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 1000, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void measureCompressionOnTryWithResource(ExecutionPlan plan) throws IOException {
+    public void measureCompressionOnTryWithResource(BenchmarkState state) throws IOException {
         try(
-                FileInputStream fin = new FileInputStream(plan.tryWithResourceTempDir.getAbsolutePath() + "/in/" + plan.count + ".data");
-                FileOutputStream fout = new FileOutputStream(plan.tryWithResourceTempDir.getAbsolutePath() + "/out/" + plan.count + ".data");
+                FileInputStream fin = new FileInputStream(state.tryWithResourceTempDir.getAbsolutePath() + "/in/" + state.count + ".data");
+                FileOutputStream fout = new FileOutputStream(state.tryWithResourceTempDir.getAbsolutePath() + "/out/" + state.count + ".data");
                 GZIPOutputStream out = new GZIPOutputStream(fout)
         ) {
             byte[] buffer = new byte[4096];
@@ -80,10 +97,7 @@ public class TryWithResourceBenchmark {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = 1000, time = 200, timeUnit = TimeUnit.MILLISECONDS)
-    public void measureCompressOnTryCatchFinally(ExecutionPlan state)
+    public void measureCompressOnTryCatchFinally(BenchmarkState state)
             throws IOException {
         FileInputStream localFileInputStream = new FileInputStream(state.tryCatchFinallyTempDir.getAbsolutePath() + "/in/" + state.count + ".data");
         Throwable localThrowable1 = null;
@@ -152,7 +166,7 @@ public class TryWithResourceBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(TryWithResourceBenchmark.class.getSimpleName())
-                .forks(1)
+                .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("TryWithResourceBenchmark-result.json")
                 .build();

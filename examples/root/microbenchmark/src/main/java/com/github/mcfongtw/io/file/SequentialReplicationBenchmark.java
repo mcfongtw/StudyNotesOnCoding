@@ -21,6 +21,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.*;
 
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
 public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(SequentialReplicationBenchmark.class);
@@ -63,9 +69,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBuffer(BenchmarkState state) throws IOException {
         try(
             FileInputStream fin = new FileInputStream(state.getFinPath());
@@ -87,9 +90,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithBufferedFileStream(BenchmarkState state) throws IOException {
         try(
             BufferedInputStream fin = new BufferedInputStream(new FileInputStream(state.getFinPath()), state.bufferSize);
@@ -111,9 +111,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithFileChannel(BenchmarkState state) throws IOException {
         try(
             FileChannel finChannel = new FileInputStream(state.getFinPath()).getChannel();
@@ -151,9 +148,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithAsyncFileChannel(BenchmarkState state) throws IOException, InterruptedException, ExecutionException {
         try(
                 AsynchronousFileChannel finChannel = AsynchronousFileChannel.open(Paths.get(state.getFinPath()), StandardOpenOption.READ);
@@ -210,9 +204,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmap(BenchmarkState state) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
@@ -255,9 +246,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBufferedRandomAccessFile(BenchmarkState state) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
@@ -289,9 +277,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(BenchmarkState state) throws Exception {
         try (
                 RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
@@ -333,9 +318,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferFromCopy(BenchmarkState state) throws IOException {
         try (
                 RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
@@ -383,9 +365,6 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(SequentialReplicationBenchmark.class.getSimpleName())
-                .detectJvmArgs()
-                .warmupIterations(10)
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("SequentialReplicationBenchmark-result.json")
                 .build();

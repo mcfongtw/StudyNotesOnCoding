@@ -22,6 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
 public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(MemoryPagingBenchmark.class);
@@ -102,9 +108,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBuffer(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -130,9 +133,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithBufferedFileStream(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -160,9 +160,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithFileChannel(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -204,9 +201,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmap(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -255,9 +249,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithMmapAndFsync(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -306,9 +297,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBufferedRandomAccessFile(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -343,9 +331,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void copyWithRawBufferedRandomAccessFileAndFsync(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -380,9 +365,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopy(BenchmarkState state) throws Exception {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -428,9 +410,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void zeroTransferToCopyAndFsync(BenchmarkState state) throws Exception {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
             String finPath = state.listOfFinPath.get(index);
@@ -481,9 +460,6 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(MemoryPagingBenchmark.class.getSimpleName())
-                .detectJvmArgs()
-                .warmupIterations(10)
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("MemoryPagingBenchmark-result.json")
                 .build();

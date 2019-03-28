@@ -7,6 +7,8 @@ public abstract class AbstractBenchmarkLifecycle implements BenchmarkLifecycle {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    ////////////[Setup Trial]////////////////////////
+
     @Override
     public void preTrialSetUp() throws Exception {
         logger.trace("[preTrialSetUp]");
@@ -23,6 +25,8 @@ public abstract class AbstractBenchmarkLifecycle implements BenchmarkLifecycle {
     public void postTrialSetUp() throws Exception {
         logger.trace("[postTrialSetUp]");
     }
+
+    ////////////[TearDown Trial]////////////////////////
 
     @Override
     public void preTrialTearDown() throws Exception {
@@ -41,6 +45,8 @@ public abstract class AbstractBenchmarkLifecycle implements BenchmarkLifecycle {
         logger.trace("[postTrialTearDown]");
     }
 
+    ////////////[Setup Iteration]////////////////////////
+
     @Override
     public void preIterationSetup() throws Exception {
         logger.trace("[preIterationSetup]");
@@ -58,6 +64,8 @@ public abstract class AbstractBenchmarkLifecycle implements BenchmarkLifecycle {
         logger.trace("[postIterationSetup]");
     }
 
+    ////////////[TearDown Iteration]////////////////////////
+
     @Override
     public void preIterationTearDown() throws Exception{
         logger.trace("[preIterationTearDown]");
@@ -72,6 +80,51 @@ public abstract class AbstractBenchmarkLifecycle implements BenchmarkLifecycle {
 
     @Override
     public void postIterationTearDown()  throws Exception {
+        logger.trace("[postIterationTearDown]");
+    }
+
+
+    ////////////[Setup Invocation]////////////////////////
+    // WARNING: Level.Invocation should be used carefully!
+    //
+    // Level.Invocation influences the WarmUp iterations
+    //////////////////////////////////////////////////////
+
+    @Override
+    public void preInvocationSetup() throws Exception {
+        logger.trace("[preInvocationSetup]");
+    }
+
+    @Override
+    public void doInvocationSetup() throws Exception {
+        this.preInvocationSetup();
+        logger.trace("[doInvocationSetup]");
+        this.postInvocationSetup();
+    }
+
+    @Override
+    public void postInvocationSetup()  throws Exception {
+        logger.trace("[postInvocationSetup]");
+    }
+
+    ////////////[TearDown Invocation]////////////////////////
+    // WARNING: Level.Invocation should be used carefully!
+    //////////////////////////////////////////////////////
+
+    @Override
+    public void preInvocationTearDown() throws Exception{
+        logger.trace("[preInvocationTearDown]");
+    }
+
+    @Override
+    public void doInvocationTearDown() throws Exception{
+        this.preInvocationTearDown();
+        logger.trace("[doInvocationTearDown]");
+        this.postInvocationTearDown();
+    }
+
+    @Override
+    public void postInvocationTearDown()  throws Exception {
         logger.trace("[postIterationTearDown]");
     }
 }

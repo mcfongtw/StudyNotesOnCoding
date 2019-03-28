@@ -21,6 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.mcfongtw.io.AbstractIoBenchmarkBase.AbstractRandomAccessIoBenchmarkLifecycle.DataType.COUNT;
 
+@BenchmarkMode({Mode.AverageTime})
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Measurement(iterations = 20)
+@Warmup(iterations = 5)
+@Fork(3)
+@Threads(1)
 public class RandomAccessClassifierBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(RandomAccessClassifierBenchmark.class);
@@ -60,9 +66,6 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 800, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithMmap(BenchmarkState state) throws IOException {
         try (
                 RandomAccessFile fin = new RandomAccessFile(state.getFinPath(), "r");
@@ -135,9 +138,6 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime, Mode.SingleShotTime})
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    @Measurement(iterations = NUM_ITERATION, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void classifyWithFileStream(BenchmarkState state) throws IOException {
         try (
                 FileInputStream fis = new FileInputStream(state.getFinPath());
@@ -202,9 +202,6 @@ public class RandomAccessClassifierBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(RandomAccessClassifierBenchmark.class.getSimpleName())
-                .detectJvmArgs()
-                .warmupIterations(10)
-                .forks(1)
                 .resultFormat(ResultFormatType.JSON)
                 .result("RandomAccessClassifierBenchmark-result.json")
                 .build();
