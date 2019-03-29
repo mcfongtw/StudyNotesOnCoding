@@ -1,4 +1,4 @@
-package com.github.mcfongtw;
+package com.github.mcfongtw.tutorial;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

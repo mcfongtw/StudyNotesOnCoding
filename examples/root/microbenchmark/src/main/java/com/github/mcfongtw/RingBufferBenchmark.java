@@ -91,7 +91,7 @@ class ObjectEventProducer {
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Measurement(iterations = 10)
 @Warmup(iterations = 5)
-@Fork(3)
+@Fork(value = 3, jvmArgsAppend = {"-XX:+PrintGCDetails"})
 @Threads(1)
 public class RingBufferBenchmark extends BenchmarkBase {
 
