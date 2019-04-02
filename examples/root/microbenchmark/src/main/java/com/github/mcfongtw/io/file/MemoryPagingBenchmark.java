@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Measurement(iterations = 20)
 @Warmup(iterations = 5)
-@Fork(3)
+@Fork(1)
 @Threads(1)
 public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
@@ -34,56 +34,17 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
     @Getter
     @State(Scope.Benchmark)
-    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
-
-        private final static int MAX_NUM_FILES = 100;
-
-        private final static int BUFFER_SIZE = UNIT_ONE_PAGE;
-
+    public static class BenchmarkState extends AbstractPagingIoBenchmarkLifecycle {
         private LatencyMetric ioLatencyMetric = new LatencyMetric(MemoryPagingBenchmark.class.getName());
-
-        private List<String> listOfFinPath = new ArrayList<>();
-        private List<String> listOfFoutPath = new ArrayList<>();
-
+        
         //128, 1K, 4K, 128K, 1M
         @Param({"128", "4096", "131072", "1048576"})
-        public int fileSize;
+        protected int fileSize;
 
         @Override
         @Setup(Level.Trial)
         public void doTrialSetUp() throws Exception {
             super.doTrialSetUp();
-        }
-
-        @Override
-        public void preTrialSetUp() throws Exception {
-            super.preTrialSetUp();
-
-            tempDir = Files.createTempDir();
-            new File(tempDir.getAbsolutePath()).mkdirs();
-
-            for(int index = 0; index < MAX_NUM_FILES; index ++) {
-                String finPath = String.format(tempDir.getAbsolutePath() + "/in-%d.data", index);
-                String foutPath = String.format(tempDir.getAbsolutePath() + "/out-%d.data", index);
-                listOfFinPath.add(finPath);
-                listOfFoutPath.add(foutPath);
-
-                FileUtils.touch(new File(finPath));
-                FileUtils.touch(new File(foutPath));
-
-                //Sequential data generation
-                try(
-                        FileOutputStream fin = new FileOutputStream(finPath);
-                ) {
-                    for(int i = 0; i < fileSize; i++) {
-                        fin.write((byte) i);
-                    }
-                }
-
-                logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
-                logger.debug("File created at [{}]", finPath);
-                logger.debug("File created at [{}]", foutPath);
-            }
         }
 
         @Override
@@ -110,8 +71,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithRawBuffer(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     FileInputStream fin = new FileInputStream(finPath);
                     FileOutputStream fout = new FileOutputStream(foutPath);
@@ -135,8 +96,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithBufferedFileStream(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     BufferedInputStream fin = new BufferedInputStream(new FileInputStream(finPath), state.BUFFER_SIZE);
                     BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(foutPath), state.BUFFER_SIZE);
@@ -162,8 +123,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithFileChannel(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     FileChannel finChannel = new FileInputStream(finPath).getChannel();
                     FileChannel foutChannel = new FileOutputStream(foutPath).getChannel();
@@ -189,7 +150,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
                     bufIndex += bufLength;
 
-                    LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
+                    LOG.trace("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert finChannel.size() == foutChannel.size();
@@ -203,8 +164,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithMmap(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
 
             try (
 
@@ -236,7 +197,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
                     bufIndex += state.BUFFER_SIZE;
 
-                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
+                    LOG.trace("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert fin.length() == fout.length();
@@ -251,8 +212,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithMmapAndFsync(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
 
             try (
 
@@ -284,7 +245,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
                     bufIndex += state.BUFFER_SIZE;
 
-                    LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
+                    LOG.trace("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.BUFFER_SIZE});
                 }
 
                 assert fin.length() == fout.length();
@@ -299,8 +260,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithRawBufferedRandomAccessFile(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     RandomAccessFile fin = new RandomAccessFile(finPath, "r");
                     RandomAccessFile fout = new RandomAccessFile(foutPath, "rw");
@@ -333,8 +294,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void copyWithRawBufferedRandomAccessFileAndFsync(BenchmarkState state) throws IOException {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     RandomAccessFile fin = new RandomAccessFile(finPath, "r");
                     RandomAccessFile fout = new RandomAccessFile(foutPath, "rws");
@@ -367,8 +328,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void zeroTransferToCopy(BenchmarkState state) throws Exception {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     RandomAccessFile fromFile = new RandomAccessFile(finPath, "r");
                     RandomAccessFile toFile = new RandomAccessFile(foutPath, "rw");
@@ -392,7 +353,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
                     long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                     if (returnCode >= 0) {
-                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
+                        LOG.trace("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
                     } else {
                         LOG.warn("transferTo failed! error code: [{}]", returnCode);
                     }
@@ -412,8 +373,8 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
     @Benchmark
     public void zeroTransferToCopyAndFsync(BenchmarkState state) throws Exception {
         for(int index = 0; index < state.MAX_NUM_FILES; index++) {
-            String finPath = state.listOfFinPath.get(index);
-            String foutPath = state.listOfFoutPath.get(index);
+            String finPath = state.getListOfFinPath().get(index);
+            String foutPath = state.getListOfFoutPath().get(index);
             try (
                     RandomAccessFile fromFile = new RandomAccessFile(finPath, "r");
                     RandomAccessFile toFile = new RandomAccessFile(foutPath, "rws");
@@ -437,7 +398,7 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
                     long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                     if (returnCode >= 0) {
-                        LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
+                        LOG.trace("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.BUFFER_SIZE});
                     } else {
                         LOG.warn("transferTo failed! error code: [{}]", returnCode);
                     }

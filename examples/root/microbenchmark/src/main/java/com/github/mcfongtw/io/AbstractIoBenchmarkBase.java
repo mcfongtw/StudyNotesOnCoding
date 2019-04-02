@@ -358,4 +358,63 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
         }
     }
 
+    @Getter
+    protected static abstract class AbstractPagingIoBenchmarkLifecycle extends AbstractIoBenchmarkLifecycle {
+
+        protected String finPath;
+
+        protected String foutPath;
+
+        protected File tempDir;
+
+        private int fileSize;
+
+        protected List<String> listOfFinPath = new ArrayList<>();
+
+        protected List<String> listOfFoutPath = new ArrayList<>();
+
+        public final static int MAX_NUM_FILES = 100;
+
+        public final static int BUFFER_SIZE = UNIT_ONE_PAGE;
+
+        @Override
+        public void preTrialSetUp() throws Exception {
+            super.preTrialSetUp();
+
+            tempDir = Files.createTempDir();
+            new File(tempDir.getAbsolutePath()).mkdirs();
+
+            for(int index = 0; index < MAX_NUM_FILES; index ++) {
+                String finPath = String.format(tempDir.getAbsolutePath() + "/in-%d.data", index);
+                String foutPath = String.format(tempDir.getAbsolutePath() + "/out-%d.data", index);
+                listOfFinPath.add(finPath);
+                listOfFoutPath.add(foutPath);
+
+                FileUtils.touch(new File(finPath));
+                FileUtils.touch(new File(foutPath));
+
+                //Sequential data generation
+                try(
+                        FileOutputStream fin = new FileOutputStream(finPath);
+                ) {
+                    for(int i = 0; i < fileSize; i++) {
+                        fin.write((byte) i);
+                    }
+                }
+
+                logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
+                logger.debug("File created at [{}]", finPath);
+                logger.debug("File created at [{}]", foutPath);
+            }
+        }
+
+        @Override
+        public void postTrialTearDown() throws Exception {
+            super.postTrialTearDown();
+
+            FileUtils.deleteDirectory(tempDir);
+            logger.debug("Temp dir deleted at [{}]", tempDir.getAbsolutePath());
+        }
+    }
+
 }

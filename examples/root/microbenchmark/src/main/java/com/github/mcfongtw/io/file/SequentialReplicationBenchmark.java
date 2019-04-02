@@ -137,7 +137,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
                 bufIndex += bufLength;
 
-                LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
+                LOG.trace("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
             }
 
             assert finChannel.size() == foutChannel.size();
@@ -178,7 +178,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
                     @Override
                     public void completed(Integer result, Semaphore lock) {
-                        LOG.debug("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, state.bufferSize});
+                        LOG.trace("streamed [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{position, finLength, state.bufferSize});
 
                         lock.release();
                     }
@@ -234,7 +234,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
                 bufIndex += state.bufferSize;
 
-                LOG.debug("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
+                LOG.trace("mmapped [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{bufIndex, finLength, state.bufferSize});
             }
 
             assert fin.length() == fout.length();
@@ -301,7 +301,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
 
                 long returnCode = fromChannel.transferTo(toIndex, bufLength, toChannel);
                 if(returnCode >= 0 ) {
-                    LOG.debug("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.bufferSize});
+                    LOG.trace("transferTo [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{toIndex, fromLength, state.bufferSize});
                 } else {
                     LOG.warn("transferTo failed! error code: [{}]", returnCode);
                 }
@@ -343,7 +343,7 @@ public class SequentialReplicationBenchmark extends AbstractIoBenchmarkBase {
                 long returnCode = toChannel.transferFrom(fromChannel, fromIndex, bufLength);
 
                 if(returnCode >= 0 ) {
-                    LOG.debug("transferFrom [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{fromIndex, fromLength, state.bufferSize});
+                    LOG.trace("transferFrom [{}] / [{}] bytes w/ buffer size [{}]", new Object[]{fromIndex, fromLength, state.bufferSize});
                 } else {
                     LOG.warn("transferFrom failed! error code: [{}]", returnCode);
                 }
