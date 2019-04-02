@@ -35,45 +35,18 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     @Getter
     @State(Scope.Benchmark)
-    public static class BenchmarkState extends AbstractSequentialIoBenchmarkLifecycle {
+    public static class BenchmarkState extends AbstractReplicationIoBenchmarkLifecycle {
 
         private LatencyMetric ioLatencyMetric = new LatencyMetric(FileReplicationBenchmark.class.getName());
 
         //1MB, 10MB, 100MB
         @Param({"1048576", "10485760", "104857600"})
-        public int fileSize;
+        protected int fileSize;
 
         @Override
         @Setup(Level.Trial)
         public void doTrialSetUp() throws Exception {
             super.doTrialSetUp();
-        }
-
-        @Override
-        public void preTrialSetUp() throws Exception {
-            super.preTrialSetUp();
-
-            tempDir = Files.createTempDir();
-            new File(tempDir.getAbsolutePath()).mkdirs();
-
-            finPath = tempDir.getAbsolutePath() + "/in.data";
-            foutPath = tempDir.getAbsolutePath() + "/out.data";
-
-            FileUtils.touch(new File(finPath));
-            FileUtils.touch(new File(foutPath));
-
-            //Sequential data generation
-            try(
-                    FileOutputStream fin = new FileOutputStream(finPath);
-            ) {
-                for(int i = 0; i < fileSize; i++) {
-                    fin.write((byte) i);
-                }
-            }
-
-            logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
-            logger.debug("File created at [{}]", finPath);
-            logger.debug("File created at [{}]", foutPath);
         }
 
         @Override
@@ -112,7 +85,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
             long returnCode = fromChannel.transferTo(0, fromLength, toChannel);
             if(returnCode >= 0 ) {
-                LOG.debug("transferTo [{}] / [{}] bytes", new Object[]{fromLength, fromLength});
+                LOG.trace("transferTo [{}] / [{}] bytes", new Object[]{fromLength, fromLength});
             } else {
                 LOG.warn("transferTo failed! error code: [{}]", returnCode);
             }

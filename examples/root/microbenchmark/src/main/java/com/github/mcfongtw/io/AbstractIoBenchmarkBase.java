@@ -146,6 +146,53 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
     }
 
     @Getter
+    protected static abstract class AbstractReplicationIoBenchmarkLifecycle extends AbstractIoBenchmarkLifecycle {
+
+        protected String finPath;
+
+        protected String foutPath;
+
+        protected File tempDir;
+
+        private int fileSize;
+
+        @Override
+        public void preTrialSetUp() throws Exception {
+            super.preTrialSetUp();
+
+            tempDir = Files.createTempDir();
+            new File(tempDir.getAbsolutePath()).mkdirs();
+
+            finPath = tempDir.getAbsolutePath() + "/in.data";
+            foutPath = tempDir.getAbsolutePath() + "/out.data";
+
+            FileUtils.touch(new File(finPath));
+            FileUtils.touch(new File(foutPath));
+
+            //Sequential data generation
+            try(
+                    FileOutputStream fin = new FileOutputStream(finPath);
+            ) {
+                for(int i = 0; i < fileSize; i++) {
+                    fin.write((byte) i);
+                }
+            }
+
+            logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
+            logger.debug("File created at [{}]", finPath);
+            logger.debug("File created at [{}]", foutPath);
+        }
+
+        @Override
+        public void postTrialTearDown() throws Exception {
+            super.postTrialTearDown();
+
+            FileUtils.deleteDirectory(tempDir);
+            logger.debug("Temp dir deleted at [{}]", tempDir.getAbsolutePath());
+        }
+    }
+
+    @Getter
     public static class AbstractRandomAccessIoBenchmarkLifecycle extends AbstractIoBenchmarkLifecycle {
         private static final int TOTAL_DATA_WRITTEN = 32 * UNIT_ONE_MEGA;
 
