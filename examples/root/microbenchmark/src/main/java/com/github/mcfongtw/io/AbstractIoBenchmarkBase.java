@@ -6,6 +6,7 @@ import com.github.mcfongtw.BenchmarkBase;
 import com.github.mcfongtw.utils.SudoExecutors;
 import com.google.common.io.Files;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -154,7 +155,7 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
 
         protected File tempDir;
 
-        private int fileSize;
+        protected int fileSize;
 
         @Override
         public void preTrialSetUp() throws Exception {
@@ -176,6 +177,9 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
                 for(int i = 0; i < fileSize; i++) {
                     fin.write((byte) i);
                 }
+                logger.debug("File [{}] generated with size [{}]", finPath, fin.getChannel().size());
+
+                assert fileSize != 0 && fin.getChannel().size() == fileSize;
             }
 
             logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
@@ -367,7 +371,7 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
 
         protected File tempDir;
 
-        private int fileSize;
+        protected int fileSize;
 
         protected List<String> listOfFinPath = new ArrayList<>();
 
@@ -400,6 +404,10 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
                     for(int i = 0; i < fileSize; i++) {
                         fin.write((byte) i);
                     }
+
+                    logger.debug("File [{}] generated with size [{}]", finPath, fin.getChannel().size());
+
+                    assert fileSize != 0 && fin.getChannel().size() == fileSize;
                 }
 
                 logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());

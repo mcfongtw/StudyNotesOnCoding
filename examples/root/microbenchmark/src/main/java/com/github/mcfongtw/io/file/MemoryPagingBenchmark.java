@@ -39,7 +39,13 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
         
         //128, 1K, 4K, 128K, 1M
         @Param({"128", "4096", "131072", "1048576"})
-        protected int fileSize;
+        protected int paramFileSize;
+
+        @Override
+        public void preTrialSetUp() throws Exception {
+            fileSize = paramFileSize;
+            super.preTrialSetUp();
+        }
 
         @Override
         @Setup(Level.Trial)

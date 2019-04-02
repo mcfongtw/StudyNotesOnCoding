@@ -2,7 +2,6 @@ package com.github.mcfongtw.io.file;
 
 import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
-import com.google.common.io.Files;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -41,7 +39,13 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
         //1MB, 10MB, 100MB
         @Param({"1048576", "10485760", "104857600"})
-        protected int fileSize;
+        protected int paramFileSize;
+
+        @Override
+        public void preTrialSetUp() throws Exception {
+            fileSize = paramFileSize;
+            super.preTrialSetUp();
+        }
 
         @Override
         @Setup(Level.Trial)
