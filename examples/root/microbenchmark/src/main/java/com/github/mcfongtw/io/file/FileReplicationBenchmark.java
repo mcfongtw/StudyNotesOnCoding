@@ -5,6 +5,8 @@ import com.github.mcfongtw.metrics.LatencyMetric;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -75,7 +77,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
     }
 
     @Benchmark
-    public void zeroTransferToCopy(BenchmarkState state) throws Exception {
+    public void zeroTransferToCopy(BenchmarkState state, Blackhole blackhole) throws Exception {
         try (
                 RandomAccessFile fromFile = new RandomAccessFile(state.getFinPath(), "r");
                 RandomAccessFile toFile = new RandomAccessFile(state.getFoutPath(), "rw");
@@ -98,11 +100,13 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
             long afterTime = System.nanoTime();
             state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+
+            blackhole.consume(afterTime - beforeTime);
         }
     }
 
     @Benchmark
-    public void nioFilesCopy(BenchmarkState state) throws Exception {
+    public void nioFilesCopy(BenchmarkState state, Blackhole blackhole) throws Exception {
         Path srcPath = Paths.get(state.getFinPath());
         Path dstPath = Paths.get(state.getFoutPath());
 
@@ -114,10 +118,12 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
         long afterTime = System.nanoTime();
         state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+
+        blackhole.consume(afterTime - beforeTime);
     }
 
     @Benchmark
-    public void commonIoFilesCopy(BenchmarkState state) throws Exception {
+    public void commonIoFilesCopy(BenchmarkState state, Blackhole blackhole) throws Exception {
         File srcFile = new File(state.getFinPath());
         File dstFile = new File(state.getFoutPath());
 
@@ -129,10 +135,12 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
         long afterTime = System.nanoTime();
         state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+
+        blackhole.consume(afterTime - beforeTime);
     }
 
     @Benchmark
-    public void guavaFilesCopy(BenchmarkState state) throws Exception {
+    public void guavaFilesCopy(BenchmarkState state, Blackhole blackhole) throws Exception {
         File srcFile = new File(state.getFinPath());
         File dstFile = new File(state.getFoutPath());
 
@@ -144,6 +152,8 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
         long afterTime = System.nanoTime();
         state.ioLatencyMetric.addTime(afterTime - beforeTime, TimeUnit.NANOSECONDS);
+
+        blackhole.consume(afterTime - beforeTime);
     }
 
     public static void main(String[] args) throws RunnerException {
@@ -152,6 +162,7 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
         //curl -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "demo"'
         Options opt = new OptionsBuilder()
                 .include(FileReplicationBenchmark.class.getSimpleName())
+                .addProfiler(GCProfiler.class)
                 .resultFormat(ResultFormatType.JSON)
                 .result("FileReplicationBenchmark-result.json")
                 .build();
