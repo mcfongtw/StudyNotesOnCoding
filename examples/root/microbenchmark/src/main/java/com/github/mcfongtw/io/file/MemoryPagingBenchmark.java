@@ -22,11 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode({Mode.AverageTime, Mode.Throughput})
+@BenchmarkMode({Mode.AverageTime})
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Measurement(iterations = 20)
 @Warmup(iterations = 5)
 @Fork(3)
+@Threads(1)
 public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(MemoryPagingBenchmark.class);

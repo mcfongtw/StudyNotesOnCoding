@@ -21,11 +21,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode({Mode.AverageTime, Mode.Throughput})
+@BenchmarkMode({Mode.AverageTime})
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Measurement(iterations = 20)
 @Warmup(iterations = 5)
 @Fork(3)
+@Threads(1)
 public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
     public static Logger LOG = LoggerFactory.getLogger(FileReplicationBenchmark.class);
