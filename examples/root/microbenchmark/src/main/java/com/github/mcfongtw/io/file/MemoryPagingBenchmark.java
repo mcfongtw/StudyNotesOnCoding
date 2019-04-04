@@ -2,9 +2,7 @@ package com.github.mcfongtw.io.file;
 
 import com.github.mcfongtw.io.AbstractIoBenchmarkBase;
 import com.github.mcfongtw.metrics.LatencyMetric;
-import com.google.common.io.Files;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -18,8 +16,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode({Mode.AverageTime})
@@ -39,11 +35,10 @@ public class MemoryPagingBenchmark extends AbstractIoBenchmarkBase {
         
         //128, 1K, 4K, 128K, 1M
         @Param({"128", "4096", "131072", "1048576"})
-        protected int paramFileSize;
+        protected int fileSize;
 
         @Override
         public void preTrialSetUp() throws Exception {
-            fileSize = paramFileSize;
             super.preTrialSetUp();
         }
 

@@ -41,11 +41,10 @@ public class FileReplicationBenchmark extends AbstractIoBenchmarkBase {
 
         //1MB, 10MB, 100MB
         @Param({"1048576", "10485760", "104857600"})
-        protected int paramFileSize;
+        protected int fileSize;
 
         @Override
         public void preTrialSetUp() throws Exception {
-            fileSize = paramFileSize;
             super.preTrialSetUp();
         }
 

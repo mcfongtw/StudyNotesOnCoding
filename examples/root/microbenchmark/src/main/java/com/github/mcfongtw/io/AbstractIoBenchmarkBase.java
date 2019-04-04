@@ -174,12 +174,12 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
             try(
                     FileOutputStream fin = new FileOutputStream(finPath);
             ) {
-                for(int i = 0; i < fileSize; i++) {
+                for(int i = 0; i < this.getFileSize(); i++) {
                     fin.write((byte) i);
                 }
                 logger.debug("File [{}] generated with size [{}]", finPath, fin.getChannel().size());
 
-                assert fileSize != 0 && fin.getChannel().size() == fileSize;
+                assert this.getFileSize() != 0 && fin.getChannel().size() == this.getFileSize();
             }
 
             logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
@@ -401,13 +401,13 @@ public abstract class AbstractIoBenchmarkBase extends BenchmarkBase {
                 try(
                         FileOutputStream fin = new FileOutputStream(finPath);
                 ) {
-                    for(int i = 0; i < fileSize; i++) {
+                    for(int i = 0; i < this.getFileSize(); i++) {
                         fin.write((byte) i);
                     }
 
                     logger.debug("File [{}] generated with size [{}]", finPath, fin.getChannel().size());
 
-                    assert fileSize != 0 && fin.getChannel().size() == fileSize;
+                    assert this.getFileSize() != 0 && fin.getChannel().size() == this.getFileSize();
                 }
 
                 logger.debug("Temp dir created at [{}]", tempDir.getAbsolutePath());
