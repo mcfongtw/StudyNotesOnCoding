@@ -59,6 +59,16 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>netty-all</artifactId>
             <version>${netty4.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -79,6 +89,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
