@@ -98,7 +98,7 @@ class FileChangeService extends Observable implements Runnable, Closeable {
         dirPathToWatch = fileToWatch.getParentFile().toPath();
 
         try {
-            dirPathToWatch.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            dirPathToWatch.register(watcher, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY});
             log.info("Start watching [{}]", dirPathToWatch.normalize().toAbsolutePath());
         } catch (IOException ioe) {
             log.error("Failed to create FileChangeService: " + file.getAbsolutePath(), ioe);
@@ -120,7 +120,11 @@ class FileChangeService extends Observable implements Runnable, Closeable {
 
         while(true) {
             try {
+                log.debug("watcher.take() ...");
+                // WatcherService is slow on some platform, i.e. MacOS
+                // https://bugs.openjdk.java.net/browse/JDK-7133447
                 key = watcher.take();
+                log.debug("watcher.take() ...DONE");
             } catch (InterruptedException err) {
                 log.error("Failed to watch file!", err);
                 return;

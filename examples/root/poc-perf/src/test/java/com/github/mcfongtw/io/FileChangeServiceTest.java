@@ -24,6 +24,7 @@ class SimpleFileModifiedObserver implements FileModifiedObserver {
 
 }
 
+@Slf4j
 public class FileChangeServiceTest {
 
     private FileModifiedObserver fileModifiedObserver = new SimpleFileModifiedObserver();
@@ -55,7 +56,8 @@ public class FileChangeServiceTest {
 
         rewrite(TEST_FILE, "123\n");
 
-        Thread.sleep(100);
+        //TODO: watcher.take() may take up to 1x second to respond. Need to improve
+        Thread.sleep(11_000);
 
         Assertions.assertEquals(1, fileChangeService.getModifiedCount());
 
@@ -69,5 +71,7 @@ public class FileChangeServiceTest {
         byte[] date = content.getBytes();
         fooStream.write(date);
         fooStream.close();
+
+        log.info("Rewrite [{}] completed", content);
     }
 }
