@@ -4,9 +4,6 @@ language: java
 dist: trusty
 sudo: false
 
-before_install:
-  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
-
 matrix:
   include:
     # 8
@@ -18,12 +15,6 @@ matrix:
     # 9
     - env: JDK='Oracle JDK 9'
       jdk: oraclejdk9
-
-    # 11
-    - env: JDK='Oracle JDK 11'
-      install: . ./install-jdk.sh -F 11 -L BCL
-    - env: JDK='OpenJDK 11'
-      install: . ./install-jdk.sh -F 11 -L GPL
 
 script:
   - echo PATH = ${PATH}
