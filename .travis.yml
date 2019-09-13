@@ -1,23 +1,33 @@
 language: java
 
-
-jdk:
-  - oraclejdk8
-  - oraclejdk9
-  - openjdk8
-
 #Container-based
 dist: trusty
 sudo: false
 
+before_install:
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+
+matrix:
+  include:
+    # 8
+    - env: JDK='Oracle JDK 8'
+      jdk: oraclejdk8
+    - env: JDK='OpenJDK 8'
+      jdk: openjdk8
+
+    # 9
+    - env: JDK='Oracle JDK 9'
+      jdk: oraclejdk9
+
+    # 11
+    - env: JDK='Oracle JDK 11'
+      install: . ./install-jdk.sh -F 11 -L BCL
+    - env: JDK='OpenJDK 11'
+      install: . ./install-jdk.sh -F 11 -L GPL
+
 script:
-  - cd examples/root
-  # oraclejdk 8
-  - jdk_switcher use oraclejdk8
-  - mvn test
-  # oraclejdk 9
-  - jdk_switcher use oraclejdk9
-  - mvn test
-  # openjdk 8
-  - jdk_switcher use openjdk8
-  - mvn test
+  - echo PATH = ${PATH}
+  - echo JAVA_HOME = ${JAVA_HOME}
+  - java -version
+  - javac -version
+  - ./travis.sh
