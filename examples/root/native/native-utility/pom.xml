@@ -17,6 +17,21 @@
 
     <build>
         <plugins>
+            <!-- display active profile in validate phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>show-profiles</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -46,7 +61,7 @@
                     </sources>
                     <compilerStartOptions>
                         <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
-                        <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
+                        <compilerStartOption>-I ${jdk.platform.includes.path}</compilerStartOption>
                     </compilerStartOptions>
                     <compilerEndOptions>
                         <compilerEndOption>-fPIC</compilerEndOption>
@@ -54,7 +69,7 @@
                     </compilerEndOptions>
                     <linkerStartOptions>
                         <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
-                        <linkerStartOption>-I ${JAVA_HOME}/include/linux/</linkerStartOption>
+                        <linkerStartOption>-I ${jdk.platform.includes.path}</linkerStartOption>
                         <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
                         <linkerStartOption>-L ${basedir}/src/main/cpp</linkerStartOption>
                     </linkerStartOptions>
