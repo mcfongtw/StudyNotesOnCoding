@@ -1,5 +1,16 @@
-#include <malloc.h>
-#include <mcheck.h>
+
+#ifdef __linux__
+    // There is where malloc() is defined on LINUX_OS
+    #include <malloc.h>
+    #include <mcheck.h>
+#elif __APPLE__
+    // There is where malloc() is defined on MAC_OS
+    #include <stdlib.h>
+#else
+    #error OS Not Defined / Supported
+#endif
+
+
 #include <iostream>
 #include "MallocUtils.h"
 
@@ -15,7 +26,12 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_mallocStats(JNIEnv *jenv, jclass jclazz) {
-    malloc_stats();
+    #ifdef __linux__
+        malloc_stats();
+    #elif __APPLE__
+    #else
+        #error OS Not Defined / Supported
+    #endif
 }
 
 
@@ -28,8 +44,16 @@ JNIEXPORT jint JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_mallopt
   (JNIEnv *jenv, jclass jclazz, jint j_param, jint j_value) {
     int c_param = (int)j_param;
     int c_value = (int)j_value;
+    int result = -1;
 
-    return mallopt( c_param, c_value);
+    #ifdef __linux__
+        result =  mallopt( c_param, c_value);
+    #elif __APPLE__
+    #else
+        #error OS Not Defined / Supported
+    #endif
+
+    return result;
   }
 
 /*
@@ -39,7 +63,12 @@ JNIEXPORT jint JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_mallopt
  */
 JNIEXPORT void JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_mtrace
   (JNIEnv *jenv, jclass jclazz) {
-    mtrace();
+    #ifdef __linux__
+        mtrace();
+    #elif __APPLE__
+    #else
+        #error OS Not Defined / Supported
+    #endif
   }
 
 /*
@@ -49,7 +78,12 @@ JNIEXPORT void JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_mtrace
  */
 JNIEXPORT void JNICALL Java_com_github_mcfongtw_jni_utils_MallocUtils_muntrace
   (JNIEnv *jenv, jclass jclazz) {
-    muntrace();
+    #ifdef __linux__
+        muntrace();
+    #elif __APPLE__
+    #else
+        #error OS Not Defined / Supported
+    #endif
   }
 
 #ifdef __cplusplus

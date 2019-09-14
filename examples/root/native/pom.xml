@@ -19,4 +19,25 @@
     <packaging>pom</packaging>
 
     <name>Java Perf Native</name>
+
+    <profiles>
+        <profile>
+            <id>osx</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <jdk.platform.includes.path>${JAVA_HOME}/include/darwin</jdk.platform.includes.path>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <jdk.platform.includes.path>${JAVA_HOME}/include/linux</jdk.platform.includes.path>
+            </properties>
+        </profile>
+    </profiles>
 </project>
