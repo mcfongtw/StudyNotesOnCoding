@@ -149,6 +149,78 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
         </dependency>
+
+        <!-- CSV Parsing -->
+        <dependency>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.csveed</groupId>
+            <artifactId>csveed</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.4</version>		<!-- 1.5+ requires Java 7 -->
+        </dependency>
+        <dependency>
+            <groupId>net.sf.flatpack</groupId>
+            <artifactId>flatpack</artifactId>
+            <version>3.4.2</version>	<!-- 4.x+ requires Java 8 -->
+        </dependency>
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.jcsv</groupId>
+            <artifactId>jcsv</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.espertech</groupId>
+            <artifactId>esperio-csv</artifactId>
+            <version>5.5.0</version>	<!-- 6.x+ requires Java 8 -->
+        </dependency>
+        <dependency>
+            <groupId>br.com.objectos</groupId>
+            <artifactId>way-io</artifactId>
+            <version>1.25.0</version>	<!-- 2.x+ requires Java 7 -->
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>genjava</groupId>
+            <artifactId>gj-csv</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.quux00.simplecsv</groupId>
+            <artifactId>simplecsv</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+            <version>2.6.7</version>	<!-- 2.7+ requires Java 7 -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.6.7</version>
+        </dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -882,6 +954,35 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.concurrency.contention.RandomnessGeneratorBenchmark</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!--
+                                        Shading signed JARs will fail without this.
+                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                    -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>CSVParsingBenchmark</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>CSVParsingBenchmark-jmh-${jmh.version}</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.mcfongtw.CSVParsingBenchmark</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
