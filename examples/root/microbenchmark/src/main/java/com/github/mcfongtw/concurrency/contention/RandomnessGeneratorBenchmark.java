@@ -22,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @Measurement(iterations = 10)
 @Warmup(iterations = 5)
 @Fork(3)
-@Threads(2)
 public class RandomnessGeneratorBenchmark extends BenchmarkBase {
 
     @Getter
@@ -71,9 +70,11 @@ public class RandomnessGeneratorBenchmark extends BenchmarkBase {
         }
     }
 
+    /////////////////
 
     @Benchmark
-    public int measureReentrantLock(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(1)
+    public int measureReentrantLock_1(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
         Lock lock = state.getLock();
         lock.lock();
         try {
@@ -89,7 +90,44 @@ public class RandomnessGeneratorBenchmark extends BenchmarkBase {
     }
 
     @Benchmark
-    public int measureSynchronized(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(2)
+    public int measureReentrantLock_2(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        Lock lock = state.getLock();
+        lock.lock();
+        try {
+            long oldSeed = state.seed;
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            int remainder = (int) state.seed % state.BIT_SIZE;
+            return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Benchmark
+    @Threads(4)
+    public int measureReentrantLock_4(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        Lock lock = state.getLock();
+        lock.lock();
+        try {
+            long oldSeed = state.seed;
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            int remainder = (int) state.seed % state.BIT_SIZE;
+            return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /////////////////
+
+    @Benchmark
+    @Threads(1)
+    public int measureSynchronized_1(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
         synchronized (state.objectLock){
             long oldSeed = state.seed;
             long newSeed = computeNewSeed(oldSeed);
@@ -101,7 +139,36 @@ public class RandomnessGeneratorBenchmark extends BenchmarkBase {
     }
 
     @Benchmark
-    public int measureAtomicPrimitive(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(2)
+    public int measureSynchronized_2(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        synchronized (state.objectLock){
+            long oldSeed = state.seed;
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            int remainder = (int) state.seed % state.BIT_SIZE;
+            return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+        }
+    }
+
+    @Benchmark
+    @Threads(4)
+    public int measureSynchronized_4(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        synchronized (state.objectLock){
+            long oldSeed = state.seed;
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            int remainder = (int) state.seed % state.BIT_SIZE;
+            return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+        }
+    }
+
+    /////////////////
+
+    @Benchmark
+    @Threads(1)
+    public int measureAtomicPrimitive_1(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
         while(true) {
             long oldSeed = state.atomicSeed.get();
             long newSeed = computeNewSeed(oldSeed);
@@ -113,6 +180,38 @@ public class RandomnessGeneratorBenchmark extends BenchmarkBase {
             }
         }
     }
+
+    @Benchmark
+    @Threads(2)
+    public int measureAtomicPrimitive_2(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        while(true) {
+            long oldSeed = state.atomicSeed.get();
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            if(state.atomicSeed.compareAndSet(oldSeed, newSeed)) {
+                int remainder = (int) state.seed % state.BIT_SIZE;
+                return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+            }
+        }
+    }
+
+    @Benchmark
+    @Threads(4)
+    public int measureAtomicPrimitive_4(RandomnessGeneratorBenchmark.BenchmarkState state, Blackhole blackhole) {
+        while(true) {
+            long oldSeed = state.atomicSeed.get();
+            long newSeed = computeNewSeed(oldSeed);
+            state.seed = newSeed;
+
+            if(state.atomicSeed.compareAndSet(oldSeed, newSeed)) {
+                int remainder = (int) state.seed % state.BIT_SIZE;
+                return remainder > 0 ? remainder : remainder + state.BIT_SIZE;
+            }
+        }
+    }
+
+    /////////////////
 
     //Java implementation for Random.nextInt()
     public static final long MULTIPLIER = 25214903917L;

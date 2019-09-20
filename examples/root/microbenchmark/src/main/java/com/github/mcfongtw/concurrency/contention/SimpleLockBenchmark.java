@@ -21,7 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @Measurement(iterations = 10)
 @Warmup(iterations = 5)
 @Fork(3)
-@Threads(2)
 public class SimpleLockBenchmark extends BenchmarkBase {
 
     @Getter
@@ -61,9 +60,11 @@ public class SimpleLockBenchmark extends BenchmarkBase {
         }
     }
 
+    /////////////////
 
     @Benchmark
-    public void measureReentrantLock(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(1)
+    public void measureReentrantLock_1(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         Lock lock = state.getLock();
         lock.lock();
         try {
@@ -74,16 +75,76 @@ public class SimpleLockBenchmark extends BenchmarkBase {
     }
 
     @Benchmark
-    public void measureSynchronized(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(2)
+    public void measureReentrantLock_2(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        Lock lock = state.getLock();
+        lock.lock();
+        try {
+            state.value++;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Benchmark
+    @Threads(4)
+    public void measureReentrantLock_4(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        Lock lock = state.getLock();
+        lock.lock();
+        try {
+            state.value++;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /////////////////////////////
+
+    @Benchmark
+    @Threads(1)
+    public void measureSynchronized_1(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         synchronized (state.getObjectLock()) {
             state.value++;
         }
     }
 
     @Benchmark
-    public void measureAtomicPrimitive(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    @Threads(2)
+    public void measureSynchronized_2(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        synchronized (state.getObjectLock()) {
+            state.value++;
+        }
+    }
+
+    @Benchmark
+    @Threads(4)
+    public void measureSynchronized_4(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        synchronized (state.getObjectLock()) {
+            state.value++;
+        }
+    }
+
+    ////////////////////////////////
+
+    @Benchmark
+    @Threads(1)
+    public void measureAtomicPrimitive_1(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         state.getAtomicLong().getAndAdd(1);
     }
+
+    @Benchmark
+    @Threads(2)
+    public void measureAtomicPrimitive_2(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        state.getAtomicLong().getAndAdd(1);
+    }
+
+    @Benchmark
+    @Threads(4)
+    public void measureAtomicPrimitive_4(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
+        state.getAtomicLong().getAndAdd(1);
+    }
+
+    /////////////////
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
