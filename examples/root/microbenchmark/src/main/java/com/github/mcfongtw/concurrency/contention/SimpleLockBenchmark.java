@@ -1,8 +1,7 @@
-package com.github.mcfongtw.concurrency;
+package com.github.mcfongtw.concurrency.contention;
 
 import com.github.mcfongtw.BenchmarkBase;
 import com.github.mcfongtw.SimpleBenchmarkLifecycle;
-import com.github.mcfongtw.StreamBenchmark;
 import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -22,11 +21,11 @@ import java.util.concurrent.locks.ReentrantLock;
 @Measurement(iterations = 10)
 @Warmup(iterations = 5)
 @Fork(3)
-@Threads(1)
-public class LockBenchmark extends BenchmarkBase {
+@Threads(2)
+public class SimpleLockBenchmark extends BenchmarkBase {
 
     @Getter
-    @State(Scope.Benchmark)
+    @State(Scope.Thread)
     public static class BenchmarkState extends SimpleBenchmarkLifecycle {
 
         public long value = 0;
@@ -64,7 +63,7 @@ public class LockBenchmark extends BenchmarkBase {
 
 
     @Benchmark
-    public void measureReentrantLock(LockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    public void measureReentrantLock(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         Lock lock = state.getLock();
         lock.lock();
         try {
@@ -75,20 +74,20 @@ public class LockBenchmark extends BenchmarkBase {
     }
 
     @Benchmark
-    public void measureSynchronized(LockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    public void measureSynchronized(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         synchronized (state.getObjectLock()) {
             state.value++;
         }
     }
 
     @Benchmark
-    public void measureAtomicPrimitive(LockBenchmark.BenchmarkState state, Blackhole blackhole) {
+    public void measureAtomicPrimitive(SimpleLockBenchmark.BenchmarkState state, Blackhole blackhole) {
         state.getAtomicLong().getAndAdd(1);
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(LockBenchmark.class.getSimpleName())
+                .include(SimpleLockBenchmark.class.getSimpleName())
                 .resultFormat(ResultFormatType.JSON)
                 .result("LockBenchmark-result.json")
                 .build();
