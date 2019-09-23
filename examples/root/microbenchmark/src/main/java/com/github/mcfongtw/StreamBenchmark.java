@@ -1,5 +1,6 @@
 package com.github.mcfongtw;
 
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import lombok.Getter;
 import org.openjdk.jmh.annotations.*;
@@ -31,7 +32,7 @@ public class StreamBenchmark extends BenchmarkBase {
     @Getter
     @State(Scope.Benchmark)
     public static class BenchmarkState extends SimpleBenchmarkLifecycle {
-        private volatile int[] integers = new int[SIZE];
+        private volatile List<Integer> integers = Lists.newArrayList();
 
         @Setup(Level.Trial)
         @Override
@@ -39,9 +40,9 @@ public class StreamBenchmark extends BenchmarkBase {
             super.doTrialSetUp();
             for ( int i=0; i < SIZE ; i++){
                 if ( i < SIZE / 2){
-                    integers[i] = i;
+                    integers.add(i);
                 }else {
-                    integers[i] = i-SIZE;
+                    integers.add(i-SIZE);
                 }
             }
         }
@@ -50,7 +51,7 @@ public class StreamBenchmark extends BenchmarkBase {
         @Override
         public void doTrialTearDown() throws Exception {
             super.doTrialTearDown();
-            integers = null;
+            integers.clear();
         }
 
         @Setup(Level.Iteration)
@@ -68,52 +69,98 @@ public class StreamBenchmark extends BenchmarkBase {
     }
 
     @Benchmark
-    public void measureSumViaWhileIterator(BenchmarkState state, Blackhole blackhole){
+    public void measureEvenSumViaWhileIterator(BenchmarkState state, Blackhole blackhole){
         int result = 0;
-        Iterator<Integer> iterator = Ints.asList(state.getIntegers()).iterator();
+        Iterator<Integer> iterator = state.getIntegers().iterator();
         while ( iterator.hasNext()){
-            result += iterator.next();
+            int value = iterator.next();
+            if( value % 2 == 0) {
+                result += value;
+            }
         }
+
+        assert result == -25_000_000;
 
         blackhole.consumeCPU(result);
     }
 
     @Benchmark
-    public void measureSumViaForLoop(BenchmarkState state, Blackhole blackhole){
+    public void measureEvenSumViaForLoop(BenchmarkState state, Blackhole blackhole){
         int result = 0;
-        for (int i = 0; i < state.getIntegers().length; i++) {
-            int value = state.getIntegers()[i];
-            result += value;
+        for (int i = 0; i < state.getIntegers().size(); i++) {
+            int value = state.getIntegers().get(i);
+            if( value % 2 == 0) {
+                result += value;
+            }
         }
-        blackhole.consumeCPU(result);
+
+        assert result == -25_000_000;
+
+        blackhole.consumeCPU( result);
     }
 
     @Benchmark
-    public void measureSumViaForEachLoop(BenchmarkState state, Blackhole blackhole){
+    public void measureEvenSumViaForEachLoop(BenchmarkState state, Blackhole blackhole){
         int result = 0;
         for (int value : state.getIntegers()) {
-            result += value;
+            if( value % 2 == 0) {
+                result += value;
+            }
         }
+
+        assert result == -25_000_000;
+
         blackhole.consumeCPU(result);
     }
 
     @Benchmark
-    public void measureSumViaParallelStream(BenchmarkState state, Blackhole blackhole){
-        int result = IntStream.of(state.getIntegers())
-                .boxed()
+    public void measureEvenSumViaParallelStream(BenchmarkState state, Blackhole blackhole){
+        int result = state.getIntegers()
+                .stream()
+                .parallel()
+                .filter( x -> x % 2 == 0)
+                .mapToInt(x -> x.intValue())
+                .sum();
+
+        assert result == -25_000_000;
+
+        blackhole.consumeCPU(result);
+    }
+
+    @Benchmark
+    public void measuremEvenSumViaSequentialStream(BenchmarkState state, Blackhole blackhole){
+        int result = state.getIntegers()
+                .stream()
+                .filter( x -> x % 2 == 0)
+                .mapToInt(x -> x.intValue())
+                .sum();
+
+        assert result == -25_000_000;
+
+        blackhole.consumeCPU(result);
+    }
+
+    @Benchmark
+    public void measureTotalSumViaParallelStream(BenchmarkState state, Blackhole blackhole){
+        int result = state.getIntegers()
+                .stream()
                 .parallel()
                 .mapToInt(x -> x.intValue())
                 .sum();
 
+        assert result == -25_000_000;
+
         blackhole.consumeCPU(result);
     }
 
     @Benchmark
-    public void measuremSumViaSequentialStream(BenchmarkState state, Blackhole blackhole){
-        int result = IntStream.of(state.getIntegers())
-                .boxed()
+    public void measuremTotalSumViaSequentialStream(BenchmarkState state, Blackhole blackhole){
+        int result = state.getIntegers()
+                .stream()
                 .mapToInt(x -> x.intValue())
                 .sum();
+
+        assert result == -25_000_000;
 
         blackhole.consumeCPU(result);
     }
