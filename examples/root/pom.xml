@@ -13,7 +13,7 @@
         <module>native</module>
         <module>java-jni</module>
         <module>microbenchmark</module>
-        <module>poc-perf</module>
+        <module>poc-demo</module>
         <module>common</module>
         <module>poc-pattern</module>
     </modules>
