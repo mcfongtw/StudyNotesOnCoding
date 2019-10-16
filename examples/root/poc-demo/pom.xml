@@ -38,6 +38,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <name>Java Perf Poc</name>
 
+    <properties>
+        <dagger2.version>2.16</dagger2.version>
+        <mockito.version>2.23.4</mockito.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>javassist</groupId>
@@ -69,6 +74,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${dagger2.version}</version>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -91,11 +101,16 @@ THE POSSIBILITY OF SUCH DAMAGE.
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -103,8 +118,36 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.1</version>
                 <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${dagger2.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <!-- https://stackoverflow.com/questions/42257379/how-to-configure-lombok-with-maven-compiler-plugin -->
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${dagger2.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+
                     <compilerVersion>${javac.target}</compilerVersion>
                     <source>${javac.target}</source>
                     <target>${javac.target}</target>
