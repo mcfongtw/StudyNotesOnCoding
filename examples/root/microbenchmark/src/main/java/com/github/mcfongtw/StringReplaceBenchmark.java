@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5)
 @Fork(3)
 @Threads(1)
-public class StringReplaceBenchmark {
+public class StringReplaceBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
     public static class BenchmarkState extends SimpleBenchmarkLifecycle {

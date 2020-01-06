@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5)
 @Fork(3)
 @Threads(1)
-public class SystemTimeBenchmark {
+public class SystemTimeBenchmark extends BenchmarkBase {
 
     @State(Scope.Benchmark)
     public static class BenchmarkState extends SimpleBenchmarkLifecycle {
