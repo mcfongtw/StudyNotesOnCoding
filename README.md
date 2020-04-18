@@ -1,1 +1,1 @@
-Master branch: ![](https://travis-ci.org/mcfongtw/StudyNotesOnJavaPerformance.svg?branch=master))
+Master branch: ![](https://travis-ci.org/mcfongtw/StudyNotesOnJavaPerformance.svg?branch=master)
