@@ -47,7 +47,7 @@ public class CommonJavaConcurrentTest {
      * CountDownLatch is different because the count never resets.
      */
     @Test
-    public void testReusableCountDownLatch() {
+    public void testReusableCountDownLatch() throws InterruptedException {
         List<String> list = Lists.newArrayList();
         CountDownLatch countDownLatch = new CountDownLatch(7);
         ExecutorService es = Executors.newFixedThreadPool(20);
@@ -62,8 +62,13 @@ public class CommonJavaConcurrentTest {
             });
         }
         es.shutdown();
+        countDownLatch.await();
 
-        Assertions.assertTrue(list.size() <= 7);
+
+        System.out.println(list);
+        Assertions.assertTrue(list.size() == 7);
+
+        System.out.println(es);
     }
 
 
