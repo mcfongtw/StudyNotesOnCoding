@@ -9,13 +9,13 @@ The solution is through Docker + Vagrant
  * Vagrant can orchestrate Docker containers: run multiple containers concurrently and link them together
  * The * Container Host * (libcontainer / Docker module) still requires Linux kernel 3.8 or higher and x86_64 architecture. This bounds considerably the environments Docker can natively run on.
 
-![](./img/VagrantPlusDocker.jpg)
+![](img/VagrantPlusDocker.jpg)
 
 Therefore, using Docker + Vagrant, we could build a project being
 * Isolated: you don’t want to mess it up when testing some new tool or a different project.
 * Repeatable: the same environment should be consistently reproducible on every team member machine and on CI and production servers.
 
-![](./img/VagrantContainerHostBoxArch.png)
+![](img/VagrantContainerHostBoxArch.png)
  
 # Vagrantfile
 
@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 end
 ```
-![](./img/HierarchicalVagrantDockerLayout.png)
+![](img/HierarchicalVagrantDockerLayout.png)
 Please note that Vagrant boxes running on a Linux host would require to set **force_host_vm** to true for the VM box to spin up. Otherwise, VM box would not spin up and Docker container would take Linux Host as Container Host setup.  
 
 ### Ubuntu Perf Tools
