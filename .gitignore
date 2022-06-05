@@ -6,7 +6,12 @@
 *-result.json
 
 # target
-examples/root/microbenchmark/target
-examples/root/poc-*/target
+examples/java-*/target
+examples/perf-*/target
 
 hs_err_pid*.log
+.Rproj.user
+.Rhistory
+
+
+

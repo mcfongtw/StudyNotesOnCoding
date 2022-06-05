@@ -1,78 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2014, Oracle America, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
- * Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
- * Neither the name of Oracle nor the names of its contributors may be used
-   to endorse or promote products derived from this software without
-   specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDEVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>java.perf.example-root</artifactId>
+        <artifactId>notes.coding.examples</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <groupId>com.github.mcfongtw</groupId>
-    <artifactId>java.perf.microbenchmark</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>notes.java.microbenchmark</artifactId>
     <packaging>jar</packaging>
 
-    <name>Java Perf MicroBenchmark</name>
+    <name>Notes Java Perf MicroBenchmark</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
             <version>${jmh.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.kickstarter</groupId>
+            <artifactId>dropwizard-influxdb-reporter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.common</artifactId>
-            <version>${project.version}</version>
+            <artifactId>notes.java.common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.java-jni</artifactId>
-            <version>${project.version}</version>
+            <artifactId>notes.java.jni</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>${netty4.version}</version>
         </dependency>
         <!-- Compression Algorithm-->
         <dependency>
@@ -164,12 +149,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.4</version>		<!-- 1.5+ requires Java 7 -->
+            <version>1.4</version>        <!-- 1.5+ requires Java 7 -->
         </dependency>
         <dependency>
             <groupId>net.sf.flatpack</groupId>
             <artifactId>flatpack</artifactId>
-            <version>3.4.2</version>	<!-- 4.x+ requires Java 8 -->
+            <version>3.4.2</version>    <!-- 4.x+ requires Java 8 -->
         </dependency>
         <dependency>
             <groupId>net.sf.supercsv</groupId>
@@ -189,12 +174,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>com.espertech</groupId>
             <artifactId>esperio-csv</artifactId>
-            <version>5.5.0</version>	<!-- 6.x+ requires Java 8 -->
+            <version>5.5.0</version>    <!-- 6.x+ requires Java 8 -->
         </dependency>
         <dependency>
             <groupId>br.com.objectos</groupId>
             <artifactId>way-io</artifactId>
-            <version>1.25.0</version>	<!-- 2.x+ requires Java 7 -->
+            <version>1.25.0</version>    <!-- 2.x+ requires Java 7 -->
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -214,18 +199,15 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
-            <version>2.6.7</version>	<!-- 2.7+ requires Java 7 -->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.6.7</version>
         </dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -262,13 +244,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <fileSets>
                                 <fileSet>
                                     <sourceFile>
-                                        ../native/native-utility/target/java.perf.native-utility.so
+                                        ../native/native-utility/target/notes.native.utility.so
                                     </sourceFile>
                                     <destinationFile>target/classes/libnative-utility.so</destinationFile>
                                 </fileSet>
                                 <fileSet>
                                     <sourceFile>
-                                        ../native/native-jni/target/java.perf.native-jni.so
+                                        ../native/native-jni/target/notes.native.jni.so
                                     </sourceFile>
                                     <destinationFile>target/classes/libnative-jni.so</destinationFile>
                                 </fileSet>
@@ -292,7 +274,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>SystemTimeBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.SystemTimeBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -321,7 +304,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>CommonHashBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.CommonHashBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -350,7 +334,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>TryWithResourceBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.TryWithResourceBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -379,10 +364,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>SequentialReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.file.SequentialReplicationBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>influxdb.json</resource>
                                     <resource>${project.build.directory}/classes/libnative-utility.so</resource>
@@ -414,10 +401,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>ByteByByteReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.file.ByteByByteReplicationBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>influxdb.json</resource>
                                 </transformer>
@@ -447,10 +436,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>RandomAccessClassifierBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.file.RandomAccessClassifierBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>influxdb.json</resource>
                                 </transformer>
@@ -480,10 +471,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>FileReplicationBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.file.FileReplicationBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>influxdb.json</resource>
                                 </transformer>
@@ -513,10 +506,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>MemoryPagingBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.io.file.MemoryPagingBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>influxdb.json</resource>
                                 </transformer>
@@ -546,20 +541,25 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>HibernateOneToManyBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.spring.data.HibernateOneToManyBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>application.yml</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.factories</resource>
                                 </transformer>
                             </transformers>
@@ -588,20 +588,25 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>HibernateOneToOneBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.spring.data.HibernateOneToOneBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>application.yml</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.factories</resource>
                                 </transformer>
                             </transformers>
@@ -630,20 +635,25 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>HibernateManyToManyBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.spring.data.HibernateManyToManyBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>application.yml</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.factories</resource>
                                 </transformer>
                             </transformers>
@@ -672,20 +682,25 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>HibernateListVsSetBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.spring.data.HibernateListVsSetBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>application.yml</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.factories</resource>
                                 </transformer>
                             </transformers>
@@ -714,7 +729,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>ObjectReferenceBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.ObjectReferenceBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -743,7 +759,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>ByteBufBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.ByteBufBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -772,10 +789,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>JavaCompressionBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.JavaCompressionBenchmark</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                                     <resource>logback.xml</resource>
                                     <resource>corpus/urls.10K</resource>
                                     <resource>corpus/fireworks.jpeg</resource>
@@ -807,7 +826,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>StreamBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.StreamBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -836,7 +856,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>FibonacciBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.FibonacciBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -865,7 +886,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>RingBufferBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.RingBufferBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -894,7 +916,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>StringReplaceBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.StringReplaceBenchmark</mainClass>
                                 </transformer>
                             </transformers>
@@ -923,8 +946,10 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>LockBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.concurrency.contention.SimpleLockBenchmark</mainClass>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.mcfongtw.concurrency.contention.SimpleLockBenchmark
+                                    </mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
@@ -952,8 +977,10 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>RandomnessGeneratorBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.github.mcfongtw.concurrency.contention.RandomnessGeneratorBenchmark</mainClass>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.github.mcfongtw.concurrency.contention.RandomnessGeneratorBenchmark
+                                    </mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
@@ -981,7 +1008,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         <configuration>
                             <finalName>CSVParsingBenchmark-jmh-${jmh.version}</finalName>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.github.mcfongtw.CSVParsingBenchmark</mainClass>
                                 </transformer>
                             </transformers>

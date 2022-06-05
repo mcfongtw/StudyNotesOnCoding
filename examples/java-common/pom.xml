@@ -3,25 +3,32 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>java.perf.example-root</artifactId>
+        <artifactId>notes.coding.examples</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>java.design.pattern</artifactId>
     <groupId>com.github.mcfongtw</groupId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>notes.java.common</artifactId>
     <packaging>jar</packaging>
 
-    <name>Java Design Pattern Poc</name>
+    <name>Notes Java Common</name>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -38,42 +45,6 @@
                     <target>${javac.target}</target>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-shade-plugin</artifactId>-->
-                <!--<version>2.2</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>CpuLockDownDemo</id>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>shade</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<finalName>CpuLockDownDemo</finalName>-->
-                            <!--<transformers>-->
-                                <!--<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-                                    <!--<mainClass>com.github.mcfongtw.scaling.CpuLockDownDemo</mainClass>-->
-                                <!--</transformer>-->
-                            <!--</transformers>-->
-                            <!--<filters>-->
-                                <!--<filter>-->
-                                    <!--&lt;!&ndash;-->
-                                        <!--Shading signed JARs will fail without this.-->
-                                        <!--http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar-->
-                                    <!--&ndash;&gt;-->
-                                    <!--<artifact>*:*</artifact>-->
-                                    <!--<excludes>-->
-                                        <!--<exclude>META-INF/*.SF</exclude>-->
-                                        <!--<exclude>META-INF/*.DSA</exclude>-->
-                                        <!--<exclude>META-INF/*.RSA</exclude>-->
-                                    <!--</excludes>-->
-                                <!--</filter>-->
-                            <!--</filters>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
@@ -84,13 +55,9 @@
                         <version>1.1.0</version>
                     </dependency>
                 </dependencies>
+                <!--https://issues.apache.org/jira/browse/SUREFIRE-1588-->
                 <configuration>
-                    <!--https://issues.apache.org/jira/browse/SUREFIRE-1588-->
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <!--https://stackoverflow.com/questions/9583292/how-can-i-append-to-the-system-path-for-maven-surefire-tests-that-use-dlls-->
-                    <environmentVariables>
-                        <LD_LIBRARY_PATH>${basedir}/target/classes</LD_LIBRARY_PATH>
-                    </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>
