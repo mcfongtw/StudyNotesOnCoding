@@ -5,15 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>notes.coding.parent</artifactId>
+        <artifactId>notes.coding.root</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <groupId>com.github.mcfongtw</groupId>
-    <artifactId>java.perf.example-root</artifactId>
+    <artifactId>notes.coding.examples</artifactId>
     <packaging>pom</packaging>
-    <version>0.1-SNAPSHOT</version>
+
+    <name>Notes Example POM</name>
 
     <modules>
         <module>native</module>

@@ -3,18 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>java.perf.example-root</artifactId>
+        <artifactId>notes.coding.examples</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>java.design.pattern</artifactId>
+    <artifactId>notes.java.pattern</artifactId>
     <groupId>com.github.mcfongtw</groupId>
-    <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Java Design Pattern Poc</name>
+    <name>Notes Java Design Pattern</name>
 
     <dependencies>
         <!-- Testing -->

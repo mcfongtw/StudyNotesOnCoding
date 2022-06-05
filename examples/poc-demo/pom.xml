@@ -1,42 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2014, Oracle America, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
- * Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
- * Neither the name of Oracle nor the names of its contributors may be used
-   to endorse or promote products derived from this software without
-   specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDEVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>java.perf.example-root</artifactId>
+        <artifactId>notes.coding.examples</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <groupId>com.github.mcfongtw</groupId>
-    <artifactId>java.demo.poc</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>notes.java.demo</artifactId>
     <packaging>jar</packaging>
 
-    <name>Java Perf Poc</name>
+    <name>Notes Perf Demo</name>
 
     <properties>
         <dagger2.version>2.16</dagger2.version>
@@ -51,12 +26,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
         </dependency>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.common</artifactId>
+            <artifactId>notes.java.common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
-            <artifactId>java.perf.java-jni</artifactId>
+            <artifactId>notes.java.jni</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -169,7 +144,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                             <fileSets>
                                 <fileSet>
                                     <sourceFile>
-                                        ../native/native-utility/target/java.perf.native-utility.so
+                                        ../native/native-utility/target/notes.native.utility.so
                                     </sourceFile>
                                     <destinationFile>target/classes/libnative-utility.so</destinationFile>
                                 </fileSet>

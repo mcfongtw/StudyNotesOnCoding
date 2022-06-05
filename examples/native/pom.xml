@@ -8,17 +8,16 @@
         <module>native-jni</module>
     </modules>
     <parent>
-        <artifactId>java.perf.example-root</artifactId>
+        <artifactId>notes.coding.examples</artifactId>
         <groupId>com.github.mcfongtw</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <groupId>com.github.mcfongtw</groupId>
-    <artifactId>java.perf.native</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>notes.native</artifactId>
     <packaging>pom</packaging>
 
-    <name>Java Perf Native</name>
+    <name>Notes Native POM</name>
 
     <profiles>
         <profile>

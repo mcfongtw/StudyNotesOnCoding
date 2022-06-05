@@ -6,16 +6,15 @@
 
     <parent>
         <groupId>com.github.mcfongtw</groupId>
-        <artifactId>java.perf.example-root</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <artifactId>notes.coding.examples</artifactId>
+        <version>${revision}</version>
     </parent>
 
     <groupId>com.github.mcfongtw</groupId>
-    <artifactId>java.perf.java-jni</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <artifactId>notes.java.jni</artifactId>
     <packaging>jar</packaging>
 
-    <name>Java Perf Java-JNI</name>
+    <name>Notes JNI Java</name>
 
     <dependencies>
         <!-- Testing -->
@@ -55,7 +54,7 @@
                             <fileSets>
                                 <fileSet>
                                     <sourceFile>
-                                        ../native/native-utility/target/java.perf.native-utility.so
+                                        ../native/native-utility/target/notes.native.utility.so
                                     </sourceFile>
                                     <destinationFile>target/classes/libnative-utility.so</destinationFile>
                                 </fileSet>
