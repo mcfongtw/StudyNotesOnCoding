@@ -7,7 +7,7 @@
 
 # target
 examples/java-*/target
-examples/poc-*/target
+examples/perf-*/target
 
 hs_err_pid*.log
 .Rproj.user
