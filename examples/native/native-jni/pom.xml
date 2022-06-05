@@ -20,7 +20,6 @@
         <dependency>
             <groupId>com.github.mcfongtw</groupId>
             <artifactId>notes.java.jni</artifactId>
-            <version>${project.version}</version>
             <!-- trigger java-jni to compile java code -->
             <scope>compile</scope>
         </dependency>

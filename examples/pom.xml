@@ -44,9 +44,9 @@
         <guava.version>23.0</guava.version>
         <commons.io.version>2.6</commons.io.version>
         <awaitibility.version>3.1.1</awaitibility.version>
+        <mockito.version>2.23.4</mockito.version>
         <junit.version>5.2.0</junit.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.2.3</logback.version>
         <iodropwizard.metrics.version>4.0.3</iodropwizard.metrics.version>
         <iodropwizard-influxdb-reporter.version>1.1.0</iodropwizard-influxdb-reporter.version>
         <netty4.version>4.1.42.Final</netty4.version>
@@ -55,58 +55,107 @@
         <h2.version>1.4.197</h2.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>${jmh.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>${iodropwizard.metrics.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>${netty4.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.kickstarter</groupId>
-            <artifactId>dropwizard-influxdb-reporter</artifactId>
-            <version>${iodropwizard-influxdb-reporter.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.dropwizard.metrics</groupId>
-                    <artifactId>metrics-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Artifacts from Notes project -->
+            <dependency>
+                <groupId>com.github.mcfongtw</groupId>
+                <artifactId>notes.java.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mcfongtw</groupId>
+                <artifactId>notes.java.jni</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mcfongtw</groupId>
+                <artifactId>notes.native.jni</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mcfongtw</groupId>
+                <artifactId>notes.native.utility</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Third party artifacts -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${iodropwizard.metrics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kickstarter</groupId>
+                <artifactId>dropwizard-influxdb-reporter</artifactId>
+                <version>${iodropwizard-influxdb-reporter.version}</version>
+            </dependency>
 
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitibility.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility-proxy</artifactId>
+                <version>${awaitibility.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
