@@ -1,4 +1,0 @@
-# vagrant build
-.vagrant/
-*.log
-*.svg

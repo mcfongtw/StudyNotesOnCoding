@@ -19,10 +19,10 @@
     <modules>
         <module>native</module>
         <module>java-jni</module>
-        <module>microbenchmark</module>
-        <module>poc-demo</module>
-        <module>common</module>
-        <module>poc-pattern</module>
+        <module>java-microbenchmark</module>
+        <module>perf-demo</module>
+        <module>java-common</module>
+        <module>java-pattern</module>
     </modules>
 
     <properties>

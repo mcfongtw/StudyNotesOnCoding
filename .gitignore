@@ -6,7 +6,7 @@
 *-result.json
 
 # target
-examples/microbenchmark/target
+examples/java-*/target
 examples/poc-*/target
 
 hs_err_pid*.log
