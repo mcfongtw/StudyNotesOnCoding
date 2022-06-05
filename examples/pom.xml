@@ -53,6 +53,7 @@
         <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
         <lombok.version>1.18.4</lombok.version>
         <h2.version>1.4.197</h2.version>
+        <jackson.version>2.6.7</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +80,16 @@
                 <version>${project.version}</version>
             </dependency>
             <!-- Third party artifacts -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-csv</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
